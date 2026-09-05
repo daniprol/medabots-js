@@ -22,9 +22,9 @@ export class RosterPreview {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.domElement.setAttribute('aria-label', 'Selected Medabot 3D preview');
     container.append(this.renderer.domElement);
-    this.scene.add(new THREE.HemisphereLight('#eafaff', '#6b7da3', 2.3));
-    const sun = new THREE.DirectionalLight('#fff3d3', 2.5);
-    sun.position.set(-3, 6, 8);
+    this.scene.add(new THREE.HemisphereLight('#eafaff', '#7388ae', 0.75));
+    const sun = new THREE.DirectionalLight('#fff4e1', 2.3);
+    sun.position.set(-4, 6, 5);
     this.scene.add(sun);
     this.camera.position.set(0, 2.7, 8);
     this.camera.lookAt(0, 1.65, 0);
@@ -35,8 +35,22 @@ export class RosterPreview {
     this.resize();
     const render = (now: number) => {
       const t = (now - this.started) / 1000;
-      this.character.model.root.rotation.y = 0.32 + Math.sin(t * 0.65) * 0.1;
-      this.character.model.root.position.y = Math.sin(t * 2) * 0.028;
+      this.character.model.root.rotation.y = 0.66 + Math.sin(t * 0.65) * 0.1;
+      const m = this.character.model;
+      m.root.position.y = Math.sin(t * 2) * 0.012;
+      m.head.rotation.y = -0.15;
+      m.leftArm.rotation.set(0.2, -0.16, -0.08);
+      m.rightArm.rotation.set(-0.08, 0.32, 0.12);
+      if (m.rig)
+        for (const [i, hip] of m.feet.entries()) {
+          hip.rotation.z = i === 0 ? 0.13 : -0.1;
+          hip.rotation.x = i === 0 ? 0.08 : -0.18;
+          m.rig.knees[i]!.rotation.x = i === 0 ? 0.12 : 0.28;
+          m.rig.innerLegs[i]!.quaternion.copy(hip.quaternion);
+          m.rig.innerKnees[i]!.quaternion.copy(m.rig.knees[i]!.quaternion);
+        }
+      for (const [i, arm] of [m.leftArm, m.rightArm].entries())
+        m.rig?.innerArms[i]?.quaternion.copy(arm.quaternion);
       this.renderer.render(this.scene, this.camera);
       this.raf = requestAnimationFrame(render);
     };
@@ -46,7 +60,7 @@ export class RosterPreview {
     const w = this.container.clientWidth,
       h = this.container.clientHeight;
     this.renderer.setSize(w, h);
-    const halfHeight = Math.max(2.1, (1.4 * h) / Math.max(w, 1));
+    const halfHeight = Math.max(1.85, (1.4 * h) / Math.max(w, 1));
     const halfWidth = (halfHeight * w) / Math.max(h, 1);
     this.camera.top = halfHeight;
     this.camera.bottom = -halfHeight;
@@ -62,9 +76,9 @@ export class RosterPreview {
   }
   portraits() {
     const results: Record<string, string> = {};
-    const camera = new THREE.OrthographicCamera(-0.9, 0.9, 1.06, -1.06, 0.1, 20);
+    const camera = new THREE.OrthographicCamera(-1.05, 1.05, 1.24, -1.24, 0.1, 20);
     camera.position.set(0, 2.25, 8);
-    camera.lookAt(0, 1.85, 0);
+    camera.lookAt(0, 2.04, 0);
     for (const def of Object.values(this.content.characters)) {
       let png = portraits.get(def);
       if (!png) {

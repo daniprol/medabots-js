@@ -33,6 +33,20 @@ test('setup discovers controls and the default roster enters the arena without c
   await expect
     .poll(() => page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.tick))
     .toBeGreaterThan(10);
+  // Regress a negative first-frame delta that inverted the camera after slow WebGL initialization.
+  const labels = await page.getByTestId(/^combatant-label-/).evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const box = node.getBoundingClientRect();
+      return { x: box.x, y: box.y, right: box.right, bottom: box.bottom };
+    }),
+  );
+  expect(labels).toHaveLength(4);
+  for (const label of labels) {
+    expect(label.x).toBeGreaterThanOrEqual(0);
+    expect(label.y).toBeGreaterThanOrEqual(0);
+    expect(label.right).toBeLessThanOrEqual(1440);
+    expect(label.bottom).toBeLessThanOrEqual(900);
+  }
   expect(errors).toEqual([]);
 });
 test('three profiles assign without conflicts; two keyboards move and attack independently; blur pauses', async ({

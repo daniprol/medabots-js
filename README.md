@@ -95,6 +95,10 @@ TypeBox in `src/content/schemas.ts` is the source for content types, runtime val
 
 Author feet at Y=0, face +Z, and size the body to the JSONC collider (the initial robots’ bodies are about 2.4 world units tall, excluding horns). Give each destructible armor section the configured node name; keep the exposed frame separate. `GLTFLoader` resolves those nodes and controls visibility from snapshots. Missing nodes produce a useful console error and retain the procedural fallback. The loader does not change collision or battle rules. No proprietary sprites, ROM data, audio, or models are included; `graphics_reference.png` is only the supplied design reference.
 
+**Character art:** the four procedural models use individually drawn, beveled armor profiles and tapered shells, recessed eyes, hollow barrels, and segmented hands/feet. `src/render/models/armor.ts` contains the small geometry helpers and bare joint frame; each character file owns its external silhouette. Hip/knee and shoulder poses animate from snapshots, including the exposed inner frame after destruction. Rigid geometry is batched by material while the damage groups and joint pivots remain separate. Toon materials use a nearest-filtered four-band gradient and simple back-face outlines. The orthographic camera gently tightens around active fighters while retaining room for jumps and the HUD.
+
+See [character art research](docs/character-art-research.md) for licensed visual references and the deliberate differences in the supplied target (including its Arcbeetle/Warbandit naming). Reference photographs are not bundled assets. To inspect the current roster and battle, run `pnpm exec tsx scripts/inspect-characters.ts` with the dev server running; captures go into ignored `.artifacts/`.
+
 **Add an arena:** add an arena JSONC with four spawns and uniquely named horizontal platforms. The industrial renderer builds those platforms from data. Keep jumps reachable: approximate apex is `jumpSpeed² / (2 × gravity)`. The main floor belongs at Y=0. AI navigation intentionally uses straightforward chasing, jumping, and dropping.
 
 ## How the game is organized

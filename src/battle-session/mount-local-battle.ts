@@ -58,7 +58,7 @@ export function mountLocalBattle(options: MountBattleOptions) {
     result: ReturnType<typeof resultOverlay> | undefined,
     completed = false,
     raf = 0,
-    last = performance.now(),
+    last: number | undefined,
     resultDelay = 0,
     disposed = false,
     lastHudTick = -1,
@@ -66,7 +66,8 @@ export function mountLocalBattle(options: MountBattleOptions) {
   const toSetup = () => options.onReturnToSetup?.();
   function animate(now: number) {
     if (disposed) return;
-    const delta = Math.min((now - last) / 1000, 0.1);
+    // Start from the first RAF timestamp: a slow mount can finish after its queued frame timestamp.
+    const delta = last === undefined ? 0 : Math.max(0, Math.min((now - last) / 1000, 0.1));
     last = now;
     session.advance(delta);
     const events = session.drainEvents();

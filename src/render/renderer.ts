@@ -19,6 +19,7 @@ export class BattleRenderer {
   private height = 1;
   private worldWidth: number;
   private time = 0;
+  private focusX = 0;
   private shotGeometry = new THREE.SphereGeometry(1, 10, 6);
   private labels = new Map<string, HTMLElement>();
   private rings = new Map<string, THREE.Mesh>();
@@ -52,8 +53,8 @@ export class BattleRenderer {
     this.container.append(this.renderer.domElement);
     this.camera.position.set(0, 10.1, 42);
     this.camera.lookAt(0, 6.1, 0);
-    this.scene.add(new THREE.HemisphereLight('#eefaff', '#697998', 1.8));
-    const sun = new THREE.DirectionalLight('#fff5d5', 2.2);
+    this.scene.add(new THREE.HemisphereLight('#eefaff', '#6b7fa3', 0.7));
+    const sun = new THREE.DirectionalLight('#fff2d9', 2.1);
     sun.position.set(-10, 20, 16);
     sun.castShadow = false;
     sun.shadow.mapSize.set(2048, 2048);
@@ -63,7 +64,7 @@ export class BattleRenderer {
     sun.shadow.camera.bottom = -10;
     sun.shadow.normalBias = 0.035;
     this.scene.add(sun);
-    const rim = new THREE.DirectionalLight('#7bddff', 1.4);
+    const rim = new THREE.DirectionalLight('#7bddff', 0.55);
     rim.position.set(5, 8, -7);
     this.scene.add(rim);
     this.arena = createArena(content.arenas[snapshot.arenaId]!);
@@ -74,6 +75,7 @@ export class BattleRenderer {
       this.views.set(c.id, view);
       this.scene.add(view.root);
       const label = document.createElement('div');
+      label.dataset.testid = `combatant-label-${c.id}`;
       label.className = `robot-label ${c.teamId === snapshot.combatants[0]!.teamId ? 'cyan' : 'coral'}`;
       label.textContent = `${c.role === 'leader' ? '◆ ' : ''}${c.id}${humans.includes(c.id) ? ' · YOU' : ''}`;
       this.container.append(label);
@@ -115,10 +117,12 @@ export class BattleRenderer {
     dt: number,
     events: BattleEvent[] = [],
   ) {
+    dt = THREE.MathUtils.clamp(dt, 0, 0.1);
     this.time += dt;
     this.effects.emit(events);
     const freeze = this.effects.freezeSeconds > 0;
     this.effects.update(dt);
+    this.frameAction(current, dt);
     const blend = THREE.MathUtils.clamp(alpha, 0, 1);
     const animationDt = this.effects.finalSlowSeconds > 0 ? dt * 0.22 : dt;
     const placedLabels: { x: number; y: number }[] = [];
@@ -188,25 +192,49 @@ export class BattleRenderer {
     }
     const focus = current.combatants.reduce((n, c) => n + c.x, 0) / 4;
     this.arena.distant.position.x = -focus * 0.035;
-    const shake = this.effects.shake;
-    this.camera.position.x = Math.sin(this.time * 117) * shake;
-    this.camera.position.y = 10.1 + Math.cos(this.time * 91) * shake;
+
     this.renderer.render(this.scene, this.camera);
+  }
+  /** Keep the floor anchored and fit all active robots, with a modest close-up during a clustered fight. */
+  private frameAction(snapshot: BattleSnapshot, dt: number) {
+    const actors = snapshot.combatants.filter((c) => !c.knockedOut);
+    if (!actors.length) return;
+    const left = Math.min(...actors.map((c) => c.x)),
+      right = Math.max(...actors.map((c) => c.x));
+    const top = Math.max(...actors.map((c) => c.y + 3.6));
+    const worldWidth = this.camera.right - this.camera.left;
+    const widthFit = worldWidth / Math.max(1, right - left + 4);
+    const heightFit =
+      (((this.height - Math.min(185, this.height * 0.25)) / (top + 1.0)) * worldWidth) / this.width;
+    const targetZoom = THREE.MathUtils.clamp(Math.min(widthFit, heightFit), 0.72, 1.32);
+    this.camera.zoom = THREE.MathUtils.damp(this.camera.zoom, targetZoom, 3.5, dt);
+    const arenaHalf = this.content.arenas[snapshot.arenaId]!.width / 2;
+    const allowedPan = Math.max(0, arenaHalf - worldWidth / (2 * this.camera.zoom));
+    const center = THREE.MathUtils.clamp((left + right) / 2, -allowedPan, allowedPan);
+    this.focusX = THREE.MathUtils.damp(this.focusX, center, 3.5, dt);
+    const centerY = (this.camera.top - this.camera.bottom) / (2 * this.camera.zoom) - 1.0;
+    const shake = this.effects.shake;
+    const x = this.focusX + Math.sin(this.time * 117) * shake;
+    const y = centerY + Math.cos(this.time * 91) * shake;
+    this.camera.position.set(x, y + 4, 42);
+    this.camera.lookAt(x, y, 0);
+    this.camera.updateProjectionMatrix();
+    this.camera.updateMatrixWorld();
   }
   portrait(characterId: string): string {
     const cached = portraitCache.get(this.content.characters[characterId]!);
     if (cached) return cached;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#142b42');
-    const light = new THREE.DirectionalLight('#fff3d5', 3);
+    const light = new THREE.DirectionalLight('#fff3d5', 1.8);
     light.position.set(-3, 5, 8);
-    scene.add(light, new THREE.HemisphereLight('#e3f6ff', '#63829b', 3));
+    scene.add(light, new THREE.HemisphereLight('#e3f6ff', '#63829b', 0.9));
     const view = new CharacterView(this.content.characters[characterId]!);
     view.model.root.rotation.y = -0.32;
     scene.add(view.root);
-    const camera = new THREE.OrthographicCamera(-0.95, 0.95, 1.12, -1.12, 0.1, 20);
+    const camera = new THREE.OrthographicCamera(-1.02, 1.02, 1.21, -1.21, 0.1, 20);
     camera.position.set(0, 2.15, 8);
-    camera.lookAt(0, 1.8, 0);
+    camera.lookAt(0, 2.0, 0);
     const size = this.renderer.getSize(new THREE.Vector2());
     this.renderer.setSize(160, 190, false);
     this.renderer.render(scene, camera);
