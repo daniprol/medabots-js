@@ -1,0 +1,27 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/ability.schema.json",
+  "id": "warbandit-medaforce",
+  "kind": "ability",
+  "displayName": "CRIMSON LANCE",
+  "abilityKind": "special",
+  "delivery": "melee",
+  "startupMs": 320,
+  "activeMs": 230,
+  "recoveryMs": 520,
+  "damage": 65,
+  "staggerMs": 350,
+  "knockbackX": 10,
+  "knockbackY": 6,
+  "projectileSpeed": 28,
+  "projectileLifetimeMs": 1500,
+  "hitbox": {
+    "x": 1.4,
+    "y": 1.55,
+    "width": 5.5,
+    "height": 2.3
+  },
+  "specialCost": 100,
+  "maxUses": 0,
+  "color": "#ff8844"
+}

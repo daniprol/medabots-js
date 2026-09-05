@@ -1,0 +1,13 @@
+// Movement in world units / second. Jump reaches the upper gantries.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "warbandit-legs",
+  "kind": "part",
+  "slot": "legs",
+  "armor": 130,
+  "movement": {
+    "speed": 8,
+    "jumpSpeed": 17.6,
+    "dashSpeed": 19
+  }
+}

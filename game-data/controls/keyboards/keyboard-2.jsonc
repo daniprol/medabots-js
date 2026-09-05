@@ -1,0 +1,45 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../schemas/keyboard.schema.json",
+  "id": "keyboard-2",
+  "kind": "keyboard",
+  "displayName": "Keyboard 2 \u00b7 Arrows + numpad",
+  "bindings": {
+    "moveLeft": [
+      "ArrowLeft"
+    ],
+    "moveRight": [
+      "ArrowRight"
+    ],
+    "jump": [
+      "ArrowUp"
+    ],
+    "dropThroughPlatform": [
+      "ArrowDown"
+    ],
+    "rightArm": [
+      "Numpad1"
+    ],
+    "leftArm": [
+      "Numpad2"
+    ],
+    "head": [
+      "Numpad3"
+    ],
+    "guard": [
+      "Numpad0"
+    ],
+    "chargeSpecial": [
+      "Numpad4"
+    ],
+    "activateSpecial": [
+      "Numpad5"
+    ],
+    "partnerStrategy": [
+      "Numpad6"
+    ],
+    "pause": [
+      "NumpadEnter"
+    ]
+  }
+}

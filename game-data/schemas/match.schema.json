@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots match definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "seed",
+    "arenaId",
+    "rulesId",
+    "teams"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "match",
+      "type": "string"
+    },
+    "seed": {
+      "minimum": 0,
+      "maximum": 4294967295,
+      "type": "integer"
+    },
+    "arenaId": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "rulesId": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "teams": {
+      "minItems": 2,
+      "maxItems": 2,
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "combatants"
+        ],
+        "properties": {
+          "id": {
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "type": "string",
+            "description": "Globally unique, stable kebab-case content identifier."
+          },
+          "combatants": {
+            "minItems": 2,
+            "maxItems": 2,
+            "type": "array",
+            "items": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "instanceId",
+                "characterId",
+                "role"
+              ],
+              "properties": {
+                "instanceId": {
+                  "pattern": "^[AB][12]$",
+                  "type": "string"
+                },
+                "characterId": {
+                  "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                  "type": "string",
+                  "description": "Globally unique, stable kebab-case content identifier."
+                },
+                "role": {
+                  "anyOf": [
+                    {
+                      "const": "leader",
+                      "type": "string"
+                    },
+                    {
+                      "const": "partner",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "loadout": {
+                  "additionalProperties": false,
+                  "type": "object",
+                  "required": [
+                    "head",
+                    "leftArm",
+                    "rightArm",
+                    "legs"
+                  ],
+                  "properties": {
+                    "head": {
+                      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                      "type": "string",
+                      "description": "Globally unique, stable kebab-case content identifier."
+                    },
+                    "leftArm": {
+                      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                      "type": "string",
+                      "description": "Globally unique, stable kebab-case content identifier."
+                    },
+                    "rightArm": {
+                      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                      "type": "string",
+                      "description": "Globally unique, stable kebab-case content identifier."
+                    },
+                    "legs": {
+                      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                      "type": "string",
+                      "description": "Globally unique, stable kebab-case content identifier."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

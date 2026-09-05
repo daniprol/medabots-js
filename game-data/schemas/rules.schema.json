@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots rules definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "tickRate",
+    "roundTimeMs",
+    "gravity",
+    "acceleration",
+    "friction",
+    "doubleTapMs",
+    "dashDurationMs",
+    "dashCooldownMs",
+    "dropThroughMs",
+    "guardDamageMultiplier",
+    "guardKnockbackMultiplier",
+    "brokenLegSpeedMultiplier",
+    "brokenLegJumpMultiplier",
+    "brokenLegDashMultiplier",
+    "specialMaximum",
+    "chargePerSecond",
+    "meterPerDamageDealt",
+    "meterPerDamageReceived"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "rules",
+      "type": "string"
+    },
+    "tickRate": {
+      "const": 60,
+      "type": "number"
+    },
+    "roundTimeMs": {
+      "minimum": 100,
+      "maximum": 600000,
+      "type": "integer",
+      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
+    },
+    "gravity": {
+      "minimum": 1,
+      "maximum": 100,
+      "type": "number"
+    },
+    "acceleration": {
+      "minimum": 1,
+      "maximum": 200,
+      "type": "number"
+    },
+    "friction": {
+      "minimum": 1,
+      "maximum": 200,
+      "type": "number"
+    },
+    "doubleTapMs": {
+      "minimum": 1,
+      "maximum": 1000,
+      "type": "integer",
+      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
+    },
+    "dashDurationMs": {
+      "minimum": 1,
+      "maximum": 1000,
+      "type": "integer",
+      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
+    },
+    "dashCooldownMs": {
+      "minimum": 1,
+      "maximum": 5000,
+      "type": "integer",
+      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
+    },
+    "dropThroughMs": {
+      "minimum": 1,
+      "maximum": 2000,
+      "type": "integer",
+      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
+    },
+    "guardDamageMultiplier": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number",
+      "description": "Fraction of incoming damage retained while guarding (0–1)."
+    },
+    "guardKnockbackMultiplier": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number",
+      "description": "Fraction of knockback retained while guarding (0–1)."
+    },
+    "brokenLegSpeedMultiplier": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "brokenLegJumpMultiplier": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "brokenLegDashMultiplier": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "specialMaximum": {
+      "minimum": 1,
+      "maximum": 1000,
+      "type": "number"
+    },
+    "chargePerSecond": {
+      "minimum": 0.1,
+      "maximum": 1000,
+      "type": "number"
+    },
+    "meterPerDamageDealt": {
+      "minimum": 0,
+      "maximum": 10,
+      "type": "number"
+    },
+    "meterPerDamageReceived": {
+      "minimum": 0,
+      "maximum": 10,
+      "type": "number"
+    }
+  }
+}

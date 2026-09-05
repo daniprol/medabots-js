@@ -1,0 +1,13 @@
+// Movement in world units / second. Jump reaches the upper gantries.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "rokusho-legs",
+  "kind": "part",
+  "slot": "legs",
+  "armor": 130,
+  "movement": {
+    "speed": 8.9,
+    "jumpSpeed": 18.2,
+    "dashSpeed": 21
+  }
+}

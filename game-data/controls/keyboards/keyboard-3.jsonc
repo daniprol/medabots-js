@@ -1,0 +1,45 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../schemas/keyboard.schema.json",
+  "id": "keyboard-3",
+  "kind": "keyboard",
+  "displayName": "Keyboard 3 \u00b7 TFGH",
+  "bindings": {
+    "moveLeft": [
+      "KeyF"
+    ],
+    "moveRight": [
+      "KeyH"
+    ],
+    "jump": [
+      "KeyT"
+    ],
+    "dropThroughPlatform": [
+      "KeyG"
+    ],
+    "rightArm": [
+      "KeyV"
+    ],
+    "leftArm": [
+      "KeyB"
+    ],
+    "head": [
+      "KeyN"
+    ],
+    "guard": [
+      "KeyR"
+    ],
+    "chargeSpecial": [
+      "KeyC"
+    ],
+    "activateSpecial": [
+      "KeyM"
+    ],
+    "partnerStrategy": [
+      "Comma"
+    ],
+    "pause": [
+      "Backspace"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "rokusho-right-arm",
+  "kind": "part",
+  "slot": "rightArm",
+  "armor": 100,
+  "abilityId": "rokusho-right-arm-attack"
+}

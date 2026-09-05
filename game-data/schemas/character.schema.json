@@ -1,0 +1,332 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots character definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "displayName",
+    "tagline",
+    "visual",
+    "collider",
+    "hitRegions",
+    "defaultLoadout",
+    "specialAbilityId"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "character",
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "visual": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "type",
+            "model",
+            "color",
+            "accent"
+          ],
+          "properties": {
+            "type": {
+              "const": "procedural",
+              "type": "string"
+            },
+            "model": {
+              "anyOf": [
+                {
+                  "const": "metabee",
+                  "type": "string"
+                },
+                {
+                  "const": "rokusho",
+                  "type": "string"
+                },
+                {
+                  "const": "arcbeetle",
+                  "type": "string"
+                },
+                {
+                  "const": "warbandit",
+                  "type": "string"
+                }
+              ]
+            },
+            "color": {
+              "type": "string"
+            },
+            "accent": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "type",
+            "url",
+            "nodes"
+          ],
+          "properties": {
+            "type": {
+              "const": "gltf",
+              "type": "string"
+            },
+            "url": {
+              "pattern": "^/assets/.+.glb$",
+              "type": "string"
+            },
+            "nodes": {
+              "additionalProperties": false,
+              "type": "object",
+              "required": [
+                "head",
+                "leftArm",
+                "rightArm",
+                "legs",
+                "innerFrame"
+              ],
+              "properties": {
+                "head": {
+                  "type": "string"
+                },
+                "leftArm": {
+                  "type": "string"
+                },
+                "rightArm": {
+                  "type": "string"
+                },
+                "legs": {
+                  "type": "string"
+                },
+                "innerFrame": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "collider": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "minimum": 0.1,
+          "maximum": 5,
+          "type": "number"
+        },
+        "height": {
+          "minimum": 0.1,
+          "maximum": 8,
+          "type": "number"
+        }
+      }
+    },
+    "hitRegions": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "head",
+        "leftArm",
+        "rightArm",
+        "legs"
+      ],
+      "properties": {
+        "head": {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "properties": {
+            "x": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "y": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "width": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            },
+            "height": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            }
+          },
+          "description": "Local center, width and height in world units; X mirrors with facing."
+        },
+        "leftArm": {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "properties": {
+            "x": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "y": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "width": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            },
+            "height": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            }
+          },
+          "description": "Local center, width and height in world units; X mirrors with facing."
+        },
+        "rightArm": {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "properties": {
+            "x": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "y": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "width": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            },
+            "height": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            }
+          },
+          "description": "Local center, width and height in world units; X mirrors with facing."
+        },
+        "legs": {
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "properties": {
+            "x": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "y": {
+              "minimum": -10,
+              "maximum": 10,
+              "type": "number"
+            },
+            "width": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            },
+            "height": {
+              "minimum": 0.01,
+              "maximum": 10,
+              "type": "number"
+            }
+          },
+          "description": "Local center, width and height in world units; X mirrors with facing."
+        }
+      },
+      "description": "Independent local armor rectangles. Feet are at Y=0."
+    },
+    "defaultLoadout": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "head",
+        "leftArm",
+        "rightArm",
+        "legs"
+      ],
+      "properties": {
+        "head": {
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "type": "string",
+          "description": "Globally unique, stable kebab-case content identifier."
+        },
+        "leftArm": {
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "type": "string",
+          "description": "Globally unique, stable kebab-case content identifier."
+        },
+        "rightArm": {
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "type": "string",
+          "description": "Globally unique, stable kebab-case content identifier."
+        },
+        "legs": {
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "type": "string",
+          "description": "Globally unique, stable kebab-case content identifier."
+        }
+      }
+    },
+    "specialAbilityId": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    }
+  }
+}

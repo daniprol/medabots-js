@@ -1,0 +1,41 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../schemas/match.schema.json",
+  "id": "local-default",
+  "kind": "match",
+  "seed": 42819,
+  "arenaId": "industrial-arena",
+  "rulesId": "battle-rules",
+  "teams": [
+    {
+      "id": "team-a",
+      "combatants": [
+        {
+          "instanceId": "A1",
+          "characterId": "metabee",
+          "role": "leader"
+        },
+        {
+          "instanceId": "A2",
+          "characterId": "arcbeetle",
+          "role": "partner"
+        }
+      ]
+    },
+    {
+      "id": "team-b",
+      "combatants": [
+        {
+          "instanceId": "B1",
+          "characterId": "rokusho",
+          "role": "leader"
+        },
+        {
+          "instanceId": "B2",
+          "characterId": "warbandit",
+          "role": "partner"
+        }
+      ]
+    }
+  ]
+}

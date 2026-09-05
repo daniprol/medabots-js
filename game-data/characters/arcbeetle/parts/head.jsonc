@@ -1,0 +1,9 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "arcbeetle-head",
+  "kind": "part",
+  "slot": "head",
+  "armor": 175,
+  "abilityId": "arcbeetle-head-attack"
+}

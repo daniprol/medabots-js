@@ -1,0 +1,27 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/ability.schema.json",
+  "id": "warbandit-left-arm-attack",
+  "kind": "ability",
+  "displayName": "Low strike",
+  "abilityKind": "melee",
+  "delivery": "melee",
+  "startupMs": 100,
+  "activeMs": 120,
+  "recoveryMs": 240,
+  "damage": 22,
+  "staggerMs": 100,
+  "knockbackX": 4,
+  "knockbackY": 2,
+  "projectileSpeed": 23,
+  "projectileLifetimeMs": 1300,
+  "hitbox": {
+    "x": 1.15,
+    "y": 0.7,
+    "width": 2.6,
+    "height": 0.7
+  },
+  "specialCost": 0,
+  "maxUses": 0,
+  "color": "#ffdf65"
+}

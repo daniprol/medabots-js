@@ -1,0 +1,16 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../schemas/ai.schema.json",
+  "id": "ai-balanced",
+  "kind": "ai",
+  "reactionMs": 150,
+  "preferredDistance": 4.4,
+  "aggression": 0.83,
+  "guardProbability": 0.14,
+  "jumpThreshold": 1.2,
+  "strategyWeights": {
+    "leader": 2,
+    "proximity": 1,
+    "weakness": 0.8
+  }
+}

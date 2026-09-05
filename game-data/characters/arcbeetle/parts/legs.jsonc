@@ -1,0 +1,13 @@
+// Movement in world units / second. Jump reaches the upper gantries.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "arcbeetle-legs",
+  "kind": "part",
+  "slot": "legs",
+  "armor": 155,
+  "movement": {
+    "speed": 6.4,
+    "jumpSpeed": 16.8,
+    "dashSpeed": 16
+  }
+}

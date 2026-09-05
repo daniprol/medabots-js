@@ -1,0 +1,13 @@
+// Movement in world units / second. Jump reaches the upper gantries.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "metabee-legs",
+  "kind": "part",
+  "slot": "legs",
+  "armor": 130,
+  "movement": {
+    "speed": 7.3,
+    "jumpSpeed": 17.2,
+    "dashSpeed": 18
+  }
+}

@@ -1,0 +1,9 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "warbandit-right-arm",
+  "kind": "part",
+  "slot": "rightArm",
+  "armor": 100,
+  "abilityId": "warbandit-right-arm-attack"
+}

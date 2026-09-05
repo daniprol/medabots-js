@@ -1,0 +1,48 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../schemas/gamepad.schema.json",
+  "id": "standard-gamepad",
+  "kind": "gamepad",
+  "displayName": "Standard controller",
+  "axisIndex": 0,
+  "deadzone": 0.18,
+  "activationThreshold": 0.5,
+  "bindings": {
+    "moveLeft": [
+      14
+    ],
+    "moveRight": [
+      15
+    ],
+    "jump": [
+      0
+    ],
+    "dropThroughPlatform": [
+      13
+    ],
+    "rightArm": [
+      2
+    ],
+    "leftArm": [
+      3
+    ],
+    "head": [
+      1
+    ],
+    "guard": [
+      4
+    ],
+    "chargeSpecial": [
+      6
+    ],
+    "activateSpecial": [
+      5
+    ],
+    "partnerStrategy": [
+      8
+    ],
+    "pause": [
+      9
+    ]
+  }
+}

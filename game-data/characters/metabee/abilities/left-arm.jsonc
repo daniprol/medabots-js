@@ -1,0 +1,27 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/ability.schema.json",
+  "id": "metabee-left-arm-attack",
+  "kind": "ability",
+  "displayName": "Breaker shot",
+  "abilityKind": "projectile",
+  "delivery": "projectile",
+  "startupMs": 100,
+  "activeMs": 17,
+  "recoveryMs": 240,
+  "damage": 15,
+  "staggerMs": 100,
+  "knockbackX": 4,
+  "knockbackY": 2,
+  "projectileSpeed": 23,
+  "projectileLifetimeMs": 1300,
+  "hitbox": {
+    "x": 1.15,
+    "y": 0.45,
+    "width": 0.55,
+    "height": 0.32
+  },
+  "specialCost": 0,
+  "maxUses": 0,
+  "color": "#ffdf65"
+}

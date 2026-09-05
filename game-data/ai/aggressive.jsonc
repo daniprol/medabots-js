@@ -1,0 +1,16 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../schemas/ai.schema.json",
+  "id": "ai-aggressive",
+  "kind": "ai",
+  "reactionMs": 100,
+  "preferredDistance": 4.4,
+  "aggression": 0.97,
+  "guardProbability": 0.07,
+  "jumpThreshold": 1.2,
+  "strategyWeights": {
+    "leader": 2,
+    "proximity": 1,
+    "weakness": 0.8
+  }
+}

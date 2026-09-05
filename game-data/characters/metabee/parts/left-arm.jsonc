@@ -1,0 +1,9 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "metabee-left-arm",
+  "kind": "part",
+  "slot": "leftArm",
+  "armor": 95,
+  "abilityId": "metabee-left-arm-attack"
+}

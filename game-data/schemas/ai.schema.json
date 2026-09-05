@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots ai definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "reactionMs",
+    "preferredDistance",
+    "aggression",
+    "guardProbability",
+    "jumpThreshold",
+    "strategyWeights"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "ai",
+      "type": "string"
+    },
+    "reactionMs": {
+      "minimum": 1,
+      "maximum": 3000,
+      "type": "integer",
+      "description": "Time between deterministic AI decisions, rounded up to simulation ticks."
+    },
+    "preferredDistance": {
+      "minimum": 0,
+      "maximum": 30,
+      "type": "number"
+    },
+    "aggression": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "guardProbability": {
+      "minimum": 0,
+      "maximum": 1,
+      "type": "number"
+    },
+    "jumpThreshold": {
+      "minimum": 0,
+      "maximum": 10,
+      "type": "number"
+    },
+    "strategyWeights": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "leader",
+        "proximity",
+        "weakness"
+      ],
+      "properties": {
+        "leader": {
+          "minimum": 0,
+          "maximum": 10,
+          "type": "number"
+        },
+        "proximity": {
+          "minimum": 0,
+          "maximum": 10,
+          "type": "number"
+        },
+        "weakness": {
+          "minimum": 0,
+          "maximum": 10,
+          "type": "number"
+        }
+      }
+    }
+  }
+}

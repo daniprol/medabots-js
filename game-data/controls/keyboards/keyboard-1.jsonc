@@ -1,0 +1,45 @@
+// Editable game content. Durations are milliseconds; distances are world units.
+{
+  "$schema": "../../schemas/keyboard.schema.json",
+  "id": "keyboard-1",
+  "kind": "keyboard",
+  "displayName": "Keyboard 1 \u00b7 WASD",
+  "bindings": {
+    "moveLeft": [
+      "KeyA"
+    ],
+    "moveRight": [
+      "KeyD"
+    ],
+    "jump": [
+      "KeyW"
+    ],
+    "dropThroughPlatform": [
+      "KeyS"
+    ],
+    "rightArm": [
+      "KeyJ"
+    ],
+    "leftArm": [
+      "KeyK"
+    ],
+    "head": [
+      "KeyL"
+    ],
+    "guard": [
+      "KeyI"
+    ],
+    "chargeSpecial": [
+      "KeyU"
+    ],
+    "activateSpecial": [
+      "KeyO"
+    ],
+    "partnerStrategy": [
+      "KeyP"
+    ],
+    "pause": [
+      "Escape"
+    ]
+  }
+}

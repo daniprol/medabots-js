@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots gamepad definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "displayName",
+    "axisIndex",
+    "deadzone",
+    "activationThreshold",
+    "bindings"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "gamepad",
+      "type": "string"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "axisIndex": {
+      "minimum": 0,
+      "maximum": 15,
+      "type": "integer",
+      "description": "Zero-based browser Gamepad.axes index for horizontal movement."
+    },
+    "deadzone": {
+      "minimum": 0,
+      "maximum": 0.9,
+      "type": "number",
+      "description": "Ignore stick drift below this absolute value."
+    },
+    "activationThreshold": {
+      "minimum": 0.1,
+      "maximum": 1,
+      "type": "number",
+      "description": "Absolute axis value which becomes digital movement. Must exceed deadzone."
+    },
+    "bindings": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "moveLeft",
+        "moveRight",
+        "jump",
+        "dropThroughPlatform",
+        "rightArm",
+        "leftArm",
+        "head",
+        "guard",
+        "chargeSpecial",
+        "activateSpecial",
+        "partnerStrategy",
+        "pause"
+      ],
+      "properties": {
+        "moveLeft": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "moveRight": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "jump": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "dropThroughPlatform": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "rightArm": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "leftArm": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "head": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "guard": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "chargeSpecial": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "activateSpecial": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "partnerStrategy": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "pause": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        }
+      },
+      "description": "Every action is required. Multiple physical inputs may trigger one action."
+    }
+  }
+}
