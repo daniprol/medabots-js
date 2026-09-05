@@ -1,9 +1,9 @@
-// Shared keyboard layout. All three shared presets use distinct physical keys.
+// Physical KeyboardEvent.code bindings. All menu presets come from these definitions.
 {
   "$schema": "../../schemas/keyboard.schema.json",
-  "id": "keyboard-2",
+  "id": "keyboard-solo",
   "kind": "keyboard",
-  "displayName": "Shared · Right side",
+  "displayName": "Solo \u00b7 Arrows + F/G",
   "bindings": {
     "moveLeft": [
       "ArrowLeft"
@@ -12,33 +12,35 @@
       "ArrowRight"
     ],
     "jump": [
-      "ArrowUp"
+      "ArrowUp",
+      "Space"
     ],
     "dropThroughPlatform": [
       "ArrowDown"
     ],
     "rightArm": [
-      "KeyJ"
+      "KeyF"
     ],
     "leftArm": [
-      "KeyK"
+      "KeyG"
     ],
     "head": [
-      "KeyL"
+      "KeyH"
     ],
     "guard": [
-      "ShiftRight"
+      "ShiftLeft"
     ],
     "chargeSpecial": [
-      "KeyU"
+      "KeyR"
     ],
     "activateSpecial": [
-      "KeyO"
+      "KeyT"
     ],
     "partnerStrategy": [
-      "KeyP"
+      "KeyQ"
     ],
     "pause": [
+      "Escape",
       "Enter"
     ]
   }

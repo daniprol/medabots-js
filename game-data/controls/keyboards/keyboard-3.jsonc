@@ -1,45 +1,45 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Physical KeyboardEvent.code bindings. All menu presets come from these definitions.
 {
   "$schema": "../../schemas/keyboard.schema.json",
   "id": "keyboard-3",
   "kind": "keyboard",
-  "displayName": "Keyboard 3 \u00b7 TFGH",
+  "displayName": "Shared \u00b7 Numpad",
   "bindings": {
     "moveLeft": [
-      "KeyF"
+      "Numpad4"
     ],
     "moveRight": [
-      "KeyH"
+      "Numpad6"
     ],
     "jump": [
-      "KeyT"
+      "Numpad8"
     ],
     "dropThroughPlatform": [
-      "KeyG"
+      "Numpad5"
     ],
     "rightArm": [
-      "KeyV"
+      "Numpad1"
     ],
     "leftArm": [
-      "KeyB"
+      "Numpad2"
     ],
     "head": [
-      "KeyN"
+      "Numpad3"
     ],
     "guard": [
-      "KeyR"
+      "Numpad0"
     ],
     "chargeSpecial": [
-      "KeyC"
+      "Numpad7"
     ],
     "activateSpecial": [
-      "KeyM"
+      "Numpad9"
     ],
     "partnerStrategy": [
-      "Comma"
+      "NumpadAdd"
     ],
     "pause": [
-      "Backspace"
+      "NumpadEnter"
     ]
   }
 }

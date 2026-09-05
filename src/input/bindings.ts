@@ -66,9 +66,17 @@ export function mapGamepad(pad: GamepadLike, profile: GamepadDefinition): Action
   return state;
 }
 export const keyLabel = (code: string) =>
-  code
-    .replace('Key', '')
-    .replace('Digit', '')
-    .replace('Arrow', '')
-    .replace('Numpad', 'Num ')
-    .replace('Escape', 'Esc');
+  (
+    ({
+      ArrowLeft: '←',
+      ArrowRight: '→',
+      ArrowUp: '↑',
+      ArrowDown: '↓',
+      ShiftLeft: 'L Shift',
+      ShiftRight: 'R Shift',
+      ControlLeft: 'L Ctrl',
+      ControlRight: 'R Ctrl',
+      Escape: 'Esc',
+      Space: 'Space',
+    }) as Record<string, string>
+  )[code] ?? code.replace('Key', '').replace('Digit', '').replace('Numpad', 'Num ');

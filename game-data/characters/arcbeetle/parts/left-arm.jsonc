@@ -1,9 +1,9 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-left-arm",
   "kind": "part",
   "slot": "leftArm",
-  "armor": 120,
+  "armor": 480,
   "abilityId": "arcbeetle-left-arm-attack"
 }

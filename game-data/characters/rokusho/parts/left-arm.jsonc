@@ -1,9 +1,9 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "rokusho-left-arm",
   "kind": "part",
   "slot": "leftArm",
-  "armor": 95,
+  "armor": 380,
   "abilityId": "rokusho-left-arm-attack"
 }

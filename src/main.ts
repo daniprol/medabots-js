@@ -1,7 +1,7 @@
 import './ui/styles.css';
+import './ui/roster.css';
 import { loadBundledContent } from './content/load-bundled-content';
-import { createBattle, type BattleSetup, type BattleSnapshot } from './battle-core';
-import { BattleRenderer } from './render/renderer';
+import { type BattleSetup, type BattleSnapshot } from './battle-core';
 import { createMatchSetup, quickAssignments } from './ui/match-setup';
 import { mountLocalBattle } from './battle-session/mount-local-battle';
 import type { Assignments } from './input/bindings';
@@ -53,43 +53,21 @@ try {
     mounted?.dispose();
     mounted = undefined;
     disposeSetup?.();
-    currentSetup = defaultSetup;
-    activeContent = content;
-    const viewport = element('div', 'viewport setup-viewport');
-    root.append(viewport);
-    const snapshot = createBattle({ setup: defaultSetup, content }).getSnapshot();
-    const preview = structuredClone(snapshot);
-    preview.combatants.forEach((c, i) => {
-      c.x = [5.1, 11.2, 8.2, 14][i]!;
-      c.y = i % 2 === 0 ? 0 : 4;
-      c.facing = -1;
-    });
-    const renderer = new BattleRenderer(viewport, content, preview, []);
-    const portraits = Object.fromEntries(
-      snapshot.combatants.map((c) => [c.characterId, renderer.portrait(c.characterId)]),
-    );
-    let raf = 0,
-      last = performance.now();
-    function animate(now: number) {
-      renderer.render(preview, preview, 1, Math.min((now - last) / 1000, 0.05));
-      last = now;
-      raf = requestAnimationFrame(animate);
-    }
-    raf = requestAnimationFrame(animate);
+    const menuContent = {
+      ...content,
+      keyboards: activeContent.keyboards,
+      gamepads: activeContent.gamepads,
+    };
+    activeContent = menuContent;
     const ui = createMatchSetup(
       root,
+      menuContent,
       content,
-      defaultSetup,
-      portraits,
-      (a) => start(a, defaultSetup, content),
+      currentSetup,
+      (assignments, setup, selectedContent) => start(assignments, setup, selectedContent),
       saved,
     );
-    disposeSetup = () => {
-      cancelAnimationFrame(raf);
-      ui.dispose();
-      renderer.dispose();
-      viewport.remove();
-    };
+    disposeSetup = () => ui.dispose();
   }
   if (import.meta.env.DEV) {
     window.__BATTLE_DEBUG__ = {

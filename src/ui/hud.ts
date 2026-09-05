@@ -26,6 +26,7 @@ export function createHUD(
     {
       root: HTMLElement;
       bars: Record<string, HTMLElement>;
+      headStatus: HTMLElement;
       meter: HTMLElement;
       caption: HTMLElement;
     }
@@ -77,10 +78,11 @@ export function createHUD(
       const meter = element('i');
       special.append(meter);
       const caption = element('div', 'meter-caption');
-      data.append(special, caption);
+      const headStatus = element('div', 'head-status');
+      data.append(special, caption, headStatus);
       card.append(portrait, data);
       team.append(card);
-      cards.set(c.id, { root: card, bars, meter, caption });
+      cards.set(c.id, { root: card, bars, meter, caption, headStatus });
     }
   }
   top.append(teams[0]!, center, teams[1]!);
@@ -114,6 +116,18 @@ export function createHUD(
           'aria-label',
           `${c.id} ${c.characterId}${c.knockedOut ? ' knocked out' : ''}`,
         );
+        const protectedHead =
+          content.rules[s.rulesId]!.protectHeadUntilPartsDestroyed &&
+          ['leftArm', 'rightArm', 'legs'].some(
+            (slot) => !c.parts[slot as keyof typeof c.parts].destroyed,
+          );
+        card.headStatus.textContent = c.knockedOut
+          ? 'ROBOT DISABLED'
+          : protectedHead
+            ? '◆ HEAD PROTECTED'
+            : '⚠ HEAD EXPOSED';
+        card.headStatus.classList.toggle('exposed', !protectedHead && !c.knockedOut);
+        card.headStatus.title = 'Both arms and legs must break before the head can take damage.';
         for (const slot of Slots) {
           const p = c.parts[slot];
           const bar = card.bars[slot]!;

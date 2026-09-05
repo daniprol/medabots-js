@@ -1,10 +1,10 @@
-// Movement in world units / second. Jump reaches the upper gantries.
+// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-legs",
   "kind": "part",
   "slot": "legs",
-  "armor": 155,
+  "armor": 620,
   "movement": {
     "speed": 6.4,
     "jumpSpeed": 16.8,

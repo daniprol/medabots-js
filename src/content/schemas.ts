@@ -75,6 +75,10 @@ export const RulesSchema = obj({
   ...base,
   kind: Type.Literal('rules'),
   tickRate: Type.Literal(60),
+  protectHeadUntilPartsDestroyed: Type.Boolean({
+    description:
+      'Helmet hits are absorbed by surviving limbs until both arms and legs are destroyed. Excess damage never carries into the head.',
+  }),
   roundTimeMs: integer(100, 600000),
   gravity: num(1, 100),
   acceleration: num(1, 200),

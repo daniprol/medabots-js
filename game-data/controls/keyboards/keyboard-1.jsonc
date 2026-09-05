@@ -1,9 +1,9 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Shared keyboard layout. All three shared presets use distinct physical keys.
 {
   "$schema": "../../schemas/keyboard.schema.json",
   "id": "keyboard-1",
   "kind": "keyboard",
-  "displayName": "Keyboard 1 \u00b7 WASD",
+  "displayName": "Shared · Left side",
   "bindings": {
     "moveLeft": [
       "KeyA"
@@ -18,25 +18,25 @@
       "KeyS"
     ],
     "rightArm": [
-      "KeyJ"
+      "KeyF"
     ],
     "leftArm": [
-      "KeyK"
+      "KeyG"
     ],
     "head": [
-      "KeyL"
+      "KeyH"
     ],
     "guard": [
-      "KeyI"
+      "ShiftLeft"
     ],
     "chargeSpecial": [
-      "KeyU"
+      "KeyQ"
     ],
     "activateSpecial": [
-      "KeyO"
+      "KeyE"
     ],
     "partnerStrategy": [
-      "KeyP"
+      "KeyR"
     ],
     "pause": [
       "Escape"

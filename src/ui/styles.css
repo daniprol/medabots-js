@@ -899,3 +899,15 @@ kbd {
     margin-top: 2px;
   }
 }
+
+.head-status {
+  font:
+    700 8px 'Barlow',
+    sans-serif;
+  letter-spacing: 1px;
+  color: #7daac0;
+  margin-top: 3px;
+}
+.head-status.exposed {
+  color: #ffae73;
+}

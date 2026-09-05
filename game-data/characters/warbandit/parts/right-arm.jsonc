@@ -1,9 +1,9 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-right-arm",
   "kind": "part",
   "slot": "rightArm",
-  "armor": 100,
+  "armor": 400,
   "abilityId": "warbandit-right-arm-attack"
 }

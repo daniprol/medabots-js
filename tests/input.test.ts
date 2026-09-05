@@ -10,9 +10,11 @@ import {
 } from '../src/input/bindings';
 import { KeyboardInput } from '../src/input/keyboard-input';
 describe('input normalization and assignments', () => {
-  it('ships three mutually non-overlapping keyboard profiles', () => {
-    expect(Object.keys(content.keyboards)).toHaveLength(3);
-    expect(keyboardConflicts(Object.values(content.keyboards))).toEqual([]);
+  it('ships a solo layout and three mutually non-overlapping shared keyboard profiles', () => {
+    expect(Object.keys(content.keyboards)).toHaveLength(4);
+    expect(
+      keyboardConflicts(Object.values(content.keyboards).filter((p) => p.id !== 'keyboard-solo')),
+    ).toEqual([]);
   });
   it('warns on conflicting physical keys but supports multiple keys per action', () => {
     const p = structuredClone(content.keyboards['keyboard-2']!);

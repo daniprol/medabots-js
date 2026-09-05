@@ -11,8 +11,10 @@ page.on('pageerror', (e) => errors.push(e.message));
 await page.goto('http://localhost:5173');
 await page.getByTestId('match-setup').waitFor();
 await page.screenshot({ path: '.artifacts/setup.png' });
-await page.getByLabel('B1 controller').selectOption('keyboard-2');
-await page.getByLabel('B2 controller').selectOption('keyboard-3');
+await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
+await page.getByRole('button', { name: '3 players · one keyboard', exact: true }).click();
+await page.screenshot({ path: '.artifacts/controls.png' });
+await page.getByRole('button', { name: 'APPLY CONTROLS', exact: false }).click();
 await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
 await page.getByTestId('battle-hud').waitFor();
 await page.keyboard.down('d');
@@ -20,7 +22,7 @@ await page.waitForFunction(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combata
 await page.keyboard.up('d');
 await page.keyboard.press('w');
 await page.waitForFunction(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.y > 1);
-await page.keyboard.press('j');
+await page.keyboard.press('f');
 await page.screenshot({ path: '.artifacts/battle.png' });
 await page.evaluate(() => window.__BATTLE_DEBUG__!.pause());
 console.log(

@@ -50,7 +50,7 @@ it('a damage edit changes real collision damage and a speed edit changes real mo
     maxTicks: 25,
     commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
   });
-  expect(shot.snapshot.combatants[2]!.parts.head.currentArmor).toBe(108);
+  expect(shot.snapshot.combatants[2]!.parts.rightArm.currentArmor).toBe(358);
   const movement = runBattleScenario({
     content: changed,
     maxTicks: 20,

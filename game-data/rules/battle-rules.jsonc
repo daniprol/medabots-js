@@ -1,4 +1,4 @@
-// Editable game content. Durations are milliseconds; distances are world units.
+// Head hits are absorbed by surviving limbs; damage never spills into the head.
 {
   "$schema": "../schemas/rules.schema.json",
   "id": "battle-rules",
@@ -20,5 +20,6 @@
   "specialMaximum": 100,
   "chargePerSecond": 24,
   "meterPerDamageDealt": 0.22,
-  "meterPerDamageReceived": 0.14
+  "meterPerDamageReceived": 0.14,
+  "protectHeadUntilPartsDestroyed": true
 }

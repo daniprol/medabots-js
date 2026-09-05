@@ -35,8 +35,13 @@ export function fixture(change: (def: Record<string, any>) => void = () => {}) {
     }),
   );
 }
-export function closeArena(partnerTarget = false) {
+export function closeArena(partnerTarget = false, fragile = false) {
   return fixture((def) => {
+    if (fragile && def.kind === 'part') def.armor = def.slot === 'head' ? 30 : 15;
+    if (fragile && def.kind === 'ability') {
+      def.knockbackX = 0;
+      def.knockbackY = 0;
+    }
     if (def.kind === 'arena')
       def.spawns = [
         { x: -2, y: 0 },

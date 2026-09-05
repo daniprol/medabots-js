@@ -1,10 +1,10 @@
-// Movement in world units / second. Jump reaches the upper gantries.
+// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "rokusho-legs",
   "kind": "part",
   "slot": "legs",
-  "armor": 130,
+  "armor": 520,
   "movement": {
     "speed": 8.9,
     "jumpSpeed": 18.2,

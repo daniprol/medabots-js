@@ -26,6 +26,10 @@ export function applyDamage(
 ) {
   if (target.knockedOut || target.parts[slot].destroyed || ctx.state.result) return;
   const rules = ctx.content.rules[ctx.setup.rulesId]!;
+  if (slot === 'head' && rules.protectHeadUntilPartsDestroyed) {
+    slot =
+      (['rightArm', 'leftArm', 'legs'] as const).find((s) => !target.parts[s].destroyed) ?? 'head';
+  }
   const part = target.parts[slot];
   const damage = Math.min(
     part.currentArmor,

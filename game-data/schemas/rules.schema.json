@@ -7,6 +7,7 @@
     "id",
     "kind",
     "tickRate",
+    "protectHeadUntilPartsDestroyed",
     "roundTimeMs",
     "gravity",
     "acceleration",
@@ -41,6 +42,10 @@
     "tickRate": {
       "const": 60,
       "type": "number"
+    },
+    "protectHeadUntilPartsDestroyed": {
+      "description": "Helmet hits are absorbed by surviving limbs until both arms and legs are destroyed. Excess damage never carries into the head.",
+      "type": "boolean"
     },
     "roundTimeMs": {
       "minimum": 100,

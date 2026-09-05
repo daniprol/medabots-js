@@ -18,13 +18,13 @@ describe('battle integration in Node without browser globals', () => {
     expect(JSON.parse(JSON.stringify(snapshot))).toEqual(snapshot);
     snapshot.combatants[0]!.parts.head.currentArmor = 0;
     snapshot.combatants[0]!.x = 999;
-    expect(battle.getSnapshot().combatants[0]!.parts.head.currentArmor).toBe(150);
+    expect(battle.getSnapshot().combatants[0]!.parts.head.currentArmor).toBe(600);
     expect(battle.getSnapshot().combatants[0]!.x).toBe(-9);
     expect(typeof window).toBe('undefined');
   });
   it('scripted projectile hits the head and ends a match when leader head is destroyed', () => {
     const run = runBattleScenario({
-      content: closeArena(),
+      content: closeArena(false, true),
       maxTicks: 1500,
       commandFrames: shootHead,
     });
@@ -37,24 +37,25 @@ describe('battle integration in Node without browser globals', () => {
   });
   it('partner head knockout does not end the match', () => {
     const run = runBattleScenario({
-      content: closeArena(true),
+      content: closeArena(true, true),
       maxTicks: 650,
-      commandFrames: shootHead,
+      commandFrames: (s) =>
+        s.combatants.find((c) => c.id === 'B2')!.knockedOut ? frame(s.tick + 1) : shootHead(s),
     });
     expect(run.snapshot.combatants.find((c) => c.id === 'B2')!.knockedOut).toBe(true);
     expect(run.result).toBeNull();
   });
-  it('head shots damage head independently and ignore teammates', () => {
+  it('helmet hits protect the head, damage a surviving limb, and ignore teammates', () => {
     const run = runBattleScenario({
       content: closeArena(),
       maxTicks: 25,
       commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
     });
     const target = run.snapshot.combatants.find((c) => c.id === 'B1')!;
-    expect(target.parts.head.currentArmor).toBe(135);
-    expect(target.parts.legs.currentArmor).toBe(130);
-    expect(target.parts.rightArm.currentArmor).toBe(100);
-    expect(run.snapshot.combatants[1]!.parts.head.currentArmor).toBe(175);
+    expect(target.parts.head.currentArmor).toBe(600);
+    expect(target.parts.legs.currentArmor).toBe(520);
+    expect(target.parts.rightArm.currentArmor).toBe(385);
+    expect(run.snapshot.combatants[1]!.parts.head.currentArmor).toBe(700);
   });
   it('projects stable IDs through a JSON round trip and consumes a projectile once', () => {
     const run = runBattleScenario({
@@ -66,7 +67,7 @@ describe('battle integration in Node without browser globals', () => {
     expect(JSON.parse(JSON.stringify(run.snapshot)).projectiles[0].id).toBe('projectile-1');
     for (let t = 9; t < 40; t++) run.battle.step(frame(t));
     expect(run.battle.getSnapshot().projectiles).toHaveLength(0);
-    expect(run.battle.getSnapshot().combatants[2]!.parts.head.currentArmor).toBe(135);
+    expect(run.battle.getSnapshot().combatants[2]!.parts.rightArm.currentArmor).toBe(385);
   });
   it('guard reduces damage and knockback and prevents attacks', () => {
     const guard = runBattleScenario({
@@ -79,7 +80,8 @@ describe('battle integration in Node without browser globals', () => {
         }),
     });
     const target = guard.snapshot.combatants[2]!;
-    expect(target.parts.head.currentArmor).toBe(146);
+    expect(target.parts.head.currentArmor).toBe(600);
+    expect(target.parts.rightArm.currentArmor).toBe(396);
     expect(target.attack).toBeNull();
     expect(target.parts.head.uses).toBe(0);
     const unguarded = runBattleScenario({
@@ -122,7 +124,7 @@ describe('battle integration in Node without browser globals', () => {
     const hits = run.events.filter((e) => e.type === 'hit' && e.targetId === 'A1');
     expect(hits).toHaveLength(1);
     expect(hits[0]!.part).toBe('rightArm');
-    expect(run.snapshot.combatants[0]!.parts.rightArm.currentArmor).toBe(78);
+    expect(run.snapshot.combatants[0]!.parts.rightArm.currentArmor).toBe(378);
   });
   it('destroyed arms disable their ability and emit destruction once', () => {
     const local = fixture((d) => {
@@ -324,5 +326,49 @@ describe('deterministic AI and random source', () => {
     expect(b.getSnapshot().combatants[1]!.strategy).toBe('PROTECT_LEADER');
     b.step(frame(2, { A1: { strategyPressed: true } }));
     expect(b.getSnapshot().combatants[1]!.strategy).toBe('AGGRESSIVE');
+  });
+});
+
+describe('limb armor protects the head', () => {
+  it('breaks both arms and legs before any head damage, without overflow, then knocks out the leader', () => {
+    const b = createBattle({ setup, content: closeArena(false, true) });
+    const expected = ['rightArm', 'leftArm', 'legs', 'head', 'head'];
+    for (let shot = 0; shot < 5; shot++) {
+      for (let t = shot * 30 + 1; t <= (shot + 1) * 30 && !b.getResult(); t++)
+        b.step(frame(t, { A1: { headPressed: t === shot * 30 + 1 } }));
+      const target = b.getSnapshot().combatants[2]!;
+      expect(target.parts.head.currentArmor, `shot ${shot + 1}`).toBe(
+        shot < 3 ? 30 : shot === 3 ? 15 : 0,
+      );
+      const hit = b.drainEvents().find((e) => e.type === 'hit');
+      expect(hit?.part).toBe(expected[shot]);
+      if (shot < 4) expect(target.knockedOut).toBe(false);
+    }
+    expect(b.getResult()?.reason).toBe('leader-head-destroyed');
+  });
+  it('never spills excess helmet-hit damage through a destroyed limb into the head', () => {
+    const c = fixture((d) => {
+      if (d.kind === 'part' && d.slot !== 'head') d.armor = 1;
+      if (d.kind === 'ability') {
+        d.knockbackX = 0;
+        d.knockbackY = 0;
+      }
+      if (d.kind === 'arena')
+        d.spawns = [
+          { x: -2, y: 0 },
+          { x: -13, y: 0 },
+          { x: 2, y: 0 },
+          { x: 14, y: 0 },
+        ];
+    });
+    const run = runBattleScenario({ content: c, maxTicks: 90, commandFrames: shootHead });
+    const target = run.snapshot.combatants[2]!;
+    expect(
+      ['rightArm', 'leftArm', 'legs'].every(
+        (s) => target.parts[s as keyof typeof target.parts].destroyed,
+      ),
+    ).toBe(true);
+    expect(target.parts.head.currentArmor).toBe(600);
+    expect(run.events.filter((e) => e.type === 'hit').map((e) => e.damage)).toEqual([1, 1, 1]);
   });
 });

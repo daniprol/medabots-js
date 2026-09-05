@@ -1,200 +1,288 @@
 import type { ContentCatalog } from '../content/build-content-catalog';
 import type { BattleSetup } from '../battle-core';
+import type { Assignments } from '../input/bindings';
 import { connectedGamepads } from '../input/gamepad-input';
+import { RosterPreview } from '../render/roster-preview';
+import { controllerMenu } from './controller-menu';
 import {
-  assignmentErrors,
-  keyboardConflicts,
-  type Assignments,
-  type LocalControllerAssignment,
-} from '../input/bindings';
+  characterStats,
+  controllerLabel,
+  presetAssignments,
+  quickAssignments,
+  selectCharacter,
+  setupErrors,
+} from './setup-state';
 import { element, button } from './dom';
-export const quickAssignments = (): Assignments => ({
-  A1: { type: 'keyboard', profileId: 'keyboard-1' },
-  A2: { type: 'ai', aiProfileId: 'ai-balanced' },
-  B1: { type: 'ai', aiProfileId: 'ai-balanced' },
-  B2: { type: 'ai', aiProfileId: 'ai-balanced' },
-});
-const encode = (a: LocalControllerAssignment) =>
-  a.type === 'ai' ? 'ai' : a.type === 'keyboard' ? a.profileId : `gamepad-${a.gamepadIndex}`;
+export { quickAssignments } from './setup-state';
 export function createMatchSetup(
   root: HTMLElement,
-  content: ContentCatalog,
-  setup: BattleSetup,
-  portraits: Record<string, string>,
-  onStart: (assignments: Assignments) => void,
+  initialContent: ContentCatalog,
+  defaultContent: ContentCatalog,
+  initialSetup: BattleSetup,
+  onStart: (assignments: Assignments, setup: BattleSetup, content: ContentCatalog) => void,
   saved = quickAssignments(),
 ) {
-  const assignments = structuredClone(saved);
-  const overlay = element('section', 'setup-screen');
-  overlay.dataset.testid = 'match-setup';
-  const nav = element('header', 'setup-nav');
+  let content = initialContent,
+    setup = structuredClone(initialSetup),
+    assignments = structuredClone(saved),
+    selectedSlot = 'A1';
+  let menu: ReturnType<typeof controllerMenu> | undefined;
+  const screen = element('section', 'roster-screen');
+  screen.dataset.testid = 'match-setup';
+  const nav = element('header', 'roster-nav');
   nav.append(
     element('div', 'brand', 'MEDABOTS'),
-    element('span', 'edition', 'AX / ROBATTLE ARENA'),
+    element('span', 'roster-nav-title', 'AX / ROBATTLE ARENA'),
   );
-  const local = element('span', 'local-badge', '● LOCAL MULTIPLAYER');
-  nav.append(local);
-  overlay.append(nav);
-  const intro = element('div', 'setup-intro');
-  intro.append(element('p', 'eyebrow', 'FOUR MEDABOTS. TWO TEAMS. ONE WINNER.'));
-  const title = element('h1');
-  title.innerHTML = 'READY TO<br><em>ROBATTLE?</em>';
-  intro.append(
-    title,
-    element(
-      'p',
-      'intro-copy',
-      'Pick your controls. Rally your partner. Break their armor.\nTake down the enemy leader to win.',
-    ),
+  const navLinks = element('div', 'roster-nav-links');
+  navLinks.append(
+    element('span', 'current-page', 'LOCAL ROBATTLE'),
+    button('⚙  CONTROLS', openControls, 'nav-control-button'),
   );
-  overlay.append(intro);
-  const panel = element('div', 'setup-panel');
-  const panelTitle = element('div', 'panel-heading');
-  panelTitle.append(
-    element('h2', '', 'LOCAL MATCH'),
-    element('span', '', '01 — ASSIGN CONTROLLERS'),
+  const players = element('span', 'player-count');
+  navLinks.append(players);
+  nav.append(navLinks);
+  screen.append(nav);
+  const intro = element('div', 'roster-intro');
+  const heading = element('div');
+  heading.append(
+    element('span', 'eyebrow', 'YOUR TEAM. YOUR PLAYSTYLE.'),
+    element('h1', '', 'BUILD YOUR TEAM.'),
   );
-  panel.append(panelTitle);
-  const grid = element('div', 'assignment-grid');
-  const selects: HTMLSelectElement[] = [];
-  for (const team of setup.teams) {
-    const col = element('div', `assignment-team ${team.id === 'team-a' ? 'team-a' : 'team-b'}`);
-    col.append(
-      element('div', 'team-heading', team.id === 'team-a' ? 'TEAM A / CYAN' : 'TEAM B / CORAL'),
-    );
-    for (const c of team.combatants) {
-      const def = content.characters[c.characterId]!;
-      const card = element('div', 'assignment-card');
-      const portrait = element('img');
-      portrait.src = portraits[c.characterId]!;
-      portrait.alt = '';
-      const details = element('div', 'assignment-details');
-      details.append(
-        element('span', 'assignment-role', `${c.instanceId} · ${c.role.toUpperCase()}`),
-        element('strong', '', def.displayName),
-      );
-      const select = element('select');
-      select.setAttribute('aria-label', `${c.instanceId} controller`);
-      select.dataset.slot = c.instanceId;
-      selects.push(select);
-      select.addEventListener('change', () => {
-        const value = select.value;
-        assignments[c.instanceId] =
-          value === 'ai'
-            ? { type: 'ai', aiProfileId: 'ai-balanced' }
-            : value.startsWith('gamepad-')
-              ? {
-                  type: 'gamepad',
-                  gamepadIndex: Number(value.slice(8)),
-                  profileId: 'standard-gamepad',
-                }
-              : { type: 'keyboard', profileId: value };
-        refresh();
-      });
-      details.append(select);
-      card.append(portrait, details);
-      col.append(card);
-    }
-    grid.append(col);
-  }
-  panel.append(grid);
-  const status = element('p', 'controller-status');
-  status.setAttribute('aria-live', 'polite');
-  panel.append(status);
-  const actions = element('div', 'setup-actions');
-  const start = button(
-    'START ROBATTLE  ↗',
-    () => onStart(structuredClone(assignments)),
-    'button primary',
+  const instruction = element('div', 'roster-instruction');
+  instruction.append(
+    element('strong', '', '01  SELECT A SLOT'),
+    element('span', '', '02  CHOOSE A MEDABOT'),
+    element('span', '', '03  ROBATTLE'),
   );
-  const quick = button('QUICK START', () => onStart(quickAssignments()), 'button secondary');
-  actions.append(start, quick);
-  panel.append(actions);
-  panel.append(
-    element('p', 'setup-tip', '1–4 PLAYERS · SHARED KEYBOARD + GAMEPADS · UNASSIGNED SLOTS USE AI'),
-  );
-  overlay.append(panel);
-  const arenaCard = element('div', 'arena-card');
-  arenaCard.append(
-    element('span', 'eyebrow', 'ARENA / 001'),
-    element('h2', '', content.arenas[setup.arenaId]!.displayName),
-    element('p', '', content.arenas[setup.arenaId]!.subtitle),
-  );
-  overlay.append(arenaCard);
-  const footer = element('footer', 'setup-footer');
-  footer.append(
-    element('span', '', 'WASD move · W jump · J / K / L attack · double-tap to dash'),
-    element('span', '', '180 SEC / LEADER ELIMINATION'),
-  );
-  overlay.append(footer);
-  root.append(overlay);
-  let lastPads = '';
-  function refresh() {
-    const pads = connectedGamepads();
-    lastPads = pads.map((p) => `${p.index}:${p.id}`).join('|');
-    for (const select of selects) {
-      const current = encode(assignments[select.dataset.slot!]!);
-      const options: [string, string][] = [
-        ['ai', 'CPU · Balanced AI'],
-        ...Object.values(content.keyboards).map((p) => [p.id, p.displayName] as [string, string]),
-        ...pads.map(
-          (p) =>
-            [`gamepad-${p.index}`, `Gamepad ${p.index + 1} · ${p.id.slice(0, 28)}`] as [
-              string,
-              string,
-            ],
-        ),
-      ];
-      if (current.startsWith('gamepad-') && !options.some(([v]) => v === current))
-        options.push([current, 'Disconnected controller']);
-      select.replaceChildren(
-        ...options.map(([value, label]) => {
-          const o = element('option', '', label);
-          o.value = value;
-          o.disabled =
-            value !== 'ai' &&
-            Object.entries(assignments).some(
-              ([id, a]) => id !== select.dataset.slot && encode(a) === value,
-            );
-          return o;
-        }),
-      );
-      select.value = current;
-    }
-    const overlaps = keyboardConflicts(
-      Object.values(assignments).flatMap((a) =>
-        a.type === 'keyboard' ? [content.keyboards[a.profileId]!] : [],
+  intro.append(heading, instruction);
+  screen.append(intro);
+  const layout = element('div', 'roster-layout');
+  const slots = element('aside', 'roster-slots');
+  slots.setAttribute('aria-label', 'Team slots');
+  layout.append(slots);
+  const showcase = element('section', 'character-showcase');
+  const showcaseTop = element('div', 'showcase-heading');
+  const focused = element('span', 'eyebrow');
+  showcaseTop.append(focused, element('span', 'showcase-live', '● LIVE PREVIEW'));
+  showcase.append(showcaseTop);
+  const previewBox = element('div', 'roster-model');
+  showcase.append(previewBox);
+  const platform = element('div', 'preview-platform');
+  previewBox.append(platform);
+  const roster = element('div', 'character-choices');
+  roster.setAttribute('aria-label', 'Choose a character');
+  showcase.append(roster);
+  layout.append(showcase);
+  const details = element('section', 'character-details');
+  details.dataset.testid = 'character-details';
+  layout.append(details);
+  screen.append(layout);
+  const footer = element('footer', 'roster-footer');
+  const quickLayouts = element('div', 'roster-quick-layouts');
+  quickLayouts.append(element('span', '', 'PLAY YOUR WAY'));
+  for (const [preset, label] of [
+    ['solo', '1 PLAYER'],
+    ['shared-two', '2 ON ONE KEYBOARD'],
+  ] as const)
+    quickLayouts.append(
+      button(
+        label,
+        () => {
+          assignments = presetAssignments(preset);
+          refresh();
+        },
+        'preset-button',
       ),
     );
-    const errors = assignmentErrors(assignments);
-    const missing = Object.values(assignments).some(
-      (a) => a.type === 'gamepad' && !pads.some((p) => p.index === a.gamepadIndex),
+  quickLayouts.append(button('CUSTOMIZE CONTROLS', openControls, 'text-button'));
+  footer.append(quickLayouts);
+  const match = element('div', 'match-summary');
+  match.append(
+    element('strong', '', content.arenas[setup.arenaId]!.displayName),
+    element(
+      'span',
+      '',
+      `${content.rules[setup.rulesId]!.roundTimeMs / 1000}s · 2 vs 2 · Leader elimination`,
+    ),
+  );
+  footer.append(match);
+  const start = button(
+    'START ROBATTLE  ↗',
+    () => {
+      if (!start.disabled) onStart(assignments, setup, content);
+    },
+    'button primary start-match',
+  );
+  footer.append(start);
+  screen.append(footer);
+  const status = element('div', 'roster-status');
+  status.setAttribute('aria-live', 'polite');
+  screen.append(status);
+  root.append(screen);
+  const preview = new RosterPreview(
+    previewBox,
+    content,
+    setup.teams[0]!.combatants[0]!.characterId,
+  );
+  const portraits = preview.portraits();
+  function openControls() {
+    menu?.dispose();
+    menu = controllerMenu(root, content, defaultContent, assignments, (next, nextContent) => {
+      assignments = next;
+      content = nextContent;
+      refresh();
+    });
+  }
+  function refresh() {
+    const current = setup.teams
+      .flatMap((t) => t.combatants)
+      .find((c) => c.instanceId === selectedSlot)!;
+    const def = content.characters[current.characterId]!;
+    slots.replaceChildren();
+    for (const [i, team] of setup.teams.entries()) {
+      const group = element('div', `roster-team ${i === 0 ? 'team-a' : 'team-b'}`);
+      const title = element('div', 'roster-team-heading');
+      title.append(
+        element('strong', '', `TEAM ${i === 0 ? 'A' : 'B'}`),
+        element('span', '', i === 0 ? 'CYAN DIVISION' : 'CORAL DIVISION'),
+      );
+      group.append(title);
+      for (const c of team.combatants) {
+        const character = content.characters[c.characterId]!;
+        const b = button(
+          '',
+          () => {
+            selectedSlot = c.instanceId;
+            preview.select(c.characterId);
+            refresh();
+          },
+          'roster-slot',
+        );
+        b.setAttribute('aria-label', `Select ${c.instanceId} ${c.role}: ${character.displayName}`);
+        b.setAttribute('aria-pressed', String(c.instanceId === selectedSlot));
+        b.classList.toggle('selected', c.instanceId === selectedSlot);
+        const img = element('img');
+        img.src = portraits[c.characterId]!;
+        img.alt = '';
+        const text = element('div', 'slot-copy');
+        text.append(
+          element(
+            'span',
+            'slot-role',
+            `${c.instanceId} / ${c.role === 'leader' ? '◆ LEADER' : 'PARTNER'}`,
+          ),
+          element('strong', '', character.displayName),
+          element('span', 'slot-controller', controllerLabel(assignments[c.instanceId]!, content)),
+        );
+        b.append(img, text, element('span', 'slot-arrow', '↗'));
+        group.append(b);
+      }
+      slots.append(group);
+    }
+    focused.textContent = `CUSTOMIZING ${selectedSlot} / ${current.role.toUpperCase()}`;
+    roster.replaceChildren();
+    for (const character of Object.values(content.characters)) {
+      const b = button(
+        '',
+        () => {
+          setup = selectCharacter(setup, selectedSlot, character.id, content);
+          preview.select(character.id);
+          refresh();
+        },
+        'character-choice',
+      );
+      b.setAttribute('aria-label', `Choose ${character.displayName}`);
+      b.setAttribute('aria-pressed', String(character.id === current.characterId));
+      b.classList.toggle('selected', character.id === current.characterId);
+      const img = element('img');
+      img.src = portraits[character.id]!;
+      img.alt = '';
+      b.append(img, element('strong', '', character.displayName));
+      roster.append(b);
+    }
+    const stats = characterStats(current.characterId, content);
+    details.replaceChildren(
+      element(
+        'span',
+        'character-type',
+        stats.style === 'melee' ? 'CLOSE COMBAT / BLADE' : 'LONG RANGE / CANNON',
+      ),
+      element('h2', '', def.displayName),
+      element('p', 'character-tagline', def.tagline.replace(' / ', ' · ')),
     );
-    start.disabled = errors.length > 0 || missing;
-    status.textContent = missing
-      ? 'Reconnect the assigned controller or choose another input.'
-      : errors.length
-        ? errors.join(' · ')
-        : overlaps.length
-          ? `Overlapping keys: ${overlaps.join(', ')}`
-          : `${pads.length} GAMEPADS CONNECTED · ${pads.length ? 'Controllers ready' : 'Press a button on a controller to connect'}`;
-    status.classList.toggle('warning', !!(errors.length || overlaps.length || missing));
+    const statList = element('div', 'character-stats');
+    for (const [label, value, max, unit] of [
+      ['TOTAL ARMOR', stats.armor, 2600, 'HP'],
+      ['MOVEMENT', stats.speed, 10, 'SPD'],
+      ['ATTACK POWER', stats.power, 35, 'DMG'],
+      ['JUMP', stats.jump, 20, 'VEL'],
+    ] as const) {
+      const row = element('div', 'character-stat');
+      const names = element('div');
+      names.append(element('span', '', label), element('strong', '', `${value} ${unit}`));
+      const track = element('div', 'stat-track');
+      const bar = element('i');
+      bar.style.width = `${Math.min(100, (value / max) * 100)}%`;
+      track.append(bar);
+      row.append(names, track);
+      statList.append(row);
+    }
+    details.append(statList);
+    const special = element('div', 'character-special');
+    special.append(
+      element('span', 'eyebrow', '✦ MEDAFORCE'),
+      element('h3', '', stats.special.displayName),
+      element(
+        'p',
+        '',
+        `${stats.special.damage} damage · ${stats.special.delivery === 'melee' ? 'Sweeping close-range strike' : 'High-powered energy projectile'}`,
+      ),
+    );
+    details.append(special);
+    const rules = element('div', 'roster-rules');
+    rules.append(
+      element('span', 'rule-icon', '⬡'),
+      element('strong', '', 'BREAK ARMOR. EXPOSE THE HEAD.'),
+      element(
+        'p',
+        '',
+        'Both arms and legs protect the head. Break all three, then disable the enemy leader to win.',
+      ),
+    );
+    details.append(rules);
+    updateStatus();
+  }
+  function updateStatus() {
+    const errors = setupErrors(
+      assignments,
+      content,
+      connectedGamepads().map((p) => p.index),
+    );
+    start.disabled = errors.length > 0;
+    status.textContent =
+      errors[0] ?? 'Choose a team slot, then pick its Medabot. Both teams can use any character.';
+    status.classList.toggle('invalid', errors.length > 0);
+    const humans = Object.values(assignments).filter((a) => a.type !== 'ai').length;
+    players.textContent = `● ${humans} LOCAL PLAYER${humans === 1 ? '' : 'S'}`;
   }
   refresh();
+  let signature = '';
   const interval = window.setInterval(() => {
-    const pads = connectedGamepads()
-      .map((p) => `${p.index}:${p.id}`)
-      .join('|');
-    if (pads !== lastPads) refresh();
-  }, 500);
-  window.addEventListener('gamepadconnected', refresh);
-  window.addEventListener('gamepaddisconnected', refresh);
+    const next = connectedGamepads()
+      .map((p) => p.index)
+      .join(',');
+    if (next !== signature) {
+      signature = next;
+      updateStatus();
+    }
+  }, 300);
   return {
     dispose() {
       clearInterval(interval);
-      window.removeEventListener('gamepadconnected', refresh);
-      window.removeEventListener('gamepaddisconnected', refresh);
-      overlay.remove();
+      menu?.dispose();
+      preview.dispose();
+      screen.remove();
     },
   };
 }
