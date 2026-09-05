@@ -5,41 +5,17 @@
   "kind": "keyboard",
   "displayName": "Shared \u00b7 Numpad",
   "bindings": {
-    "moveLeft": [
-      "Numpad4"
-    ],
-    "moveRight": [
-      "Numpad6"
-    ],
-    "jump": [
-      "Numpad8"
-    ],
-    "dropThroughPlatform": [
-      "Numpad5"
-    ],
-    "rightArm": [
-      "Numpad1"
-    ],
-    "leftArm": [
-      "Numpad2"
-    ],
-    "head": [
-      "Numpad3"
-    ],
-    "guard": [
-      "Numpad0"
-    ],
-    "chargeSpecial": [
-      "Numpad7"
-    ],
-    "activateSpecial": [
-      "Numpad9"
-    ],
-    "partnerStrategy": [
-      "NumpadAdd"
-    ],
-    "pause": [
-      "NumpadEnter"
-    ]
-  }
+    "moveLeft": ["Numpad4"],
+    "moveRight": ["Numpad6"],
+    "jump": ["Numpad8"],
+    "dropThroughPlatform": ["Numpad5"],
+    "rightArm": ["Numpad1"],
+    "leftArm": ["Numpad2"],
+    "head": ["Numpad3"],
+    "guard": ["Numpad0"],
+    "chargeSpecial": ["Numpad7"],
+    "activateSpecial": ["Numpad9"],
+    "partnerStrategy": ["NumpadAdd"],
+    "pause": ["NumpadEnter"],
+  },
 }

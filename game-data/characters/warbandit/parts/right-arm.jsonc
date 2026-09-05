@@ -5,5 +5,5 @@
   "kind": "part",
   "slot": "rightArm",
   "armor": 400,
-  "abilityId": "warbandit-right-arm-attack"
+  "abilityId": "warbandit-right-arm-attack",
 }

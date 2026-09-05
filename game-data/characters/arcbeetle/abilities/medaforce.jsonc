@@ -19,9 +19,9 @@
     "x": 1.4,
     "y": 1.55,
     "width": 1.8,
-    "height": 2.3
+    "height": 2.3,
   },
   "specialCost": 100,
   "maxUses": 0,
-  "color": "#ff8844"
+  "color": "#ff8844",
 }

@@ -5,5 +5,5 @@
   "kind": "part",
   "slot": "rightArm",
   "armor": 500,
-  "abilityId": "arcbeetle-right-arm-attack"
+  "abilityId": "arcbeetle-right-arm-attack",
 }

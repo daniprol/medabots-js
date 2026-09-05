@@ -3,3 +3,9 @@ dist/
 test-results/
 playwright-report/
 .artifacts/
+graphics_reference.png
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store

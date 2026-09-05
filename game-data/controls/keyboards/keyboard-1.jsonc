@@ -5,41 +5,17 @@
   "kind": "keyboard",
   "displayName": "Shared · Left side",
   "bindings": {
-    "moveLeft": [
-      "KeyA"
-    ],
-    "moveRight": [
-      "KeyD"
-    ],
-    "jump": [
-      "KeyW"
-    ],
-    "dropThroughPlatform": [
-      "KeyS"
-    ],
-    "rightArm": [
-      "KeyF"
-    ],
-    "leftArm": [
-      "KeyG"
-    ],
-    "head": [
-      "KeyH"
-    ],
-    "guard": [
-      "ShiftLeft"
-    ],
-    "chargeSpecial": [
-      "KeyQ"
-    ],
-    "activateSpecial": [
-      "KeyE"
-    ],
-    "partnerStrategy": [
-      "KeyR"
-    ],
-    "pause": [
-      "Escape"
-    ]
-  }
+    "moveLeft": ["KeyA"],
+    "moveRight": ["KeyD"],
+    "jump": ["KeyW"],
+    "dropThroughPlatform": ["KeyS"],
+    "rightArm": ["KeyF"],
+    "leftArm": ["KeyG"],
+    "head": ["KeyH"],
+    "guard": ["ShiftLeft"],
+    "chargeSpecial": ["KeyQ"],
+    "activateSpecial": ["KeyE"],
+    "partnerStrategy": ["KeyR"],
+    "pause": ["Escape"],
+  },
 }

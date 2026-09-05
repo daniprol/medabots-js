@@ -1,26 +1,36 @@
-import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
+
+import { chromium } from '@playwright/test';
+
 await mkdir('.artifacts', { recursive: true });
+
 const browser = await chromium.launch({
   headless: true,
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
+
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+
 page.setDefaultTimeout(30000);
+
 const errors: string[] = [];
+
 page.on('pageerror', (error) => {
   errors.push(error.message);
   console.error(error.message);
 });
+
 page.on('console', (m) => {
   if (m.type() === 'error') {
     errors.push(m.text());
     console.error(m.text());
   }
 });
+
 try {
   await page.goto('http://localhost:5173');
   await page.getByTestId('match-setup').waitFor();
+
   for (const name of ['Metabee', 'Rokusho', 'Arcbeetle', 'Warbandit']) {
     await page.getByRole('button', { name: `Choose ${name}`, exact: true }).click();
     await page.evaluate(
@@ -34,6 +44,7 @@ try {
     );
     await page.screenshot({ path: `.artifacts/character-${name.toLowerCase()}.png` });
   }
+
   await page.getByRole('button', { name: 'Choose Metabee', exact: true }).click();
   await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
   await page.getByTestId('battle-hud').waitFor();
@@ -60,7 +71,10 @@ try {
       tick: await page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.tick),
     }),
   );
-  if (errors.length) process.exitCode = 1;
+
+  if (errors.length) {
+    process.exitCode = 1;
+  }
 } finally {
   await browser.close();
 }

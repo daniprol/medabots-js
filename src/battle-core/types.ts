@@ -1,6 +1,8 @@
-import type { ContentCatalog } from '../content/build-content-catalog';
+import type { ContentCatalog } from '../content/catalog';
 import type { MatchDefinition, PartSlot, CharacterDefinition } from '../content/schemas';
+
 export type BattleSetup = Pick<MatchDefinition, 'seed' | 'arenaId' | 'rulesId' | 'teams'>;
+
 export type CombatantCommand = {
   moveX: -1 | 0 | 1;
   jumpPressed: boolean;
@@ -13,6 +15,7 @@ export type CombatantCommand = {
   specialPressed: boolean;
   strategyPressed: boolean;
 };
+
 export const emptyCommand = (): CombatantCommand => ({
   moveX: 0,
   jumpPressed: false,
@@ -25,8 +28,11 @@ export const emptyCommand = (): CombatantCommand => ({
   specialPressed: false,
   strategyPressed: false,
 });
+
 export type CommandFrame = { tick: number; commands: Record<string, CombatantCommand> };
+
 export type Strategy = 'ATTACK_LEADER' | 'PROTECT_LEADER' | 'AGGRESSIVE';
+
 export type PartState = {
   definitionId: string;
   currentArmor: number;
@@ -35,6 +41,7 @@ export type PartState = {
   destroyed: boolean;
   uses: number;
 };
+
 export type AttackState = {
   abilityId: string;
   slot: PartSlot | 'special';
@@ -42,6 +49,7 @@ export type AttackState = {
   fired: boolean;
   hitIds: string[];
 };
+
 export type CombatantSnapshot = {
   id: string;
   characterId: string;
@@ -69,6 +77,7 @@ export type CombatantSnapshot = {
   lastTapRight: number;
   strategy: Strategy;
 };
+
 export type ProjectileSnapshot = {
   id: string;
   ownerId: string;
@@ -80,12 +89,14 @@ export type ProjectileSnapshot = {
   remainingTicks: number;
   facing: -1 | 1;
 };
+
 export type BattleResult = {
   winnerTeamId: string | null;
   reason: 'leader-head-destroyed' | 'timeout' | 'draw';
   elapsedTicks: number;
   finalCombatants: CombatantSnapshot[];
 };
+
 export type BattleSnapshot = {
   tick: number;
   arenaId: string;
@@ -96,6 +107,7 @@ export type BattleSnapshot = {
   projectiles: ProjectileSnapshot[];
   result: BattleResult | null;
 };
+
 export type BattleEvent = {
   tick: number;
   type:
@@ -119,12 +131,14 @@ export type BattleEvent = {
   strong?: boolean;
   facing?: -1 | 1;
 };
+
 export type Battle = {
   step: (frame: CommandFrame) => void;
   getSnapshot: () => BattleSnapshot;
   drainEvents: () => BattleEvent[];
   getResult: () => BattleResult | null;
 };
+
 export type BattleContext = {
   content: ContentCatalog;
   setup: BattleSetup;
@@ -133,4 +147,5 @@ export type BattleContext = {
   nextEntityId: number;
   rngState: number;
 };
+
 export type Loadout = CharacterDefinition['defaultLoadout'];

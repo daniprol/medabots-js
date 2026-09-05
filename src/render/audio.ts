@@ -1,8 +1,10 @@
 import type { BattleEvent } from '../battle-core';
+
 /** Small original synthesized effects; no sampled game audio. */
 export class BattleAudio {
   private context: AudioContext | null = null;
   enabled = true;
+
   constructor() {
     try {
       this.context = new AudioContext();
@@ -11,18 +13,33 @@ export class BattleAudio {
     }
   }
   unlock = () => {
-    if (this.context?.state === 'suspended') void this.context.resume();
+    if (this.context?.state === 'suspended') {
+      void this.context.resume();
+    }
   };
+
   toggle() {
     this.enabled = !this.enabled;
-    if (this.enabled) this.unlock();
+
+    if (this.enabled) {
+      this.unlock();
+    }
+
     return this.enabled;
   }
+
   play(events: BattleEvent[]) {
-    if (!this.enabled || this.context?.state !== 'running') return;
+    if (!this.enabled || this.context?.state !== 'running') {
+      return;
+    }
+
     let voices = 0;
+
     for (const e of events) {
-      if (voices >= 4) break;
+      if (voices >= 4) {
+        break;
+      }
+
       const sound =
         e.type === 'hit'
           ? ([e.strong ? 95 : 170, 0.075, 'square'] as const)
@@ -35,31 +52,39 @@ export class BattleAudio {
                 : e.type === 'roundEnded'
                   ? ([660, 0.6, 'triangle'] as const)
                   : null;
-      if (!sound) continue;
+
+      if (!sound) {
+        continue;
+      }
+
       voices++;
+
       const [frequency, duration, type] = sound;
-      const ctx = this.context;
-      const oscillator = ctx.createOscillator(),
-        gain = ctx.createGain();
+      const context = this.context;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
       oscillator.type = type;
-      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      oscillator.frequency.setValueAtTime(frequency, context.currentTime);
       oscillator.frequency.exponentialRampToValueAtTime(
         e.type === 'specialActivated' ? 880 : frequency * 0.25,
-        ctx.currentTime + duration,
+        context.currentTime + duration,
       );
-      gain.gain.setValueAtTime(0.025, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.025, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + duration);
       oscillator.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(context.destination);
       oscillator.start();
-      oscillator.stop(ctx.currentTime + duration);
+      oscillator.stop(context.currentTime + duration);
       oscillator.onended = () => {
         oscillator.disconnect();
         gain.disconnect();
       };
     }
   }
+
   dispose() {
-    if (this.context) void this.context.close();
+    if (this.context) {
+      void this.context.close();
+    }
   }
 }

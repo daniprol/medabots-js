@@ -1,7 +1,8 @@
-import type { ContentCatalog } from '../content/build-content-catalog';
-import { Slots } from '../content/schemas';
-import type { Battle, BattleContext, BattleSetup, CombatantSnapshot } from './types';
+import type { ContentCatalog } from '../content/catalog';
+import { PART_SLOTS } from '../content/schemas';
 import { stepBattle } from './step-battle';
+import type { Battle, BattleContext, BattleSetup, CombatantSnapshot } from './types';
+
 export function createBattle({
   setup,
   content,
@@ -9,46 +10,104 @@ export function createBattle({
   setup: BattleSetup;
   content: ContentCatalog;
 }): Battle {
-  if (!content.rules[setup.rulesId] || !content.arenas[setup.arenaId])
+  validateSetup(setup, content);
+
+  const combatants = createCombatants(setup, content);
+
+  const context: BattleContext = {
+    setup: structuredClone(setup),
+    content,
+    state: {
+      tick: 0,
+      arenaId: setup.arenaId,
+      rulesId: setup.rulesId,
+      remainingTicks: content.rules[setup.rulesId]!.roundTicks,
+      phase: 'fighting',
+      combatants,
+      projectiles: [],
+      result: null,
+    },
+    events: [],
+    nextEntityId: 1,
+    rngState: setup.seed >>> 0,
+  };
+
+  return {
+    step: (frame) => stepBattle(context, frame),
+    getSnapshot: () => structuredClone(context.state),
+    drainEvents: () => {
+      const events = context.events;
+      context.events = [];
+
+      return events;
+    },
+    getResult: () => (context.state.result ? structuredClone(context.state.result) : null),
+  };
+}
+
+function validateSetup(setup: BattleSetup, content: ContentCatalog) {
+  if (!content.rules[setup.rulesId] || !content.arenas[setup.arenaId]) {
     throw new Error('BattleSetup: unknown rules or arena');
+  }
+
   if (
     setup.teams.length !== 2 ||
-    new Set(setup.teams.map((t) => t.id)).size !== 2 ||
+    new Set(setup.teams.map((team) => team.id)).size !== 2 ||
     setup.teams.some(
-      (t) =>
-        t.combatants.length !== 2 || t.combatants.filter((c) => c.role === 'leader').length !== 1,
+      (team) =>
+        team.combatants.length !== 2 ||
+        team.combatants.filter((combatantSetup) => combatantSetup.role === 'leader').length !== 1,
     )
-  )
+  ) {
     throw new Error('BattleSetup requires two distinct teams, each with a leader and partner');
+  }
+}
+
+function createCombatants(setup: BattleSetup, content: ContentCatalog): CombatantSnapshot[] {
   const arena = content.arenas[setup.arenaId]!;
   const ids = new Set<string>();
   let index = 0;
   const combatants: CombatantSnapshot[] = setup.teams.flatMap((team) =>
-    team.combatants.map((c) => {
-      if (ids.has(c.instanceId)) throw new Error(`Duplicate combatant ${c.instanceId}`);
-      ids.add(c.instanceId);
-      const def = content.characters[c.characterId];
-      if (!def) throw new Error(`Unknown character ${c.characterId}`);
-      const loadout = c.loadout ?? def.defaultLoadout;
+    team.combatants.map((combatantSetup) => {
+      if (ids.has(combatantSetup.instanceId)) {
+        throw new Error(`Duplicate combatant ${combatantSetup.instanceId}`);
+      }
+
+      ids.add(combatantSetup.instanceId);
+
+      const definition = content.characters[combatantSetup.characterId];
+
+      if (!definition) {
+        throw new Error(`Unknown character ${combatantSetup.characterId}`);
+      }
+
+      const loadout = combatantSetup.loadout ?? definition.defaultLoadout;
       const parts = {} as CombatantSnapshot['parts'];
-      for (const slot of Slots) {
-        const p = content.parts[loadout[slot]];
-        if (!p || p.slot !== slot) throw new Error(`Invalid ${slot} part: ${loadout[slot]}`);
+
+      for (const slot of PART_SLOTS) {
+        const part = content.parts[loadout[slot]];
+
+        if (!part || part.slot !== slot) {
+          throw new Error(`Invalid ${slot} part: ${loadout[slot]}`);
+        }
+
         parts[slot] = {
-          definitionId: p.id,
-          currentArmor: p.armor,
-          maxArmor: p.armor,
+          definitionId: part.id,
+          currentArmor: part.armor,
+          maxArmor: part.armor,
           cooldownTicks: 0,
           destroyed: false,
           uses: 0,
         };
       }
+
       const spawn = arena.spawns[index++]!;
+
       return {
-        id: c.instanceId,
-        characterId: c.characterId,
+        id: combatantSetup.instanceId,
+        characterId: combatantSetup.characterId,
         teamId: team.id,
-        role: c.role,
+        role: combatantSetup.role,
         x: spawn.x,
         y: spawn.y,
         vx: 0,
@@ -56,8 +115,10 @@ export function createBattle({
         facing: spawn.x < 0 ? 1 : -1,
         grounded: true,
         groundPlatformId:
-          arena.platforms.find((p) => p.y === spawn.y && Math.abs(p.x - spawn.x) <= p.width / 2)
-            ?.id ?? null,
+          arena.platforms.find(
+            (platform) =>
+              platform.y === spawn.y && Math.abs(platform.x - spawn.x) <= platform.width / 2,
+          )?.id ?? null,
         knockedOut: false,
         guarding: false,
         charging: false,
@@ -75,31 +136,6 @@ export function createBattle({
       };
     }),
   );
-  const ctx: BattleContext = {
-    setup: structuredClone(setup),
-    content,
-    state: {
-      tick: 0,
-      arenaId: setup.arenaId,
-      rulesId: setup.rulesId,
-      remainingTicks: content.rules[setup.rulesId]!.roundTicks,
-      phase: 'fighting',
-      combatants,
-      projectiles: [],
-      result: null,
-    },
-    events: [],
-    nextEntityId: 1,
-    rngState: setup.seed >>> 0,
-  };
-  return {
-    step: (frame) => stepBattle(ctx, frame),
-    getSnapshot: () => structuredClone(ctx.state),
-    drainEvents: () => {
-      const events = ctx.events;
-      ctx.events = [];
-      return events;
-    },
-    getResult: () => (ctx.state.result ? structuredClone(ctx.state.result) : null),
-  };
+
+  return combatants;
 }

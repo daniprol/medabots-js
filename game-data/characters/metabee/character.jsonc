@@ -9,43 +9,43 @@
     "type": "procedural",
     "model": "metabee",
     "color": "#f8bc27",
-    "accent": "#fff3c7"
+    "accent": "#fff3c7",
   },
   "collider": {
     "width": 1.5,
-    "height": 2.4
+    "height": 2.4,
   },
   "hitRegions": {
     "head": {
       "x": 0,
       "y": 1.98,
       "width": 1.05,
-      "height": 0.7
+      "height": 0.7,
     },
     "leftArm": {
       "x": -0.43,
       "y": 1.27,
       "width": 0.56,
-      "height": 0.66
+      "height": 0.66,
     },
     "rightArm": {
       "x": 0.43,
       "y": 1.33,
       "width": 0.56,
-      "height": 0.66
+      "height": 0.66,
     },
     "legs": {
       "x": 0,
       "y": 0.44,
       "width": 1.1,
-      "height": 0.88
-    }
+      "height": 0.88,
+    },
   },
   "defaultLoadout": {
     "head": "metabee-head",
     "leftArm": "metabee-left-arm",
     "rightArm": "metabee-right-arm",
-    "legs": "metabee-legs"
+    "legs": "metabee-legs",
   },
-  "specialAbilityId": "metabee-medaforce"
+  "specialAbilityId": "metabee-medaforce",
 }

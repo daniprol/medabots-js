@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { content, setup } from './helpers';
+
+import { createBattle } from '../src/battle-core';
+import { replaceControlProfile } from '../src/ui/control-settings';
 import {
   presetAssignments,
   setupErrors,
   selectCharacter,
   characterStats,
 } from '../src/ui/setup-state';
-import { replaceControlProfile } from '../src/ui/control-settings';
-import { createBattle } from '../src/battle-core';
+import { content, setup } from './helpers';
 
 describe('roster and control configuration', () => {
   it('defaults to arrows and F/G for a solo player, with AI partners and opponents', () => {

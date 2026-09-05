@@ -9,43 +9,43 @@
     "type": "procedural",
     "model": "warbandit",
     "color": "#e84432",
-    "accent": "#ffad25"
+    "accent": "#ffad25",
   },
   "collider": {
     "width": 1.5,
-    "height": 2.4
+    "height": 2.4,
   },
   "hitRegions": {
     "head": {
       "x": 0,
       "y": 1.98,
       "width": 1.05,
-      "height": 0.7
+      "height": 0.7,
     },
     "leftArm": {
       "x": -0.43,
       "y": 1.27,
       "width": 0.56,
-      "height": 0.66
+      "height": 0.66,
     },
     "rightArm": {
       "x": 0.43,
       "y": 1.33,
       "width": 0.56,
-      "height": 0.66
+      "height": 0.66,
     },
     "legs": {
       "x": 0,
       "y": 0.44,
       "width": 1.1,
-      "height": 0.88
-    }
+      "height": 0.88,
+    },
   },
   "defaultLoadout": {
     "head": "warbandit-head",
     "leftArm": "warbandit-left-arm",
     "rightArm": "warbandit-right-arm",
-    "legs": "warbandit-legs"
+    "legs": "warbandit-legs",
   },
-  "specialAbilityId": "warbandit-medaforce"
+  "specialAbilityId": "warbandit-medaforce",
 }

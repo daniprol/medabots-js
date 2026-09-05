@@ -8,6 +8,6 @@
   "movement": {
     "speed": 8,
     "jumpSpeed": 17.6,
-    "dashSpeed": 19
-  }
+    "dashSpeed": 19,
+  },
 }

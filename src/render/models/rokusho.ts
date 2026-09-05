@@ -1,21 +1,13 @@
 import * as THREE from 'three';
+
+import { armor, shell, eyes, seam, rivet, fingerFist, ivory } from './armor';
+import { legArmor } from './leg-armor';
 import { ball, tube, v, ink } from './primitives';
-import {
-  armor,
-  shell,
-  eyes,
-  robotFrame,
-  finishModel,
-  legArmor,
-  seam,
-  rivet,
-  fingerFist,
-  ivory,
-} from './armor';
+import { robotFrame, finishModel } from './robot-frame';
 
 export function rokusho(color = '#e4ecf7', accent = '#2552be') {
-  const m = robotFrame();
-  shell(m.head, color, [
+  const model = robotFrame();
+  shell(model.head, color, [
     [-0.4, 0.19, 0.2, 0],
     [-0.25, 0.39, 0.32, 0],
     [0.1, 0.44, 0.36, 0],
@@ -23,7 +15,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     [0.4, 0.14, 0.15, -0.02],
   ]);
   armor(
-    m.head,
+    model.head,
     ink,
     [
       [-0.35, 0.035],
@@ -39,9 +31,9 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.376,
     0.014,
   );
-  eyes(m.head, '#f54c4b', 0.416, 0.3);
+  eyes(model.head, '#f54c4b', 0.416, 0.3);
   armor(
-    m.head,
+    model.head,
     ivory,
     [
       [-0.31, 0.12],
@@ -58,7 +50,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.02,
   );
   armor(
-    m.head,
+    model.head,
     color,
     [
       [-0.24, -0.25],
@@ -75,7 +67,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.025,
   );
   seam(
-    m.head,
+    model.head,
     [
       [0, -0.31, 0.416],
       [0, -0.43, 0.406],
@@ -84,7 +76,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
   );
   // Two sweeping stag-beetle antennae frame a single deep-blue crown blade.
   armor(
-    m.head,
+    model.head,
     accent,
     [
       [-0.15, 0.18],
@@ -102,7 +94,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.022,
   );
   armor(
-    m.head,
+    model.head,
     '#477be1',
     [
       [-0.045, 0.35],
@@ -116,17 +108,18 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.033,
     0.004,
   );
-  for (const s of [-1, 1]) {
+
+  for (const side of [-1, 1]) {
     armor(
-      m.head,
+      model.head,
       color,
       [
-        [s * 0.27, 0.18],
-        [s * 0.53, 0.27],
-        [s * 0.75, 0.81],
-        [s * 0.73, 1.0],
-        [s * 0.53, 0.79],
-        [s * 0.38, 0.54],
+        [side * 0.27, 0.18],
+        [side * 0.53, 0.27],
+        [side * 0.75, 0.81],
+        [side * 0.73, 1.0],
+        [side * 0.53, 0.79],
+        [side * 0.38, 0.54],
       ],
       0.18,
       0,
@@ -135,13 +128,13 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.026,
     );
     armor(
-      m.head,
+      model.head,
       accent,
       [
-        [s * 0.4, 0.45],
-        [s * 0.53, 0.57],
-        [s * 0.66, 0.9],
-        [s * 0.53, 0.77],
+        [side * 0.4, 0.45],
+        [side * 0.53, 0.57],
+        [side * 0.66, 0.9],
+        [side * 0.53, 0.77],
       ],
       0.022,
       0,
@@ -150,14 +143,14 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.008,
     );
     armor(
-      m.head,
+      model.head,
       ivory,
       [
-        [s * 0.3, 0.0],
-        [s * 0.44, 0.16],
-        [s * 0.47, -0.11],
-        [s * 0.3, -0.33],
-        [s * 0.23, -0.23],
+        [side * 0.3, 0.0],
+        [side * 0.44, 0.16],
+        [side * 0.47, -0.11],
+        [side * 0.3, -0.33],
+        [side * 0.23, -0.23],
       ],
       0.15,
       0,
@@ -165,16 +158,17 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.3,
       0.02,
     );
-    rivet(m.head, s * 0.39, -0.1, 0.397, '#aabacd');
-    ball(m.core, accent, s * 0.35, 1.52, 0, 0.29, 0.32, 0.35);
+    rivet(model.head, side * 0.39, -0.1, 0.397, '#aabacd');
+    ball(model.core, accent, side * 0.35, 1.52, 0, 0.29, 0.32, 0.35);
   }
-  shell(m.core, accent, [
+
+  shell(model.core, accent, [
     [1.15, 0.23, 0.2, 0],
     [1.4, 0.32, 0.24, 0],
     [1.66, 0.28, 0.21, 0],
   ]);
   armor(
-    m.core,
+    model.core,
     ivory,
     [
       [-0.23, 1.7],
@@ -192,7 +186,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.045,
   );
   seam(
-    m.core,
+    model.core,
     [
       [-0.29, 1.37, 0.347],
       [0, 1.49, 0.354],
@@ -201,7 +195,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     '#72829d',
   );
   armor(
-    m.core,
+    model.core,
     accent,
     [
       [-0.045, 1.68],
@@ -217,7 +211,7 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.008,
   );
   armor(
-    m.core,
+    model.core,
     ivory,
     [
       [-0.1, 1.11],
@@ -232,16 +226,17 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     0.24,
     0.035,
   );
-  for (const s of [-1, 1])
+
+  for (const side of [-1, 1]) {
     armor(
-      m.core,
+      model.core,
       color,
       [
-        [s * 0.13, 1.09],
-        [s * 0.33, 1.04],
-        [s * 0.49, 0.77],
-        [s * 0.26, 0.71],
-        [s * 0.18, 0.83],
+        [side * 0.13, 1.09],
+        [side * 0.33, 1.04],
+        [side * 0.49, 0.77],
+        [side * 0.26, 0.71],
+        [side * 0.18, 0.83],
       ],
       0.19,
       0,
@@ -249,8 +244,10 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.03,
       0.025,
     );
-  for (const [i, arm] of [m.leftArm, m.rightArm].entries()) {
-    const s = i === 0 ? -1 : 1;
+  }
+
+  for (const [i, arm] of [model.leftArm, model.rightArm].entries()) {
+    const side = i === 0 ? -1 : 1;
     armor(
       arm,
       color,
@@ -271,11 +268,11 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       arm,
       ivory,
       [
-        [s * 0.02, 0.1],
-        [s * 0.41, 0.22],
-        [s * 0.65, 0.56],
-        [s * 0.31, 0.43],
-        [s * -0.04, 0.24],
+        [side * 0.02, 0.1],
+        [side * 0.41, 0.22],
+        [side * 0.65, 0.56],
+        [side * 0.31, 0.43],
+        [side * -0.04, 0.24],
       ],
       0.15,
       0,
@@ -287,10 +284,10 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       arm,
       accent,
       [
-        [s * 0.12, 0.21],
-        [s * 0.39, 0.29],
-        [s * 0.5, 0.44],
-        [s * 0.24, 0.34],
+        [side * 0.12, 0.21],
+        [side * 0.39, 0.29],
+        [side * 0.5, 0.44],
+        [side * 0.24, 0.34],
       ],
       0.025,
       0,
@@ -298,9 +295,10 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.054,
       0.005,
     );
-    tube(arm, accent, v(0, -0.12, 0.02), v(s * 0.04, -0.29, 0.12), 0.1);
+    tube(arm, accent, v(0, -0.12, 0.02), v(side * 0.04, -0.29, 0.12), 0.1);
+
     const forearm = new THREE.Group();
-    forearm.position.set(s * 0.03, -0.31, 0.22);
+    forearm.position.set(side * 0.03, -0.31, 0.22);
     arm.add(forearm);
     armor(
       forearm,
@@ -334,10 +332,12 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
       0.02,
     );
     fingerFist(forearm, ivory, 0, -0.03, 0.32, 0.66);
+
     const blade = new THREE.Group();
     blade.position.set(0, 0.075, 0.25);
     blade.rotation.x = Math.PI / 2;
     forearm.add(blade);
+
     const length = i === 0 ? 0.88 : 1.18;
     armor(
       blade,
@@ -381,16 +381,18 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
     );
     rivet(forearm, -0.1, 0, 0.26);
   }
-  legArmor(m, color, ivory, 'blade');
-  for (const knee of m.rig!.knees)
-    for (const s of [-1, 1])
+
+  legArmor(model, color, ivory, 'blade');
+
+  for (const knee of model.rig!.knees) {
+    for (const side of [-1, 1]) {
       armor(
         knee,
         accent,
         [
-          [s * 0.1, -0.49],
-          [s * 0.23, -0.48],
-          [s * 0.16, -0.34],
+          [side * 0.1, -0.49],
+          [side * 0.23, -0.48],
+          [side * 0.16, -0.34],
         ],
         0.2,
         0,
@@ -398,5 +400,8 @@ export function rokusho(color = '#e4ecf7', accent = '#2552be') {
         0.42,
         0.012,
       );
-  return finishModel(m);
+    }
+  }
+
+  return finishModel(model);
 }

@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
-import { content, setup } from './helpers';
-import { GamepadInput } from '../src/input/gamepad-input';
+
 import { LocalBattleSession } from '../src/battle-session/local-battle-session';
 import type { Assignments } from '../src/input/bindings';
+import { GamepadInput } from '../src/input/gamepad-input';
+import { content, setup } from './helpers';
 const pad = (axis = 0) => ({
   connected: true,
   axes: [axis],
@@ -47,7 +48,9 @@ describe('local session controller lifecycle', () => {
     const key = new Event('keydown');
     Object.defineProperty(key, 'code', { value: 'KeyD' });
     window.dispatchEvent(key);
-    for (let i = 0; i < 20; i++) session.advance(1 / 60);
+    for (let i = 0; i < 20; i++) {
+      session.advance(1 / 60);
+    }
     expect(session.current.combatants[0]!.x).toBeGreaterThan(-9);
     expect(session.current.combatants[1]!.x).toBeGreaterThan(-12);
     expect(session.current.combatants[2]!.x).toBeLessThan(8);
@@ -81,7 +84,9 @@ describe('local session controller lifecycle', () => {
     expect(session.paused).toBe(true);
     expect(session.pauseReason).toContain('focus');
     session.resume();
-    for (let i = 0; i < 12; i++) session.advance(1 / 60);
+    for (let i = 0; i < 12; i++) {
+      session.advance(1 / 60);
+    }
     expect(session.current.combatants[0]!.vx).toBe(0);
     session.dispose();
   });

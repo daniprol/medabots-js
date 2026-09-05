@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+
 import type { BattleDebug } from '../../src/main';
 declare global {
   interface Window {
@@ -15,7 +16,9 @@ test('setup discovers controls and the default roster enters the arena without c
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error') {
+      errors.push(message.text());
+    }
   });
   await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
   await expect(page.getByLabel('A1 controller')).toHaveValue('keyboard-solo');

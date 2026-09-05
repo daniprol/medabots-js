@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
+
 import { createBattle, emptyCommand } from '../src/battle-core';
-import { content, setup, frame, fixture, closeArena, runBattleScenario } from './helpers';
-import { aiCommand, createAIState } from '../src/battle-session/ai-controller';
 import { nextRandom } from '../src/battle-core/random';
+import { aiCommand, createAIState } from '../src/battle-session/ai-controller';
+import { content, setup, frame, fixture, closeArena, runBattleScenario } from './helpers';
 const shootHead = (s: ReturnType<ReturnType<typeof createBattle>['getSnapshot']>) =>
   frame(s.tick + 1, { A1: { headPressed: s.tick % 30 === 0 } });
 describe('battle integration in Node without browser globals', () => {
@@ -65,7 +66,9 @@ describe('battle integration in Node without browser globals', () => {
     });
     expect(run.snapshot.projectiles[0]?.id).toBe('projectile-1');
     expect(JSON.parse(JSON.stringify(run.snapshot)).projectiles[0].id).toBe('projectile-1');
-    for (let t = 9; t < 40; t++) run.battle.step(frame(t));
+    for (let t = 9; t < 40; t++) {
+      run.battle.step(frame(t));
+    }
     expect(run.battle.getSnapshot().projectiles).toHaveLength(0);
     expect(run.battle.getSnapshot().combatants[2]!.parts.rightArm.currentArmor).toBe(385);
   });
@@ -95,11 +98,15 @@ describe('battle integration in Node without browser globals', () => {
     const b = createBattle({ setup, content: closeArena() });
     b.step(frame(1, { A1: { headPressed: true } }));
     expect(b.getSnapshot().combatants[0]!.attack?.age).toBe(1);
-    for (let t = 2; t <= 6; t++) b.step(frame(t));
+    for (let t = 2; t <= 6; t++) {
+      b.step(frame(t));
+    }
     expect(b.getSnapshot().projectiles).toHaveLength(0);
     b.step(frame(7));
     expect(b.getSnapshot().projectiles).toHaveLength(1);
-    for (let t = 8; t <= 21; t++) b.step(frame(t));
+    for (let t = 8; t <= 21; t++) {
+      b.step(frame(t));
+    }
     expect(b.getSnapshot().combatants[0]!.attack).not.toBeNull();
     b.step(frame(22));
     expect(b.getSnapshot().combatants[0]!.attack).not.toBeNull();
@@ -108,13 +115,14 @@ describe('battle integration in Node without browser globals', () => {
   });
   it('melee activation hits each target once even across multiple active ticks', () => {
     const local = fixture((d) => {
-      if (d.kind === 'arena')
+      if (d.kind === 'arena') {
         d.spawns = [
           { x: -0.5, y: 0 },
           { x: -13, y: 0 },
           { x: 1.5, y: 0 },
           { x: 14, y: 0 },
         ];
+      }
     });
     const run = runBattleScenario({
       content: local,
@@ -128,14 +136,17 @@ describe('battle integration in Node without browser globals', () => {
   });
   it('destroyed arms disable their ability and emit destruction once', () => {
     const local = fixture((d) => {
-      if (d.kind === 'arena')
+      if (d.kind === 'arena') {
         d.spawns = [
           { x: -0.5, y: 0 },
           { x: -13, y: 0 },
           { x: 1.5, y: 0 },
           { x: 14, y: 0 },
         ];
-      if (d.id === 'metabee-right-arm') d.armor = 10;
+      }
+      if (d.kind === 'part' && d.id === 'metabee-right-arm') {
+        d.armor = 10;
+      }
     });
     const run = runBattleScenario({
       content: local,
@@ -152,7 +163,9 @@ describe('battle integration in Node without browser globals', () => {
   });
   it('charges only grounded idle combatants and consumes the meter for a special', () => {
     const b = createBattle({ setup, content });
-    for (let t = 1; t <= 260; t++) b.step(frame(t, { A1: { chargeHeld: true } }));
+    for (let t = 1; t <= 260; t++) {
+      b.step(frame(t, { A1: { chargeHeld: true } }));
+    }
     expect(b.getSnapshot().combatants[0]!.specialMeter).toBe(100);
     b.step(frame(261, { A1: { specialPressed: true } }));
     expect(b.getSnapshot().combatants[0]!.attack?.slot).toBe('special');
@@ -167,14 +180,17 @@ describe('battle integration in Node without browser globals', () => {
   });
   it('times out by total remaining armor percentage, including draws', () => {
     const timeout = fixture((d) => {
-      if (d.kind === 'rules') d.roundTimeMs = 1000;
-      if (d.kind === 'arena')
+      if (d.kind === 'rules') {
+        d.roundTimeMs = 1000;
+      }
+      if (d.kind === 'arena') {
         d.spawns = [
           { x: -2, y: 0 },
           { x: -13, y: 0 },
           { x: 2, y: 0 },
           { x: 14, y: 0 },
         ];
+      }
     });
     expect(runBattleScenario({ content: timeout, maxTicks: 60 }).result).toMatchObject({
       winnerTeamId: null,
@@ -237,9 +253,13 @@ describe('battle integration in Node without browser globals', () => {
 describe('kinematic movement', () => {
   it('accelerates, brakes, and stays inside arena bounds', () => {
     const b = createBattle({ setup, content });
-    for (let t = 1; t <= 240; t++) b.step(frame(t, { A1: { moveX: 1 } }));
+    for (let t = 1; t <= 240; t++) {
+      b.step(frame(t, { A1: { moveX: 1 } }));
+    }
     expect(b.getSnapshot().combatants[0]!.x).toBeLessThanOrEqual(15.25);
-    for (let t = 241; t <= 260; t++) b.step(frame(t));
+    for (let t = 241; t <= 260; t++) {
+      b.step(frame(t));
+    }
     expect(b.getSnapshot().combatants[0]!.vx).toBe(0);
   });
   it('passes upward through a one-way platform, lands on it, and drops through', () => {
@@ -251,14 +271,16 @@ describe('kinematic movement', () => {
       highest = Math.max(highest, b.getSnapshot().combatants[0]!.y);
     }
     expect(highest).toBeGreaterThan(4);
-    expect(b.getSnapshot().combatants[0]).toMatchObject({
+    expect(b.getSnapshot().combatants[0]!).toMatchObject({
       y: 4,
       grounded: true,
       groundPlatformId: 'left-gantry',
     });
     b.step(frame(91, { A1: { dropHeld: true } }));
-    for (let t = 92; t <= 140; t++) b.step(frame(t));
-    expect(b.getSnapshot().combatants[0]).toMatchObject({ y: 0, grounded: true });
+    for (let t = 92; t <= 140; t++) {
+      b.step(frame(t));
+    }
+    expect(b.getSnapshot().combatants[0]!).toMatchObject({ y: 0, grounded: true });
   });
   it('detects dash from tick-based directional double taps, not held movement', () => {
     const b = createBattle({ setup, content });
@@ -275,19 +297,26 @@ describe('kinematic movement', () => {
   });
   it('destroyed legs reduce run speed, jump height and dash speed', () => {
     const local = fixture((d) => {
-      if (d.id === 'metabee-legs') d.armor = 1;
-      if (d.kind === 'arena')
+      if (d.kind === 'part' && d.id === 'metabee-legs') {
+        d.armor = 1;
+      }
+      if (d.kind === 'arena') {
         d.spawns = [
           { x: -0.5, y: 0 },
           { x: -13, y: 0 },
           { x: 1.5, y: 0 },
           { x: 14, y: 0 },
         ];
+      }
     });
     const b = createBattle({ setup, content: local });
-    for (let t = 1; t <= 30; t++) b.step(frame(t, { B1: { leftArmPressed: t === 1 } }));
+    for (let t = 1; t <= 30; t++) {
+      b.step(frame(t, { B1: { leftArmPressed: t === 1 } }));
+    }
     expect(b.getSnapshot().combatants[0]!.parts.legs.destroyed).toBe(true);
-    for (let t = 31; t <= 60; t++) b.step(frame(t, { A1: { moveX: -1 } }));
+    for (let t = 31; t <= 60; t++) {
+      b.step(frame(t, { A1: { moveX: -1 } }));
+    }
     expect(Math.abs(b.getSnapshot().combatants[0]!.vx)).toBeCloseTo(7.3 * 0.4);
     b.step(frame(61, { A1: { jumpPressed: true } }));
     expect(b.getSnapshot().combatants[0]!.vy).toBeLessThan(10);
@@ -334,32 +363,38 @@ describe('limb armor protects the head', () => {
     const b = createBattle({ setup, content: closeArena(false, true) });
     const expected = ['rightArm', 'leftArm', 'legs', 'head', 'head'];
     for (let shot = 0; shot < 5; shot++) {
-      for (let t = shot * 30 + 1; t <= (shot + 1) * 30 && !b.getResult(); t++)
+      for (let t = shot * 30 + 1; t <= (shot + 1) * 30 && !b.getResult(); t++) {
         b.step(frame(t, { A1: { headPressed: t === shot * 30 + 1 } }));
+      }
       const target = b.getSnapshot().combatants[2]!;
       expect(target.parts.head.currentArmor, `shot ${shot + 1}`).toBe(
         shot < 3 ? 30 : shot === 3 ? 15 : 0,
       );
       const hit = b.drainEvents().find((e) => e.type === 'hit');
       expect(hit?.part).toBe(expected[shot]);
-      if (shot < 4) expect(target.knockedOut).toBe(false);
+      if (shot < 4) {
+        expect(target.knockedOut).toBe(false);
+      }
     }
     expect(b.getResult()?.reason).toBe('leader-head-destroyed');
   });
   it('never spills excess helmet-hit damage through a destroyed limb into the head', () => {
     const c = fixture((d) => {
-      if (d.kind === 'part' && d.slot !== 'head') d.armor = 1;
+      if (d.kind === 'part' && d.slot !== 'head') {
+        d.armor = 1;
+      }
       if (d.kind === 'ability') {
         d.knockbackX = 0;
         d.knockbackY = 0;
       }
-      if (d.kind === 'arena')
+      if (d.kind === 'arena') {
         d.spawns = [
           { x: -2, y: 0 },
           { x: -13, y: 0 },
           { x: 2, y: 0 },
           { x: 14, y: 0 },
         ];
+      }
     });
     const run = runBattleScenario({ content: c, maxTicks: 90, commandFrames: shootHead });
     const target = run.snapshot.combatants[2]!;

@@ -1,4 +1,5 @@
 import { it, expect } from 'vitest';
+
 import { createBattle } from '../src/battle-core';
 import { buildContentCatalog } from '../src/content/build-content-catalog';
 import { content, documents, fixture, frame, setup, runBattleScenario } from './helpers';
@@ -35,15 +36,20 @@ it('every initial combatant can use all three normal slots and its configured sp
 });
 it('a damage edit changes real collision damage and a speed edit changes real movement', () => {
   const changed = fixture((d) => {
-    if (d.id === 'metabee-head-attack') d.damage = 42;
-    if (d.id === 'metabee-legs') d.movement.speed = 12;
-    if (d.kind === 'arena')
+    if (d.kind === 'ability' && d.id === 'metabee-head-attack') {
+      d.damage = 42;
+    }
+    if (d.kind === 'part' && d.id === 'metabee-legs') {
+      d.movement!.speed = 12;
+    }
+    if (d.kind === 'arena') {
       d.spawns = [
         { x: -2, y: 0 },
         { x: -13, y: 0 },
         { x: 2, y: 0 },
         { x: 14, y: 0 },
       ];
+    }
   });
   const shot = runBattleScenario({
     content: changed,
@@ -74,20 +80,21 @@ it('a new file-defined character reuses existing parts and mechanics without bat
   custom.teams[0]!.combatants[0]!.characterId = 'brass-beetle';
   const battle = createBattle({ setup: custom, content: catalog });
   battle.step(frame(1, { A1: { rightArmPressed: true } }, custom));
-  expect(battle.getSnapshot().combatants[0]).toMatchObject({
+  expect(battle.getSnapshot().combatants[0]!).toMatchObject({
     characterId: 'brass-beetle',
     attack: { abilityId: 'metabee-right-arm-attack' },
   });
 });
 it('separates grounded bodies while allowing a dash through an opponent', () => {
   const close = fixture((d) => {
-    if (d.kind === 'arena')
+    if (d.kind === 'arena') {
       d.spawns = [
         { x: -0.3, y: 0 },
         { x: -13, y: 0 },
         { x: 0.3, y: 0 },
         { x: 14, y: 0 },
       ];
+    }
   });
   const battle = createBattle({ setup, content: close });
   battle.step(frame(1));
@@ -95,7 +102,9 @@ it('separates grounded bodies while allowing a dash through an opponent', () => 
   expect(initial[2]!.x - initial[0]!.x).toBeCloseTo(1.5);
   battle.step(frame(2, { A1: { moveX: 1 } }));
   battle.step(frame(3));
-  for (let tick = 4; tick <= 12; tick++) battle.step(frame(tick, { A1: { moveX: 1 } }));
+  for (let tick = 4; tick <= 12; tick++) {
+    battle.step(frame(tick, { A1: { moveX: 1 } }));
+  }
   const final = battle.getSnapshot().combatants;
   expect(final[0]!.x).toBeGreaterThan(final[2]!.x);
 });

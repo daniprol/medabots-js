@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 import type { CharacterDefinition } from '../content/schemas';
 import type { RobotModel } from './models/primitives';
+
 export async function loadGLB(
   visual: Extract<CharacterDefinition['visual'], { type: 'gltf' }>,
 ): Promise<RobotModel> {
@@ -9,12 +11,18 @@ export async function loadGLB(
   const root = new THREE.Group();
   root.name = 'Robot';
   root.add(gltf.scene);
+
   const node = (name: string) => {
     const obj = gltf.scene.getObjectByName(name);
-    if (!obj) throw new Error(`${visual.url}: missing configured node "${name}"`);
+
+    if (!obj) {
+      throw new Error(`${visual.url}: missing configured node "${name}"`);
+    }
+
     return obj;
   };
   const groups = {} as Pick<RobotModel, 'head' | 'leftArm' | 'rightArm' | 'legs' | 'innerFrame'>;
+
   for (const key of ['head', 'leftArm', 'rightArm', 'legs', 'innerFrame'] as const) {
     const original = node(visual.nodes[key]);
     const parent = original.parent!;
@@ -29,11 +37,13 @@ export async function loadGLB(
     group.add(original);
     groups[key] = group;
   }
+
   gltf.scene.traverse((o) => {
     if (o instanceof THREE.Mesh) {
       o.castShadow = true;
       o.receiveShadow = true;
     }
   });
+
   return { root, core: new THREE.Group(), ...groups, feet: [] };
 }

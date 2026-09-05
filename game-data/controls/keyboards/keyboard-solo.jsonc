@@ -5,43 +5,17 @@
   "kind": "keyboard",
   "displayName": "Solo \u00b7 Arrows + F/G",
   "bindings": {
-    "moveLeft": [
-      "ArrowLeft"
-    ],
-    "moveRight": [
-      "ArrowRight"
-    ],
-    "jump": [
-      "ArrowUp",
-      "Space"
-    ],
-    "dropThroughPlatform": [
-      "ArrowDown"
-    ],
-    "rightArm": [
-      "KeyF"
-    ],
-    "leftArm": [
-      "KeyG"
-    ],
-    "head": [
-      "KeyH"
-    ],
-    "guard": [
-      "ShiftLeft"
-    ],
-    "chargeSpecial": [
-      "KeyR"
-    ],
-    "activateSpecial": [
-      "KeyT"
-    ],
-    "partnerStrategy": [
-      "KeyQ"
-    ],
-    "pause": [
-      "Escape",
-      "Enter"
-    ]
-  }
+    "moveLeft": ["ArrowLeft"],
+    "moveRight": ["ArrowRight"],
+    "jump": ["ArrowUp", "Space"],
+    "dropThroughPlatform": ["ArrowDown"],
+    "rightArm": ["KeyF"],
+    "leftArm": ["KeyG"],
+    "head": ["KeyH"],
+    "guard": ["ShiftLeft"],
+    "chargeSpecial": ["KeyR"],
+    "activateSpecial": ["KeyT"],
+    "partnerStrategy": ["KeyQ"],
+    "pause": ["Escape", "Enter"],
+  },
 }

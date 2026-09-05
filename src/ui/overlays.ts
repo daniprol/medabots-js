@@ -1,13 +1,16 @@
 import type { BattleResult } from '../battle-core';
 import { element, button, teamName } from './dom';
+
 export function pauseOverlay(root: HTMLElement, resume: () => void, setup: () => void) {
   const overlay = element('section', 'modal-backdrop');
   overlay.setAttribute('aria-label', 'Pause menu');
+
   const panel = element('div', 'modal-panel');
   panel.append(
     element('span', 'eyebrow', 'SYSTEM / STANDBY'),
     element('h1', '', 'ROBATTLE PAUSED'),
   );
+
   const reason = element('p', 'modal-copy');
   panel.append(
     reason,
@@ -16,6 +19,7 @@ export function pauseOverlay(root: HTMLElement, resume: () => void, setup: () =>
   );
   overlay.append(panel);
   root.append(overlay);
+
   return {
     update(text: string) {
       reason.textContent = text;
@@ -25,6 +29,7 @@ export function pauseOverlay(root: HTMLElement, resume: () => void, setup: () =>
     },
   };
 }
+
 export function resultOverlay(
   root: HTMLElement,
   result: BattleResult,
@@ -33,6 +38,7 @@ export function resultOverlay(
 ) {
   const overlay = element('section', 'modal-backdrop result-backdrop');
   overlay.dataset.testid = 'battle-results';
+
   const panel = element('div', 'modal-panel result-panel');
   panel.append(
     element('span', 'eyebrow', 'RO BATTLE / COMPLETE'),
@@ -50,8 +56,10 @@ export function resultOverlay(
           : 'Time expired. Both teams have equal armor.',
     ),
   );
+
   const stats = element('div', 'result-stats');
-  for (const team of [...new Set(result.finalCombatants.map((c) => c.teamId))]) {
+
+  for (const team of new Set(result.finalCombatants.map((combatant) => combatant.teamId))) {
     const parts = result.finalCombatants
       .filter((c) => c.teamId === team)
       .flatMap((c) => Object.values(c.parts));
@@ -59,6 +67,7 @@ export function resultOverlay(
       parts.reduce((n, p) => n + p.currentArmor, 0) / parts.reduce((n, p) => n + p.maxArmor, 0);
     stats.append(element('div', '', `${teamName(team)}  /  ${Math.round(armor * 100)}% ARMOR`));
   }
+
   panel.append(
     stats,
     button('REMATCH  ↗', rematch, 'button primary'),
@@ -66,6 +75,7 @@ export function resultOverlay(
   );
   overlay.append(panel);
   root.append(overlay);
+
   return {
     dispose() {
       overlay.remove();

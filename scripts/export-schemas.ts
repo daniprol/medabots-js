@@ -1,6 +1,9 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+
 import { schemas } from '../src/content/schemas';
+
 await mkdir('game-data/schemas', { recursive: true });
+
 await Promise.all(
   Object.entries(schemas).map(([kind, schema]) =>
     writeFile(
@@ -17,4 +20,5 @@ await Promise.all(
     ),
   ),
 );
+
 console.log(`Generated ${Object.keys(schemas).length} content schemas.`);

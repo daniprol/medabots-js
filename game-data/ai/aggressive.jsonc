@@ -11,6 +11,6 @@
   "strategyWeights": {
     "leader": 2,
     "proximity": 1,
-    "weakness": 0.8
-  }
+    "weakness": 0.8,
+  },
 }

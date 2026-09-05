@@ -5,5 +5,5 @@
   "kind": "part",
   "slot": "rightArm",
   "armor": 400,
-  "abilityId": "rokusho-right-arm-attack"
+  "abilityId": "rokusho-right-arm-attack",
 }

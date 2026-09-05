@@ -1,11 +1,14 @@
 import * as THREE from 'three';
+
 import type { BattleSnapshot, BattleEvent } from '../battle-core';
-import type { ContentCatalog } from '../content/build-content-catalog';
+import type { ContentCatalog } from '../content/catalog';
 import { createArena } from './arena-view';
 import { CharacterView, disposeModel } from './character-view';
 import { Effects } from './effects';
 import { material } from './models/primitives';
+
 const portraitCache = new WeakMap<object, string>();
+
 export class BattleRenderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
@@ -32,11 +35,12 @@ export class BattleRenderer {
     depthWrite: false,
   });
   private auraGeometry = new THREE.TorusGeometry(0.86, 0.035, 5, 36);
+
   constructor(
     private container: HTMLElement,
     private content: ContentCatalog,
     snapshot: BattleSnapshot,
-    private humans: string[],
+    humans: string[],
   ) {
     this.worldWidth = content.arenas[snapshot.arenaId]!.width + 1;
     this.renderer = new THREE.WebGLRenderer({
@@ -54,6 +58,7 @@ export class BattleRenderer {
     this.camera.position.set(0, 10.1, 42);
     this.camera.lookAt(0, 6.1, 0);
     this.scene.add(new THREE.HemisphereLight('#eefaff', '#6b7fa3', 0.7));
+
     const sun = new THREE.DirectionalLight('#fff2d9', 2.1);
     sun.position.set(-10, 20, 16);
     sun.castShadow = false;
@@ -64,22 +69,26 @@ export class BattleRenderer {
     sun.shadow.camera.bottom = -10;
     sun.shadow.normalBias = 0.035;
     this.scene.add(sun);
+
     const rim = new THREE.DirectionalLight('#7bddff', 0.55);
     rim.position.set(5, 8, -7);
     this.scene.add(rim);
     this.arena = createArena(content.arenas[snapshot.arenaId]!);
     this.scene.add(this.arena.root);
     this.effects = new Effects(this.scene, content);
+
     for (const c of snapshot.combatants) {
       const view = new CharacterView(content.characters[c.characterId]!);
       this.views.set(c.id, view);
       this.scene.add(view.root);
+
       const label = document.createElement('div');
       label.dataset.testid = `combatant-label-${c.id}`;
       label.className = `robot-label ${c.teamId === snapshot.combatants[0]!.teamId ? 'cyan' : 'coral'}`;
       label.textContent = `${c.role === 'leader' ? '◆ ' : ''}${c.id}${humans.includes(c.id) ? ' · YOU' : ''}`;
       this.container.append(label);
       this.labels.set(c.id, label);
+
       const ring = new THREE.Mesh(
         this.auraGeometry,
         new THREE.MeshBasicMaterial({ color: '#6feaff', transparent: true, opacity: 0.7 }),
@@ -87,20 +96,24 @@ export class BattleRenderer {
       ring.visible = false;
       this.scene.add(ring);
       this.rings.set(c.id, ring);
+
       const shadow = new THREE.Mesh(this.shadowGeometry, this.shadowMaterial);
       shadow.rotation.x = -Math.PI / 2;
       shadow.scale.set(1.15, 0.7, 1);
       this.scene.add(shadow);
       this.shadows.set(c.id, shadow);
     }
+
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(container);
     this.resize();
   }
+
   private resize() {
     this.width = this.container.clientWidth;
     this.height = this.container.clientHeight;
     this.renderer.setSize(this.width, this.height);
+
     const aspect = this.width / this.height;
     const worldWidth = Math.max(this.worldWidth, 17 * aspect);
     const worldHeight = worldWidth / aspect;
@@ -110,6 +123,7 @@ export class BattleRenderer {
     this.camera.bottom = -worldHeight / 2;
     this.camera.updateProjectionMatrix();
   }
+
   render(
     previous: BattleSnapshot,
     current: BattleSnapshot,
@@ -120,16 +134,20 @@ export class BattleRenderer {
     dt = THREE.MathUtils.clamp(dt, 0, 0.1);
     this.time += dt;
     this.effects.emit(events);
+
     const freeze = this.effects.freezeSeconds > 0;
     this.effects.update(dt);
     this.frameAction(current, dt);
+
     const blend = THREE.MathUtils.clamp(alpha, 0, 1);
     const animationDt = this.effects.finalSlowSeconds > 0 ? dt * 0.22 : dt;
     const placedLabels: { x: number; y: number }[] = [];
+
     for (const c of current.combatants) {
       const old = previous.combatants.find((p) => p.id === c.id) ?? c;
       const view = this.views.get(c.id)!;
-      if (!freeze)
+
+      if (!freeze) {
         view.update(
           old,
           c,
@@ -138,6 +156,8 @@ export class BattleRenderer {
           false,
           c.attack ? this.content.abilities[c.attack.abilityId] : undefined,
         );
+      }
+
       const shadow = this.shadows.get(c.id)!;
       shadow.position.set(
         view.root.position.x,
@@ -145,6 +165,7 @@ export class BattleRenderer {
         view.root.position.z,
       );
       shadow.visible = !c.knockedOut;
+
       const label = this.labels.get(c.id)!;
       const p = view.root.position
         .clone()
@@ -152,15 +173,19 @@ export class BattleRenderer {
         .project(this.camera);
       const labelX = (p.x * 0.5 + 0.5) * this.width;
       let labelY = (-p.y * 0.5 + 0.5) * this.height;
+
       while (
         placedLabels.some(
           (other) => Math.abs(other.x - labelX) < 90 && Math.abs(other.y - labelY) < 23,
         )
-      )
+      ) {
         labelY -= 24;
+      }
+
       placedLabels.push({ x: labelX, y: labelY });
       label.style.transform = `translate(-50%,-50%) translate(${labelX}px,${labelY}px)`;
       label.style.opacity = c.knockedOut ? '.3' : '1';
+
       const ring = this.rings.get(c.id)!;
       ring.visible = c.guarding || c.charging;
       ring.position.copy(view.root.position).add(new THREE.Vector3(0, 1.25, 0.8));
@@ -168,21 +193,27 @@ export class BattleRenderer {
       ring.rotation.z = this.time * 2;
       (ring.material as THREE.MeshBasicMaterial).color.set(c.guarding ? '#66d8ff' : '#ffce54');
     }
+
     const active = new Set(current.projectiles.map((p) => p.id));
-    for (const [id, mesh] of this.projectiles)
+
+    for (const [id, mesh] of this.projectiles) {
       if (!active.has(id)) {
         this.scene.remove(mesh);
         this.projectiles.delete(id);
       }
+    }
+
     for (const p of current.projectiles) {
       const a = this.content.abilities[p.abilityId]!;
       let mesh = this.projectiles.get(p.id);
+
       if (!mesh) {
         mesh = new THREE.Mesh(this.shotGeometry, material(a.color));
         mesh.scale.set(a.hitbox.width * 0.8, a.hitbox.height * 0.45, 0.13);
         this.scene.add(mesh);
         this.projectiles.set(p.id, mesh);
       }
+
       const old = previous.projectiles.find((o) => o.id === p.id) ?? p;
       mesh.position.set(
         THREE.MathUtils.lerp(old.x, p.x, blend),
@@ -190,17 +221,23 @@ export class BattleRenderer {
         1,
       );
     }
+
     const focus = current.combatants.reduce((n, c) => n + c.x, 0) / 4;
     this.arena.distant.position.x = -focus * 0.035;
 
     this.renderer.render(this.scene, this.camera);
   }
+
   /** Keep the floor anchored and fit all active robots, with a modest close-up during a clustered fight. */
   private frameAction(snapshot: BattleSnapshot, dt: number) {
     const actors = snapshot.combatants.filter((c) => !c.knockedOut);
-    if (!actors.length) return;
-    const left = Math.min(...actors.map((c) => c.x)),
-      right = Math.max(...actors.map((c) => c.x));
+
+    if (!actors.length) {
+      return;
+    }
+
+    const left = Math.min(...actors.map((c) => c.x));
+    const right = Math.max(...actors.map((c) => c.x));
     const top = Math.max(...actors.map((c) => c.y + 3.6));
     const worldWidth = this.camera.right - this.camera.left;
     const widthFit = worldWidth / Math.max(1, right - left + 4);
@@ -208,10 +245,12 @@ export class BattleRenderer {
       (((this.height - Math.min(185, this.height * 0.25)) / (top + 1.0)) * worldWidth) / this.width;
     const targetZoom = THREE.MathUtils.clamp(Math.min(widthFit, heightFit), 0.72, 1.32);
     this.camera.zoom = THREE.MathUtils.damp(this.camera.zoom, targetZoom, 3.5, dt);
+
     const arenaHalf = this.content.arenas[snapshot.arenaId]!.width / 2;
     const allowedPan = Math.max(0, arenaHalf - worldWidth / (2 * this.camera.zoom));
     const center = THREE.MathUtils.clamp((left + right) / 2, -allowedPan, allowedPan);
     this.focusX = THREE.MathUtils.damp(this.focusX, center, 3.5, dt);
+
     const centerY = (this.camera.top - this.camera.bottom) / (2 * this.camera.zoom) - 1.0;
     const shake = this.effects.shake;
     const x = this.focusX + Math.sin(this.time * 117) * shake;
@@ -221,35 +260,57 @@ export class BattleRenderer {
     this.camera.updateProjectionMatrix();
     this.camera.updateMatrixWorld();
   }
+
   portrait(characterId: string): string {
     const cached = portraitCache.get(this.content.characters[characterId]!);
-    if (cached) return cached;
+
+    if (cached) {
+      return cached;
+    }
+
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#142b42');
+
     const light = new THREE.DirectionalLight('#fff3d5', 1.8);
     light.position.set(-3, 5, 8);
     scene.add(light, new THREE.HemisphereLight('#e3f6ff', '#63829b', 0.9));
+
     const view = new CharacterView(this.content.characters[characterId]!);
     view.model.root.rotation.y = -0.32;
     scene.add(view.root);
+
     const camera = new THREE.OrthographicCamera(-1.02, 1.02, 1.21, -1.21, 0.1, 20);
     camera.position.set(0, 2.15, 8);
     camera.lookAt(0, 2.0, 0);
+
     const size = this.renderer.getSize(new THREE.Vector2());
     this.renderer.setSize(160, 190, false);
     this.renderer.render(scene, camera);
+
     const image = this.renderer.domElement.toDataURL();
     this.renderer.setSize(size.x, size.y, false);
     view.dispose();
     portraitCache.set(this.content.characters[characterId]!, image);
+
     return image;
   }
+
   dispose() {
     this.resizeObserver.disconnect();
     this.effects.dispose();
-    for (const view of this.views.values()) view.dispose();
-    for (const label of this.labels.values()) label.remove();
-    for (const ring of this.rings.values()) (ring.material as THREE.Material).dispose();
+
+    for (const view of this.views.values()) {
+      view.dispose();
+    }
+
+    for (const label of this.labels.values()) {
+      label.remove();
+    }
+
+    for (const ring of this.rings.values()) {
+      (ring.material as THREE.Material).dispose();
+    }
+
     disposeModel(this.arena.root);
     this.shotGeometry.dispose();
     this.auraGeometry.dispose();

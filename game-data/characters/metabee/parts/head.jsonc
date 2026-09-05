@@ -5,5 +5,5 @@
   "kind": "part",
   "slot": "head",
   "armor": 600,
-  "abilityId": "metabee-head-attack"
+  "abilityId": "metabee-head-attack",
 }

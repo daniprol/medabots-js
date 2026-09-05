@@ -1,6 +1,6 @@
 # Character art research
 
-Research date: 2026-09-05. The project's [supplied image](../graphics_reference.png) is the primary art direction. External illustrations and licensed model photographs were inspected as reference only; they are not game assets.
+Research date: 2026-09-05. The project's supplied local reference image (`graphics_reference.png`, excluded from release archives) is the primary art direction. External illustrations and licensed model photographs were inspected as reference only; they are not game assets.
 
 ## Direction
 

@@ -13,14 +13,14 @@
         {
           "instanceId": "A1",
           "characterId": "metabee",
-          "role": "leader"
+          "role": "leader",
         },
         {
           "instanceId": "A2",
           "characterId": "arcbeetle",
-          "role": "partner"
-        }
-      ]
+          "role": "partner",
+        },
+      ],
     },
     {
       "id": "team-b",
@@ -28,14 +28,14 @@
         {
           "instanceId": "B1",
           "characterId": "rokusho",
-          "role": "leader"
+          "role": "leader",
         },
         {
           "instanceId": "B2",
           "characterId": "warbandit",
-          "role": "partner"
-        }
-      ]
-    }
-  ]
+          "role": "partner",
+        },
+      ],
+    },
+  ],
 }

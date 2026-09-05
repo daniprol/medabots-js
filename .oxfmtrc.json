@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100,
+  "trailingComma": "all",
+  "sortImports": {},
+  "sortPackageJson": true,
+  "ignorePatterns": [
+    "dist/**",
+    "node_modules/**",
+    ".artifacts/**",
+    "test-results/**",
+    "playwright-report/**",
+    "game-data/schemas/**",
+    "pnpm-lock.yaml",
+    "public/THIRD-PARTY-NOTICES.txt"
+  ]
+}

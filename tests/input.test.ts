@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { content } from './helpers';
+
 import {
   emptyActions,
   normalizeActions,
@@ -9,6 +9,7 @@ import {
   type Assignments,
 } from '../src/input/bindings';
 import { KeyboardInput } from '../src/input/keyboard-input';
+import { content } from './helpers';
 describe('input normalization and assignments', () => {
   it('ships a solo layout and three mutually non-overlapping shared keyboard profiles', () => {
     expect(Object.keys(content.keyboards)).toHaveLength(4);
