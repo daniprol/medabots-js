@@ -1,0 +1,25 @@
+{
+  "protocolVersion": 1,
+  "simulationHz": 59.72750056960583,
+  "inputHz": 30,
+  "patchHz": 20,
+  "inputBufferSize": 8,
+  "inputTimeoutMs": 250,
+  "reconnectionSeconds": 20,
+  "countdownSeconds": 3,
+  "waitingRoomSeconds": 900,
+  "finishedRoomSeconds": 60,
+  "maxMessagesPerSecond": 120,
+  "interpolationDelayMs": 100,
+  "maxSnapshotBuffer": 30,
+  "maxPendingEvents": 256,
+  "connectionTimeoutMs": 10000,
+  "defaultRulesId": "battle-rules",
+  "servers": [
+    {
+      "name": "Localhost",
+      "url": "http://localhost:2567"
+    }
+  ],
+  "preparationTimeoutMs": 30000
+}

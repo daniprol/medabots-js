@@ -1,16 +1,16 @@
 import type { BattleSnapshot } from '../battle-core';
 import type { ContentCatalog } from '../content/catalog';
-import type { Assignments } from '../input/bindings';
 import { element, button } from './dom';
-import { createFighterCard } from './fighter-card';
+import { createFighterCard, type FighterSource } from './fighter-card';
 
 export function createHUD(
   root: HTMLElement,
   content: ContentCatalog,
   initial: BattleSnapshot,
-  assignments: Assignments,
+  assignments: Record<string, FighterSource>,
   portraits: Record<string, string>,
   pause: () => void,
+  actionLabel = 'Pause',
 ) {
   const hud = element('div', 'battle-hud');
   hud.dataset.testid = 'battle-hud';
@@ -19,7 +19,7 @@ export function createHUD(
   const header = element('header', 'battle-scoreboard');
   const timer = element('strong', 'battle-timer', '03:00');
   timer.dataset.testid = 'timer';
-  const pauseButton = button('Pause', pause, 'hud-pause');
+  const pauseButton = button(actionLabel, pause, 'hud-pause');
   header.append(
     element('span', '', `${count} VS ${count}`),
     timer,

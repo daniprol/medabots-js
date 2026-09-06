@@ -3,14 +3,16 @@ import { type BattleSetup, type BattleSnapshot } from './battle-core';
 import './ui/styles.css';
 import './ui/roster.css';
 import './ui/battle-hud.css';
+import './ui/online.css';
 import { millisecondsToTicks } from './battle-core/timing';
 import { mountLocalBattle } from './battle-session/mount-local-battle';
 import type { ContentCatalog } from './content/catalog';
 import { loadBundledContent } from './content/load-bundled-content';
 import type { Assignments } from './input/bindings';
 import { preloadSprites } from './render/sprite-assets';
-import { element } from './ui/dom';
+import { element, button } from './ui/dom';
 import { createMatchSetup, quickAssignments } from './ui/match-setup';
+import { createModeMenu } from './ui/mode-menu';
 
 export type BattleDebug = {
   getSnapshot: () => BattleSnapshot | null;
@@ -95,7 +97,50 @@ async function boot() {
         (assignments, setup, selectedContent) => start(assignments, setup, selectedContent),
         savedAssignments,
       );
-      disposeSetup = () => setupMenu.dispose();
+      const back = button('Main menu', showModes, 'button ghost mode-back');
+      root.append(back);
+      disposeSetup = () => {
+        setupMenu.dispose();
+        back.remove();
+      };
+    }
+
+    function showModes() {
+      mountedBattle?.dispose();
+      mountedBattle = undefined;
+      disposeSetup?.();
+      const menu = createModeMenu(root, showSetup, () => {
+        disposeSetup?.();
+        let cancelled = false;
+        const loading = element('section', 'error-panel', 'Loading online mode…');
+        root.append(loading);
+        disposeSetup = () => {
+          cancelled = true;
+          loading.remove();
+        };
+        void import('./online/mount-online-mode')
+          .then(({ mountOnlineMode }) => {
+            if (cancelled) {
+              return;
+            }
+            loading.remove();
+            const online = mountOnlineMode(root, content, showModes);
+            disposeSetup = () => online.dispose();
+          })
+          .catch((error: unknown) => {
+            if (!cancelled) {
+              loading.replaceChildren(
+                element(
+                  'p',
+                  '',
+                  error instanceof Error ? error.message : 'Unable to load online mode',
+                ),
+                button('Main menu', showModes),
+              );
+            }
+          });
+      });
+      disposeSetup = () => menu.dispose();
     }
 
     if (import.meta.env.DEV) {
@@ -135,7 +180,7 @@ async function boot() {
       };
     }
 
-    showSetup();
+    showModes();
   } catch (error) {
     const panel = element('section', 'error-panel');
     panel.append(

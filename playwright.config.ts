@@ -12,10 +12,17 @@ export default defineConfig({
       args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
     },
   },
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: [
+    {
+      command: 'pnpm dev',
+      url: 'http://127.0.0.1:5173',
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'pnpm dev:server',
+      url: 'http://127.0.0.1:2567/__healthcheck',
+      reuseExistingServer: !process.env.CI,
+    },
+  ],
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
 });

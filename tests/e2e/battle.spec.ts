@@ -8,6 +8,7 @@ declare global {
 }
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
+  await page.getByRole('button', { name: /Single player \/ Local/ }).click();
   await expect(page.getByTestId('match-setup')).toBeVisible();
 });
 test('setup discovers controls and the default roster enters the arena without console errors', async ({

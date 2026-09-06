@@ -11,11 +11,13 @@ const PART_LABELS: Record<PartSlot, string> = {
   legs: 'LEGS',
 };
 
+export type FighterSource = Assignments[string] | { type: 'remote'; name: string };
+
 /** Persistent armor, charge and controller information for one combatant. */
 export function createFighterCard(
   actor: CombatantSnapshot,
   content: ContentCatalog,
-  assignment: Assignments[string],
+  assignment: FighterSource,
   portraitUrl: string,
 ) {
   const card = element('article', 'fighter-card');
@@ -30,11 +32,13 @@ export function createFighterCard(
   portrait.alt = '';
   const identity = element('div');
   const source =
-    assignment.type === 'ai'
-      ? `CPU · ${content.ai[assignment.aiProfileId]!.displayName}`
-      : assignment.type === 'keyboard'
-        ? `KEY ${assignment.profileId.split('-').at(-1)}`
-        : `PAD ${assignment.gamepadIndex + 1}`;
+    assignment.type === 'remote'
+      ? assignment.name
+      : assignment.type === 'ai'
+        ? `CPU · ${content.ai[assignment.aiProfileId]!.displayName}`
+        : assignment.type === 'keyboard'
+          ? `KEY ${assignment.profileId.split('-').at(-1)}`
+          : `PAD ${assignment.gamepadIndex + 1}`;
   identity.append(
     element('strong', '', content.characters[actor.characterId]!.displayName),
     element('span', '', `${actor.id} · ${actor.role === 'leader' ? 'LEADER' : 'PARTNER'}`),

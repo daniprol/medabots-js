@@ -14,6 +14,9 @@ The [art research](docs/character-art-research.md) links to reference sources fo
 
 ## Third-party software and fonts
 
+- @noble/hashes: MIT, Paul Miller and contributors.
+- Colyseus core, SDK, schema and WebSocket transport: MIT, Endel Dreyer and contributors.
+- Express, msgpackr and the SDK runtime dependencies: their respective MIT/Apache notices are included below.
 - Three.js: MIT, three.js authors.
 - TypeBox: MIT, its copyright holders.
 - jsonc-parser: MIT, Microsoft.

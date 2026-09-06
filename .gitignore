@@ -9,3 +9,5 @@ graphics_reference.png
 .env.*
 !.env.example
 .DS_Store
+
+dist-server/

@@ -42,3 +42,9 @@ A shared keyboard can suppress simultaneous combinations due to hardware ghostin
 ## AI difficulty
 
 Easy reacts every 12 ticks and waits longer between attacks. Normal retains the existing balanced profile. Hard uses the defensive profile, including threat-based guarding. These presets change AI decisions, not armor, weapon power, or human controls. Tune `displayName`, `decisionIntervalTicks`, `attackDelayTicks`, and `variant` in `game-data/ai/*.jsonc`. They are browser difficulty presets, not original AX difficulty labels.
+
+## Online controls
+
+Choose your own keyboard or gamepad profile in the online server browser. Each connection controls one robot; other slots belong to other players. The default is the same solo keyboard profile as local play. The local AI partner-order action is disabled online.
+
+Escape/Enter opens the online menu and releases your controls. The shared battle continues. Losing focus, hiding the tab or disconnecting a gamepad also releases controls; return focus or reconnect the controller to continue. See [Online multiplayer](online-multiplayer.md) for readiness, connection recovery and server setup.

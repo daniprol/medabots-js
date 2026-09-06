@@ -2,7 +2,7 @@
   "name": "robattle-arena",
   "version": "0.1.0",
   "private": true,
-  "description": "An unofficial local robot-battle fan prototype inspired by Medabots AX for Game Boy Advance.",
+  "description": "A robot battle game with local play and authoritative Colyseus online multiplayer.",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "build": "pnpm schemas && pnpm notices && vite build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build:all",
     "preview": "vite preview --host 0.0.0.0",
     "lint": "oxlint --type-aware --deny-warnings",
     "lint:fix": "pnpm lint --fix",
@@ -20,12 +20,24 @@
     "format:check": "oxfmt --check .",
     "hooks:install": "lefthook install",
     "prepare": "tsx scripts/install-hooks.ts",
-    "notices": "tsx scripts/export-notices.ts"
+    "notices": "tsx scripts/export-notices.ts",
+    "dev:client": "vite --host 0.0.0.0",
+    "dev:server": "tsx watch server/main.ts",
+    "dev:all": "concurrently --kill-others --names client,server \"pnpm dev:client\" \"pnpm dev:server\"",
+    "build:server": "esbuild server/main.ts --bundle --platform=node --format=esm --packages=external --outfile=dist-server/main.js",
+    "start:server": "node dist-server/main.js",
+    "build:all": "pnpm build && pnpm build:server"
   },
   "dependencies": {
+    "@colyseus/core": "^0.18.10",
+    "@colyseus/schema": "^5.0.27",
+    "@colyseus/sdk": "^0.18.2",
+    "@colyseus/ws-transport": "^0.18.2",
     "@fontsource/barlow": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
+    "@noble/hashes": "^2.4.0",
     "@sinclair/typebox": "^0.34.41",
+    "express": "^5.2.1",
     "jsonc-parser": "^3.3.1",
     "three": "^0.180.0"
   },
@@ -33,6 +45,8 @@
     "@playwright/test": "^1.55.0",
     "@types/node": "^22.18.0",
     "@types/three": "^0.180.0",
+    "concurrently": "^10.0.5",
+    "esbuild": "^0.25.12",
     "lefthook": "^2.1.12",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
@@ -43,7 +57,7 @@
     "vitest": "^3.2.4"
   },
   "engines": {
-    "node": "^20.19.0 || >=22.12.0",
+    "node": ">=22.12.0",
     "pnpm": ">=10 <11"
   },
   "packageManager": "pnpm@10.17.0"
