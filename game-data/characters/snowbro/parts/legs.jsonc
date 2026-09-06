@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "snowbro-legs",
+  "kind": "part",
+  "originalId": 15,
+  "displayName": "Flavor",
+  "slot": "legs",
+  "armor": 100,
+  "defense": 2,
+  "selectionRank": 1,
+  "locomotion": 4,
+  "speedIndex": 2,
+  "attackRanks": [0, 3, 0],
+  "defenseRank": 3,
+}

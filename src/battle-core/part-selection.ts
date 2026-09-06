@@ -28,9 +28,37 @@ export function selectHitPart(
     (target.parts.leftArm.destroyed ? 2 : 0) |
     (target.parts.legs.destroyed ? 1 : 0);
   const weights = [...context.content.rules[context.setup.rulesId]!.original.partWeights[mask]!];
-  const preferences = context.content.medals[source.medalId]!.preferredParts;
+  const preference = context.content.medals[source.medalId]!.preference;
+  const positive = Object.values(target.parts)
+    .filter((part) => !part.destroyed)
+    .map((part) => part.currentArmor);
+  const extreme = preference === 4 ? Math.min(...positive) : Math.max(...positive);
+  const highestRank = Math.max(
+    ...Object.values(target.parts).map(
+      (part) => context.content.parts[part.definitionId]!.selectionRank,
+    ),
+  );
   for (const [index, slot] of HIT_ORDER.entries()) {
-    if (preferences.includes(slot)) {
+    const part = target.parts[slot];
+    const definition = context.content.parts[part.definitionId]!;
+    const ability = definition.abilityId
+      ? context.content.abilities[definition.abilityId]
+      : undefined;
+    const preferred =
+      preference === 0
+        ? slot === 'legs'
+        : preference === 1
+          ? !!ability && ability.original.category !== 2 && slot !== 'legs'
+          : preference === 2
+            ? !!ability && ability.original.category === 2
+            : preference === 3 || preference === 4
+              ? part.currentArmor === extreme
+              : preference === 5
+                ? !!ability && ability.original.statusGroup !== 255
+                : preference === 6
+                  ? definition.selectionRank === highestRank
+                  : false;
+    if (!part.destroyed && preferred) {
       weights[index] = weights[index]! * 2;
     }
   }

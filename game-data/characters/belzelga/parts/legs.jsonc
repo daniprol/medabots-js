@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "belzelga-legs",
+  "kind": "part",
+  "originalId": 20,
+  "displayName": "Helchaos",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 4,
+  "selectionRank": 2,
+  "locomotion": 0,
+  "speedIndex": 3,
+  "attackRanks": [2, 0, 2],
+  "defenseRank": 1,
+}

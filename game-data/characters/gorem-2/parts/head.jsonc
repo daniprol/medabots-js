@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "gorem-2-head",
+  "kind": "part",
+  "originalId": 25,
+  "displayName": "Doggu",
+  "slot": "head",
+  "armor": 80,
+  "defense": 7,
+  "selectionRank": 255,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "gorem-2-head-attack",
+}

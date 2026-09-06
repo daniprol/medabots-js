@@ -1,3 +1,4 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/ability.schema.json",
   "id": "rokusho-right-arm-attack",
@@ -14,30 +15,32 @@
   },
   "specialCost": 0,
   "maxUses": 0,
-  "color": "#65e9ff",
+  "color": "#e0ecf9",
   "original": {
     "actionType": 7,
+    "category": 0,
     "family": "sword",
     "refill": 10,
     "readinessReset": 213,
     "actionTicks": 16,
     "contactTick": 4,
-    "shotTick": 0,
-    "rangePixels": 240,
-    "speedPixels": 3,
-    "movementAllowed": true,
-    "verified": true,
+    "shotTick": 4,
     "comboStages": [
       {
         "actionTicks": 20,
         "contactTick": 6,
-        "shotTick": 0,
+        "shotTick": 6,
       },
       {
         "actionTicks": 28,
         "contactTick": 8,
-        "shotTick": 0,
+        "shotTick": 8,
       },
     ],
+    "rangePixels": 35,
+    "speedPixels": 3,
+    "movementAllowed": true,
+    "verified": true,
+    "statusGroup": 255,
   },
 }

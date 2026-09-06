@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "totalizer",
+  "kind": "character",
+  "displayName": "Totalizer",
+  "tagline": "Laser / Tank",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-2.png",
+    "frames": [
+      {
+        "x": 44,
+        "y": 520,
+        "width": 179,
+        "height": 216,
+      },
+      {
+        "x": 284,
+        "y": 529,
+        "width": 210,
+        "height": 200,
+      },
+      {
+        "x": 541,
+        "y": 504,
+        "width": 197,
+        "height": 210,
+      },
+      {
+        "x": 778,
+        "y": 526,
+        "width": 231,
+        "height": 206,
+      },
+    ],
+    "frameSize": 216,
+    "color": "#859d50",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "totalizer-head",
+    "leftArm": "totalizer-left-arm",
+    "rightArm": "totalizer-right-arm",
+    "legs": "totalizer-legs",
+  },
+  "specialAbilityId": "medaforce-0",
+  "medalId": "kabuto-medal",
+  "medalLevel": 1,
+  "originalSetId": 11,
+}

@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "krosserdog-legs",
+  "kind": "part",
+  "originalId": 16,
+  "displayName": "Hover",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 4,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 4,
+  "attackRanks": [5, 0, 0],
+  "defenseRank": 0,
+}

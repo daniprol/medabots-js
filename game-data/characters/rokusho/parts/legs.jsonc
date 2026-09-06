@@ -1,12 +1,14 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "rokusho-legs",
   "kind": "part",
-  "slot": "legs",
-  "armor": 50,
   "originalId": 1,
   "displayName": "Tatacker",
+  "slot": "legs",
+  "armor": 50,
   "defense": 4,
+  "selectionRank": 3,
   "locomotion": 1,
   "speedIndex": 4,
   "attackRanks": [0, 5, 0],

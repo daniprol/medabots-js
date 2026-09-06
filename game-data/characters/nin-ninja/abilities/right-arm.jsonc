@@ -1,0 +1,46 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/ability.schema.json",
+  "id": "nin-ninja-right-arm-attack",
+  "kind": "ability",
+  "displayName": "Sword",
+  "abilityKind": "melee",
+  "delivery": "melee",
+  "damage": 7,
+  "hitbox": {
+    "x": 2.5,
+    "y": 2.1,
+    "width": 2.5,
+    "height": 1.1,
+  },
+  "specialCost": 0,
+  "maxUses": 0,
+  "color": "#51729d",
+  "original": {
+    "actionType": 7,
+    "category": 0,
+    "family": "sword",
+    "refill": 13,
+    "readinessReset": 213,
+    "actionTicks": 16,
+    "contactTick": 4,
+    "shotTick": 4,
+    "comboStages": [
+      {
+        "actionTicks": 20,
+        "contactTick": 6,
+        "shotTick": 6,
+      },
+      {
+        "actionTicks": 28,
+        "contactTick": 8,
+        "shotTick": 8,
+      },
+    ],
+    "rangePixels": 35,
+    "speedPixels": 3,
+    "movementAllowed": true,
+    "verified": true,
+    "statusGroup": 255,
+  },
+}

@@ -172,8 +172,11 @@ export function horizontal(
   }
   const legs = context.content.parts[actor.parts.legs.definitionId]!;
   let index = actor.parts.legs.destroyed ? 2 : legs.speedIndex;
-  if (actor.supportStatus === 'speed') {
+  if (actor.beneficialStatus?.kind === 'speed') {
     index = Math.min(7, index + 3);
+  }
+  if (actor.harmfulStatus?.kind === 'slow') {
+    index = Math.max(0, index - 3);
   }
   const water = inWater(context, actor);
   if (water && legType(context, actor) === 7) {

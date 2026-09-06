@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "brass",
+  "kind": "character",
+  "displayName": "Brass",
+  "tagline": "Gatling Gun / Dual Leg (SHT)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 63,
+        "y": 27,
+        "width": 145,
+        "height": 216,
+      },
+      {
+        "x": 287,
+        "y": 43,
+        "width": 197,
+        "height": 196,
+      },
+      {
+        "x": 563,
+        "y": 8,
+        "width": 160,
+        "height": 219,
+      },
+      {
+        "x": 800,
+        "y": 42,
+        "width": 196,
+        "height": 201,
+      },
+    ],
+    "frameSize": 219,
+    "color": "#f1d05f",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "brass-head",
+    "leftArm": "brass-left-arm",
+    "rightArm": "brass-right-arm",
+    "legs": "brass-legs",
+  },
+  "specialAbilityId": "medaforce-0",
+  "medalId": "kabuto-medal",
+  "medalLevel": 1,
+  "originalSetId": 2,
+}

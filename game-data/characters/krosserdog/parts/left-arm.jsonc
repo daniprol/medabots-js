@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "krosserdog-left-arm",
+  "kind": "part",
+  "originalId": 16,
+  "displayName": "Battle Rifle",
+  "slot": "leftArm",
+  "armor": 30,
+  "defense": 6,
+  "selectionRank": 2,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "krosserdog-left-arm-attack",
+}

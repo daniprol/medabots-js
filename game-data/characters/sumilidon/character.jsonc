@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "sumilidon",
+  "kind": "character",
+  "displayName": "Sumilidon",
+  "tagline": "Sword / Dual Leg (GRP)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 16,
+        "y": 527,
+        "width": 215,
+        "height": 212,
+      },
+      {
+        "x": 266,
+        "y": 559,
+        "width": 246,
+        "height": 179,
+      },
+      {
+        "x": 512,
+        "y": 506,
+        "width": 238,
+        "height": 194,
+      },
+      {
+        "x": 786,
+        "y": 535,
+        "width": 228,
+        "height": 204,
+      },
+    ],
+    "frameSize": 212,
+    "color": "#e2b72d",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "sumilidon-head",
+    "leftArm": "sumilidon-left-arm",
+    "rightArm": "sumilidon-right-arm",
+    "legs": "sumilidon-legs",
+  },
+  "specialAbilityId": "medaforce-1",
+  "medalId": "kuwagata-medal",
+  "medalLevel": 1,
+  "originalSetId": 4,
+}

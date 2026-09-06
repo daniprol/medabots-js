@@ -1,10 +1,11 @@
-// AX European level 1–99 table. Entry index is level minus one.
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../schemas/medal.schema.json",
-  "kind": "medal",
   "id": "kuwagata-medal",
-  "originalId": 1,
+  "kind": "medal",
   "displayName": "Kuwagata",
+  "originalId": 1,
+  "preference": 0,
   "preferredParts": ["legs"],
   "levels": [
     {

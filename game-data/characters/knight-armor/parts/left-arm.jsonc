@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "knight-armor-left-arm",
+  "kind": "part",
+  "originalId": 26,
+  "displayName": "Great shield",
+  "slot": "leftArm",
+  "armor": 75,
+  "defense": 3,
+  "selectionRank": 0,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "knight-armor-left-arm-attack",
+}

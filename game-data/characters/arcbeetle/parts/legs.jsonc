@@ -1,12 +1,14 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-legs",
   "kind": "part",
-  "slot": "legs",
-  "armor": 55,
   "originalId": 29,
   "displayName": "Firework",
+  "slot": "legs",
+  "armor": 55,
   "defense": 3,
+  "selectionRank": 3,
   "locomotion": 0,
   "speedIndex": 4,
   "attackRanks": [4, 0, 0],

@@ -99,6 +99,8 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
 
         parts[slot] = {
           definitionId: part.id,
+          originalDefinitionId: part.id,
+          transformationTicks: 0,
           currentArmor: part.armor,
           readiness: 0,
           maxArmor: part.armor,
@@ -131,6 +133,7 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         guarding: false,
         charging: false,
         specialMeter: 0,
+        lastActivatedSpecialId: 'medaforce-0',
         parts,
         attack: null,
         staggerTicks: 0,
@@ -159,16 +162,15 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         idleTicks: 0,
         passiveChargeTicks: 0,
         displayMeter: 0,
-        panelIndex: 0,
+        panelIndex: 3,
         panelPendingTicks: 0,
-        panel: 1,
+        panel: 6,
         invulnerabilityTicks: 0,
         waterToggle: false,
         transported: false,
         iceMomentum: 0,
-        supportStatus: 'none',
-        supportMagnitude: 0,
-        supportTicks: 0,
+        beneficialStatus: null,
+        harmfulStatus: null,
       };
     }),
   );

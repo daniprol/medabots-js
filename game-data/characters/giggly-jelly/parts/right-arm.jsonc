@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "giggly-jelly-right-arm",
+  "kind": "part",
+  "originalId": 17,
+  "displayName": "Intermissile",
+  "slot": "rightArm",
+  "armor": 60,
+  "defense": 0,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "giggly-jelly-right-arm-attack",
+}

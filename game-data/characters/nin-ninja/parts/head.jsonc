@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "nin-ninja-head",
+  "kind": "part",
+  "originalId": 13,
+  "displayName": "Cover-Up",
+  "slot": "head",
+  "armor": 35,
+  "defense": 4,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "nin-ninja-head-attack",
+}

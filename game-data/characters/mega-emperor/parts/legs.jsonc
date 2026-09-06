@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "mega-emperor-legs",
+  "kind": "part",
+  "originalId": 6,
+  "displayName": "Deathcrawler",
+  "slot": "legs",
+  "armor": 55,
+  "defense": 6,
+  "selectionRank": 0,
+  "locomotion": 2,
+  "speedIndex": 1,
+  "attackRanks": [4, 2, 0],
+  "defenseRank": 1,
+}

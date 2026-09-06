@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "spidar",
+  "kind": "character",
+  "displayName": "Spidar",
+  "tagline": "No-grap trap / Multi Leg",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-2.png",
+    "frames": [
+      {
+        "x": 13,
+        "y": 764,
+        "width": 228,
+        "height": 190,
+      },
+      {
+        "x": 272,
+        "y": 776,
+        "width": 240,
+        "height": 188,
+      },
+      {
+        "x": 512,
+        "y": 743,
+        "width": 256,
+        "height": 199,
+      },
+      {
+        "x": 768,
+        "y": 792,
+        "width": 246,
+        "height": 169,
+      },
+    ],
+    "frameSize": 199,
+    "color": "#9b70bb",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "spidar-head",
+    "leftArm": "spidar-left-arm",
+    "rightArm": "spidar-right-arm",
+    "legs": "spidar-legs",
+  },
+  "specialAbilityId": "medaforce-4",
+  "medalId": "spider-medal",
+  "medalLevel": 1,
+  "originalSetId": 12,
+}

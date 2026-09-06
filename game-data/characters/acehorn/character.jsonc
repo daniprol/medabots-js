@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "acehorn",
+  "kind": "character",
+  "displayName": "Acehorn",
+  "tagline": "Symptom Clr / Multi Leg",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 24,
+        "y": 1249,
+        "width": 194,
+        "height": 257,
+      },
+      {
+        "x": 272,
+        "y": 1298,
+        "width": 235,
+        "height": 191,
+      },
+      {
+        "x": 538,
+        "y": 1231,
+        "width": 230,
+        "height": 224,
+      },
+      {
+        "x": 768,
+        "y": 1305,
+        "width": 244,
+        "height": 188,
+      },
+    ],
+    "frameSize": 257,
+    "color": "#d3e6ec",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "acehorn-head",
+    "leftArm": "acehorn-left-arm",
+    "rightArm": "acehorn-right-arm",
+    "legs": "acehorn-legs",
+  },
+  "specialAbilityId": "medaforce-8",
+  "medalId": "unicorn-medal",
+  "medalLevel": 1,
+  "originalSetId": 8,
+}

@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "snowbro-head",
+  "kind": "part",
+  "originalId": 15,
+  "displayName": "Flip",
+  "slot": "head",
+  "armor": 30,
+  "defense": 2,
+  "selectionRank": 2,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "snowbro-head-attack",
+}

@@ -1,0 +1,46 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/ability.schema.json",
+  "id": "sumilidon-right-arm-attack",
+  "kind": "ability",
+  "displayName": "Sword",
+  "abilityKind": "melee",
+  "delivery": "melee",
+  "damage": 5,
+  "hitbox": {
+    "x": 2.5,
+    "y": 2.1,
+    "width": 2.5,
+    "height": 1.1,
+  },
+  "specialCost": 0,
+  "maxUses": 0,
+  "color": "#e2b72d",
+  "original": {
+    "actionType": 7,
+    "category": 0,
+    "family": "sword",
+    "refill": 10,
+    "readinessReset": 213,
+    "actionTicks": 16,
+    "contactTick": 4,
+    "shotTick": 4,
+    "comboStages": [
+      {
+        "actionTicks": 16,
+        "contactTick": 4,
+        "shotTick": 4,
+      },
+      {
+        "actionTicks": 28,
+        "contactTick": 8,
+        "shotTick": 8,
+      },
+    ],
+    "rangePixels": 35,
+    "speedPixels": 3,
+    "movementAllowed": true,
+    "verified": true,
+    "statusGroup": 255,
+  },
+}

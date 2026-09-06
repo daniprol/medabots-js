@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "orkamar-right-arm",
+  "kind": "part",
+  "originalId": 22,
+  "displayName": "Clinch Wave",
+  "slot": "rightArm",
+  "armor": 40,
+  "defense": 7,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "orkamar-right-arm-attack",
+}

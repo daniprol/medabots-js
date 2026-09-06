@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "acehorn-right-arm",
+  "kind": "part",
+  "originalId": 8,
+  "displayName": "Canceller",
+  "slot": "rightArm",
+  "armor": 50,
+  "defense": 7,
+  "selectionRank": 5,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "acehorn-right-arm-attack",
+}

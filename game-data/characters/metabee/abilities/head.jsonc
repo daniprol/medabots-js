@@ -1,3 +1,4 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/ability.schema.json",
   "id": "metabee-head-attack",
@@ -14,19 +15,21 @@
   },
   "specialCost": 0,
   "maxUses": 3,
-  "color": "#ffdf65",
+  "color": "#f1cb34",
   "original": {
     "actionType": 2,
+    "category": 1,
     "family": "missile",
     "refill": 7,
     "readinessReset": 0,
     "actionTicks": 32,
     "contactTick": 22,
     "shotTick": 26,
-    "rangePixels": 240,
-    "speedPixels": 3,
+    "comboStages": [],
+    "rangePixels": 210,
+    "speedPixels": 4,
     "movementAllowed": false,
     "verified": true,
-    "comboStages": [],
+    "statusGroup": 255,
   },
 }

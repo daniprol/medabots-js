@@ -20,7 +20,7 @@ test('setup discovers controls and the default roster enters the arena without c
       errors.push(message.text());
     }
   });
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
   await expect(page.getByLabel('A1 controller')).toHaveValue('keyboard-solo');
   await expect(
     page.getByLabel('A2 controller').locator('option[value="keyboard-solo"]'),
@@ -28,8 +28,8 @@ test('setup discovers controls and the default roster enters the arena without c
   await expect(page.getByLabel('A2 controller').locator('option[value="keyboard-3"]')).toHaveCount(
     1,
   );
-  await page.getByRole('button', { name: 'APPLY CONTROLS', exact: false }).click();
-  await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
+  await page.getByRole('button', { name: 'Done', exact: false }).click();
+  await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('battle-hud')).toBeVisible();
   await expect(page.getByTestId('fighter-A1')).toContainText('KEY solo');
   await expect(page.getByTestId('fighter-A2')).toContainText('CPU');
@@ -55,11 +55,12 @@ test('setup discovers controls and the default roster enters the arena without c
 test('three profiles assign without conflicts; two keyboards move and attack independently; blur pauses', async ({
   page,
 }) => {
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
-  await page.getByRole('button', { name: '3 players · one keyboard', exact: true }).click();
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
+  await page.getByRole('button', { name: 'Players', exact: true }).click();
+  await page.getByLabel('Player setup', { exact: true }).selectOption('shared-three');
   await expect(page.getByLabel('A2 controller')).toHaveValue('keyboard-3');
-  await page.getByRole('button', { name: 'APPLY CONTROLS', exact: false }).click();
-  await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
+  await page.getByRole('button', { name: 'Done', exact: false }).click();
+  await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('battle-hud')).toBeVisible();
   const start = await page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!);
   await page.keyboard.down('d');
@@ -140,7 +141,7 @@ test('deterministic short match shows results, rematches, and returns to setup',
   await expect(page.getByRole('heading', { name: 'ROBATTLE PAUSED' })).toBeVisible();
   await page.getByRole('button', { name: 'RETURN TO SETUP', exact: true }).click();
   await expect(page.getByTestId('match-setup')).toBeVisible();
-  await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
+  await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('timer')).toHaveText('03:00');
 });
 
@@ -155,7 +156,7 @@ test('returning from a match with omitted assignments fills the other slots with
   await expect(page.getByTestId('fighter-A2')).toContainText('CPU');
   await page.evaluate(() => window.__BATTLE_DEBUG__!.returnToSetup());
   await expect(page.getByTestId('match-setup')).toBeVisible();
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
   await expect(page.getByLabel('A2 controller')).toHaveValue('ai');
 });
 
@@ -167,16 +168,12 @@ test('character selection and session key editing survive a battle and return to
   await expect(
     page.getByRole('button', { name: 'Select A1 leader: Rokusho', exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
+  await page.getByRole('button', { name: 'Rebind Attack', exact: true }).click();
   await page.keyboard.press('z');
-  await expect(
-    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
-  ).toHaveText('Z');
-  await page.getByRole('button', { name: 'APPLY CONTROLS', exact: false }).click();
-  await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
+  await expect(page.getByRole('button', { name: 'Rebind Attack', exact: true })).toHaveText('Z');
+  await page.getByRole('button', { name: 'Done', exact: false }).click();
+  await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('fighter-A1')).toContainText('Rokusho');
   await expect
     .poll(() =>
@@ -203,17 +200,38 @@ test('character selection and session key editing survive a battle and return to
   await expect(
     page.getByRole('button', { name: 'Select A1 leader: Rokusho', exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
-  ).toHaveText('Z');
-  await page.getByRole('button', { name: 'RESET', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
-  ).toHaveText('F');
-  await page.getByRole('button', { name: 'CANCEL', exact: true }).click();
-  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
-  ).toHaveText('Z');
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Rebind Attack', exact: true })).toHaveText('Z');
+  await page.getByRole('button', { name: 'Reset these keys', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Rebind Attack', exact: true })).toHaveText('F');
+  await page.getByRole('button', { name: 'Close controls', exact: true }).click();
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Rebind Attack', exact: true })).toHaveText('Z');
+});
+
+test('the complete roster and large control guide fit a mobile screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: /^Choose / })).toHaveCount(30);
+  await page.getByRole('button', { name: 'Choose Brass', exact: true }).click();
+  await expect(page.getByTestId('character-details')).toContainText('Brass');
+  expect(
+    await page.getByTestId('match-setup').evaluate((node) => node.scrollWidth),
+  ).toBeLessThanOrEqual(390);
+  await page.getByRole('button', { name: 'Controls', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Rebind Attack', exact: true })).toHaveText('F');
+  const keys = await page
+    .getByRole('button', { name: 'Rebind Attack', exact: true })
+    .evaluate((node) => ({
+      size: parseFloat(getComputedStyle(node).fontSize),
+      height: node.getBoundingClientRect().height,
+    }));
+  expect(keys.size).toBeGreaterThanOrEqual(20);
+  expect(keys.height).toBeGreaterThanOrEqual(44);
+  const dialog = page.getByRole('dialog');
+  expect(await dialog.evaluate((node) => node.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.getByRole('button', { name: 'Players', exact: true }).click();
+  await page.getByLabel('Player setup', { exact: true }).selectOption('shared-two');
+  await expect(page.getByLabel('B1 controller')).toHaveValue('keyboard-2');
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
 });

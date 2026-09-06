@@ -50,6 +50,18 @@ export class Effects {
         }
       }
 
+      if (event.type === 'repaired' || event.type === 'statusApplied') {
+        for (let index = 0; index < 7; index++) {
+          this.add(
+            event.x,
+            event.y,
+            event.type === 'repaired' ? '#8cffa8' : '#bd9dff',
+            'spark',
+            0.13,
+          );
+        }
+      }
+
       if (event.type === 'landed' || event.type === 'dashed') {
         for (let i = 0; i < 6; i++) {
           this.add(event.x + (Math.random() - 0.5), event.y + 0.12, '#f3ead2', 'dust', 0.22);

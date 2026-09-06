@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "sharkkan-legs",
+  "kind": "part",
+  "originalId": 23,
+  "displayName": "Smacker",
+  "slot": "legs",
+  "armor": 60,
+  "defense": 6,
+  "selectionRank": 0,
+  "locomotion": 7,
+  "speedIndex": 1,
+  "attackRanks": [3, 1, 0],
+  "defenseRank": 2,
+}

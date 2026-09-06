@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "monoklar-left-arm",
+  "kind": "part",
+  "originalId": 24,
+  "displayName": "Crime Shirk",
+  "slot": "leftArm",
+  "armor": 35,
+  "defense": 3,
+  "selectionRank": 0,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "monoklar-left-arm-attack",
+}

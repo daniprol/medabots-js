@@ -6,12 +6,8 @@
   "required": [
     "id",
     "kind",
-    "reactionMs",
-    "preferredDistance",
-    "aggression",
-    "guardProbability",
-    "jumpThreshold",
-    "strategyWeights"
+    "variant",
+    "original"
   ],
   "properties": {
     "$schema": {
@@ -26,55 +22,58 @@
       "const": "ai",
       "type": "string"
     },
-    "reactionMs": {
-      "minimum": 1,
-      "maximum": 3000,
-      "type": "integer",
-      "description": "Time between deterministic AI decisions, rounded up to simulation ticks."
-    },
-    "preferredDistance": {
+    "variant": {
       "minimum": 0,
-      "maximum": 30,
-      "type": "number"
+      "maximum": 5,
+      "type": "integer"
     },
-    "aggression": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number"
-    },
-    "guardProbability": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number"
-    },
-    "jumpThreshold": {
-      "minimum": 0,
-      "maximum": 10,
-      "type": "number"
-    },
-    "strategyWeights": {
+    "original": {
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "leader",
-        "proximity",
-        "weakness"
+        "profiles",
+        "cooldowns"
       ],
       "properties": {
-        "leader": {
-          "minimum": 0,
-          "maximum": 10,
-          "type": "number"
+        "profiles": {
+          "minItems": 15,
+          "maxItems": 15,
+          "type": "array",
+          "items": {
+            "minItems": 6,
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "minItems": 7,
+              "maxItems": 7,
+              "type": "array",
+              "items": {
+                "minimum": 0,
+                "maximum": 255,
+                "type": "integer"
+              }
+            }
+          }
         },
-        "proximity": {
-          "minimum": 0,
-          "maximum": 10,
-          "type": "number"
-        },
-        "weakness": {
-          "minimum": 0,
-          "maximum": 10,
-          "type": "number"
+        "cooldowns": {
+          "minItems": 15,
+          "maxItems": 15,
+          "type": "array",
+          "items": {
+            "minItems": 6,
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "minItems": 4,
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "minimum": 0,
+                "maximum": 1000,
+                "type": "integer"
+              }
+            }
+          }
         }
       }
     }

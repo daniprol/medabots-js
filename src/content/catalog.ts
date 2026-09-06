@@ -15,7 +15,7 @@ export type RuntimeAbility = AbilityDefinition;
 
 export type RuntimeRules = RulesDefinition & { roundTicks: number };
 
-export type RuntimeAI = AIDefinition & { reactionTicks: number };
+export type RuntimeAI = AIDefinition;
 
 export type ContentCatalog = {
   rules: Record<string, RuntimeRules>;

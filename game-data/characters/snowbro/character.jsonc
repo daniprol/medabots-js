@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "snowbro",
+  "kind": "character",
+  "displayName": "Snowbro",
+  "tagline": "Freeze / Tank",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-3.png",
+    "frames": [
+      {
+        "x": 43,
+        "y": 23,
+        "width": 158,
+        "height": 218,
+      },
+      {
+        "x": 280,
+        "y": 28,
+        "width": 205,
+        "height": 209,
+      },
+      {
+        "x": 546,
+        "y": 15,
+        "width": 182,
+        "height": 211,
+      },
+      {
+        "x": 785,
+        "y": 44,
+        "width": 222,
+        "height": 198,
+      },
+    ],
+    "frameSize": 218,
+    "color": "#ceeaf4",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "snowbro-head",
+    "leftArm": "snowbro-left-arm",
+    "rightArm": "snowbro-right-arm",
+    "legs": "snowbro-legs",
+  },
+  "specialAbilityId": "medaforce-1",
+  "medalId": "kuwagata-medal",
+  "medalLevel": 1,
+  "originalSetId": 15,
+}

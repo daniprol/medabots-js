@@ -36,9 +36,9 @@ Destroy the enemy leader’s head to win; knocking out a partner does not end th
 | S / A            | Partner panel / Medaforce    |
 | Escape or Enter  | Pause                        |
 
-For two players, choose **2 on one keyboard**. Open **Controls** to rebind keys, choose a three-player preset, or assign gamepads. Connect a controller and press one of its buttons to make it appear. Unassigned slots use AI. All players share the same computer; online play is not implemented.
+Open **Controls → Players** and choose **2 on one keyboard** for two players. The same panel offers three-player and gamepad presets. **How to play** shows large key icons and attack combinations; select a key to change it. Connect a controller and press one of its buttons to make it appear. Unassigned slots use AI. All players share the same computer; online play is not implemented.
 
-**This remaster branch is still in progress:** four playable robots and all 19 field layouts are included. It does not yet reproduce the complete AX roster, AI, or every weapon mechanic. See the [fidelity status](docs/ax-remaster-status.md) for verified behavior and remaining work.
+**Choose from all 30 AX Medabots and 19 battlefields**, with 120 source-derived parts, 12 medals, support weapons, traps, status effects and Medaforce attacks. This remaster remains in progress: AI navigation and some weapon/special details still approximate the original. See the [fidelity status](docs/ax-remaster-status.md) for verified behavior and remaining work.
 
 See the [controls guide](docs/controls.md) for all presets, controller mappings, and keyboard ghosting tips. This is a desktop prototype; touch controls are not included.
 

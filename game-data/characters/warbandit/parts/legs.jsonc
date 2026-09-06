@@ -1,12 +1,14 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-legs",
   "kind": "part",
-  "slot": "legs",
-  "armor": 50,
   "originalId": 5,
   "displayName": "Abductor",
+  "slot": "legs",
+  "armor": 50,
   "defense": 4,
+  "selectionRank": 2,
   "locomotion": 0,
   "speedIndex": 3,
   "attackRanks": [3, 0, 1],

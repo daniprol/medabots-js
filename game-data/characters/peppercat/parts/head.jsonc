@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "peppercat-head",
+  "kind": "part",
+  "originalId": 19,
+  "displayName": "Light circuit",
+  "slot": "head",
+  "armor": 25,
+  "defense": 5,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "peppercat-head-attack",
+}

@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "face-lantern",
+  "kind": "character",
+  "displayName": "Face Lantern",
+  "tagline": "Indefensible / Vehicle",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-5.png",
+    "frames": [
+      {
+        "x": 26,
+        "y": 20,
+        "width": 382,
+        "height": 393,
+      },
+      {
+        "x": 498,
+        "y": 56,
+        "width": 345,
+        "height": 350,
+      },
+      {
+        "x": 968,
+        "y": 16,
+        "width": 327,
+        "height": 351,
+      },
+      {
+        "x": 1365,
+        "y": 68,
+        "width": 398,
+        "height": 346,
+      },
+    ],
+    "frameSize": 393,
+    "color": "#ed8f26",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "face-lantern-head",
+    "leftArm": "face-lantern-left-arm",
+    "rightArm": "face-lantern-right-arm",
+    "legs": "face-lantern-legs",
+  },
+  "specialAbilityId": "medaforce-8",
+  "medalId": "unicorn-medal",
+  "medalLevel": 1,
+  "originalSetId": 27,
+}

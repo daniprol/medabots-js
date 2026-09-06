@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "oceana-head",
+  "kind": "part",
+  "originalId": 14,
+  "displayName": "All repair",
+  "slot": "head",
+  "armor": 30,
+  "defense": 9,
+  "selectionRank": 0,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "oceana-head-attack",
+}

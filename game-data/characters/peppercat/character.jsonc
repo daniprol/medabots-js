@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "peppercat",
+  "kind": "character",
+  "displayName": "Peppercat",
+  "tagline": "Thunder / Dual Leg (GRP)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-3.png",
+    "frames": [
+      {
+        "x": 33,
+        "y": 996,
+        "width": 166,
+        "height": 212,
+      },
+      {
+        "x": 260,
+        "y": 1025,
+        "width": 218,
+        "height": 175,
+      },
+      {
+        "x": 554,
+        "y": 994,
+        "width": 164,
+        "height": 215,
+      },
+      {
+        "x": 778,
+        "y": 1025,
+        "width": 234,
+        "height": 185,
+      },
+    ],
+    "frameSize": 215,
+    "color": "#dc3b48",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "peppercat-head",
+    "leftArm": "peppercat-left-arm",
+    "rightArm": "peppercat-right-arm",
+    "legs": "peppercat-legs",
+  },
+  "specialAbilityId": "medaforce-5",
+  "medalId": "bear-medal",
+  "medalLevel": 1,
+  "originalSetId": 19,
+}

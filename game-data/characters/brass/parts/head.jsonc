@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "brass-head",
+  "kind": "part",
+  "originalId": 2,
+  "displayName": "Variablehair",
+  "slot": "head",
+  "armor": 40,
+  "defense": 5,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "brass-head-attack",
+}

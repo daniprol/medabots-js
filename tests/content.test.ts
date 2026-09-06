@@ -5,8 +5,8 @@ import { millisecondsToTicks } from '../src/battle-core/timing';
 import { buildContentCatalog } from '../src/content/build-content-catalog';
 import { documents, content, fixture } from './helpers';
 describe('content pipeline', () => {
-  it('discovers and validates all four complete characters, with frozen definitions', () => {
-    expect(Object.keys(content.characters)).toHaveLength(4);
+  it('discovers and validates all thirty complete characters, with frozen definitions', () => {
+    expect(Object.keys(content.characters)).toHaveLength(30);
     expect(Object.isFrozen(content.parts['metabee-head'])).toBe(true);
     expect(content.abilities['metabee-head-attack']!.original.actionTicks).toBe(32);
   });

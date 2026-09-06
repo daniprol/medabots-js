@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "neutranurse-left-arm",
+  "kind": "part",
+  "originalId": 3,
+  "displayName": "Translate",
+  "slot": "leftArm",
+  "armor": 25,
+  "defense": 7,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "neutranurse-left-arm-attack",
+}

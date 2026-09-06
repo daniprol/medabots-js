@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "orkamar-head",
+  "kind": "part",
+  "originalId": 22,
+  "displayName": "New Wave",
+  "slot": "head",
+  "armor": 40,
+  "defense": 8,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "orkamar-head-attack",
+}

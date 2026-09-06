@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "sumilidon-head",
+  "kind": "part",
+  "originalId": 4,
+  "displayName": "Hunter",
+  "slot": "head",
+  "armor": 35,
+  "defense": 4,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "sumilidon-head-attack",
+}

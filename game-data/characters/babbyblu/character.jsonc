@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "babbyblu",
+  "kind": "character",
+  "displayName": "Babbyblu",
+  "tagline": "Confusion / Float",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 65,
+        "y": 1008,
+        "width": 125,
+        "height": 237,
+      },
+      {
+        "x": 269,
+        "y": 1051,
+        "width": 212,
+        "height": 161,
+      },
+      {
+        "x": 566,
+        "y": 996,
+        "width": 202,
+        "height": 235,
+      },
+      {
+        "x": 793,
+        "y": 1047,
+        "width": 218,
+        "height": 189,
+      },
+    ],
+    "frameSize": 237,
+    "color": "#95ddd7",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "babbyblu-head",
+    "leftArm": "babbyblu-left-arm",
+    "rightArm": "babbyblu-right-arm",
+    "legs": "babbyblu-legs",
+  },
+  "specialAbilityId": "medaforce-10",
+  "medalId": "ghost-medal",
+  "medalLevel": 1,
+  "originalSetId": 7,
+}

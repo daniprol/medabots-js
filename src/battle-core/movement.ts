@@ -41,7 +41,7 @@ export function moveCombatant(
   const oldX = actor.x;
   const oldY = actor.y;
   const wasGrounded = actor.grounded;
-  if (actor.knockedOut) {
+  if (actor.knockedOut || ['stun', 'freeze'].includes(actor.harmfulStatus?.kind ?? '')) {
     return;
   }
   const attack = actor.attack ? context.content.abilities[actor.attack.abilityId] : undefined;
@@ -57,7 +57,10 @@ export function moveCombatant(
   }
 
   const sameTap = move === -1 ? actor.lastTapLeft : actor.lastTapRight;
-  const doubleTap = move !== 0 && move !== actor.lastMoveX && tick - sameTap < 16;
+  const doubleTap =
+    move !== 0 &&
+    move !== actor.lastMoveX &&
+    tick - sameTap < (!actor.grounded && (type === 5 || type === 6) ? 8 : 16);
   if (move && move !== actor.lastMoveX) {
     if (move === -1) {
       actor.lastTapLeft = tick;
@@ -183,7 +186,7 @@ export function moveCombatant(
       horizontal(context, actor, actor.carryDirection, actor.carryMode);
       horizontal(context, actor, move, actor.carryMode === 4 ? 7 : 6);
     }
-    vertical(context, actor, 5);
+    vertical(context, actor, type === 6 ? 3 : 5);
     if (actor.grounded) {
       enter(actor, 'land');
     }
@@ -193,7 +196,13 @@ export function moveCombatant(
     }
   } else if (state === 'backhop') {
     horizontal(context, actor, -actor.facing, 8);
-    vertical(context, actor, actor.movementTicks < 10 ? -2 : 2);
+    vertical(
+      context,
+      actor,
+      -context.content.rules[context.setup.rulesId]!.original.jumpCurves.backhop![
+        actor.movementTicks
+      ]!,
+    );
     if (actor.movementTicks++ >= 29 || (actor.grounded && actor.movementTicks > 15)) {
       enter(actor, actor.grounded ? 'idle' : 'fall');
     }

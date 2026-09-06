@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "face-lantern-legs",
+  "kind": "part",
+  "originalId": 27,
+  "displayName": "Squashbasher",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 2,
+  "selectionRank": 5,
+  "locomotion": 3,
+  "speedIndex": 6,
+  "attackRanks": [1, 0, 3],
+  "defenseRank": 1,
+}

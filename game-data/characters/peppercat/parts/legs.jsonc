@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "peppercat-legs",
+  "kind": "part",
+  "originalId": 19,
+  "displayName": "Quick Alert",
+  "slot": "legs",
+  "armor": 40,
+  "defense": 5,
+  "selectionRank": 5,
+  "locomotion": 1,
+  "speedIndex": 6,
+  "attackRanks": [0, 3, 0],
+  "defenseRank": 1,
+}

@@ -8,6 +8,7 @@
     "kind",
     "originalId",
     "displayName",
+    "preference",
     "preferredParts",
     "levels"
   ],
@@ -31,6 +32,11 @@
     },
     "displayName": {
       "type": "string"
+    },
+    "preference": {
+      "minimum": 0,
+      "maximum": 7,
+      "type": "integer"
     },
     "preferredParts": {
       "uniqueItems": true,

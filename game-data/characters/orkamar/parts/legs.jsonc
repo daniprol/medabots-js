@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "orkamar-legs",
+  "kind": "part",
+  "originalId": 22,
+  "displayName": "Fishtail",
+  "slot": "legs",
+  "armor": 55,
+  "defense": 7,
+  "selectionRank": 1,
+  "locomotion": 7,
+  "speedIndex": 2,
+  "attackRanks": [0, 4, 0],
+  "defenseRank": 2,
+}

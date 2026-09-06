@@ -1,15 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-right-arm",
   "kind": "part",
-  "slot": "rightArm",
-  "armor": 35,
-  "abilityId": "metabee-right-arm-attack",
   "originalId": 0,
   "displayName": "Revolver",
+  "slot": "rightArm",
+  "armor": 35,
   "defense": 4,
+  "selectionRank": 2,
   "locomotion": 0,
   "speedIndex": 0,
   "attackRanks": [0, 0, 0],
   "defenseRank": 0,
+  "abilityId": "metabee-right-arm-attack",
 }

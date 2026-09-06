@@ -2,7 +2,7 @@
 
 Choose a character and field, then press **Start Robattle**. Open **Controls** to assign a keyboard profile, connected gamepad, or CPU independently to A1, A2, B1, and B2. Leaders are marked ◆. Any unassigned slot uses AI.
 
-**2 on one keyboard** assigns the opposing leaders to separate shared presets. The dialog also has a three-player preset and automatic gamepad assignment. Choose team slots individually for co-op. Duplicate keyboard profiles and gamepads are blocked, and overlapping active keys are reported. Up to four humans can play on the same computer.
+In **Controls → Players**, **2 on one keyboard** assigns the opposing leaders to separate shared presets. The dialog also has a three-player preset and automatic gamepad assignment. Choose team slots individually for co-op. Duplicate keyboard profiles and gamepads are blocked, and overlapping active keys are reported. Up to four humans can play on the same computer.
 
 ## Original-style input
 
@@ -35,6 +35,6 @@ A disconnected assigned pad pauses the match and identifies the device. Reconnec
 
 Edit `game-data/controls/keyboards/*.jsonc` or `gamepads/standard-gamepad.jsonc` for permanent bindings. Actions use arrays, such as `"jump": ["KeyG", "Space"]`; an empty array leaves an optional shortcut unbound. Keyboard input uses physical `KeyboardEvent.code`, independent of keyboard language. Gamepads expose horizontal/vertical axis indices, button arrays, deadzone, and activation threshold.
 
-The controls dialog supports session-only key editing, alternate keys, gamepad mapping, and a live input tester. **Apply controls** validates edits; **Cancel** discards them; **Reset** restores a preset. Reloading restores JSONC values.
+The **How to play** tab shows a directional pad, large action keys, and the head/left-arm/drop combinations. Select a key to capture a replacement; Escape cancels capture. **Extra keys & shortcuts** holds alternate bindings and advanced gamepad mapping. **Done** validates and applies edits; the close button discards them; **Reset these keys** restores the selected preset. Reloading restores JSONC values.
 
 A shared keyboard can suppress simultaneous combinations due to hardware ghosting. Non-overlapping profiles prevent software conflicts, but cannot remove that hardware limitation. Use different combinations, an anti-ghosting keyboard, or gamepads when needed. Touch and online play are not implemented.

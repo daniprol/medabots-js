@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "oceana-left-arm",
+  "kind": "part",
+  "originalId": 14,
+  "displayName": "Repair Arm",
+  "slot": "leftArm",
+  "armor": 30,
+  "defense": 11,
+  "selectionRank": 0,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "oceana-left-arm-attack",
+}

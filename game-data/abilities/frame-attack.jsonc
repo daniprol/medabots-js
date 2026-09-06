@@ -1,3 +1,4 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/ability.schema.json",
   "id": "frame-attack",
@@ -28,5 +29,7 @@
     "movementAllowed": true,
     "verified": true,
     "comboStages": [],
+    "category": 0,
+    "statusGroup": 255,
   },
 }

@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "nin-ninja",
+  "kind": "character",
+  "displayName": "Nin-Ninja",
+  "tagline": "Sword / Dual Leg (GRP)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-2.png",
+    "frames": [
+      {
+        "x": 28,
+        "y": 1001,
+        "width": 179,
+        "height": 211,
+      },
+      {
+        "x": 276,
+        "y": 1019,
+        "width": 201,
+        "height": 186,
+      },
+      {
+        "x": 551,
+        "y": 973,
+        "width": 217,
+        "height": 235,
+      },
+      {
+        "x": 768,
+        "y": 1016,
+        "width": 246,
+        "height": 180,
+      },
+    ],
+    "frameSize": 235,
+    "color": "#51729d",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "nin-ninja-head",
+    "leftArm": "nin-ninja-left-arm",
+    "rightArm": "nin-ninja-right-arm",
+    "legs": "nin-ninja-legs",
+  },
+  "specialAbilityId": "medaforce-4",
+  "medalId": "spider-medal",
+  "medalLevel": 1,
+  "originalSetId": 13,
+}

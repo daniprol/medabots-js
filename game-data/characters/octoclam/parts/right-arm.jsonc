@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "octoclam-right-arm",
+  "kind": "part",
+  "originalId": 10,
+  "displayName": "Catch",
+  "slot": "rightArm",
+  "armor": 30,
+  "defense": 6,
+  "selectionRank": 4,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "octoclam-right-arm-attack",
+}

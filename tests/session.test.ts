@@ -106,7 +106,7 @@ describe('local session controller lifecycle', () => {
     Object.defineProperty(event, 'code', { value: 'KeyT' });
     window.dispatchEvent(event);
     session.advance(TICK_DURATION_SECONDS);
-    expect(session.current.combatants.find((actor) => actor.id === 'A2')!.panelIndex).toBe(0);
+    expect(session.current.combatants.find((actor) => actor.id === 'A2')!.panelIndex).toBe(3);
     session.dispose();
   });
 });

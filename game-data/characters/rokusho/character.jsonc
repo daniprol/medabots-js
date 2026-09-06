@@ -1,9 +1,10 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../schemas/character.schema.json",
   "id": "rokusho",
   "kind": "character",
   "displayName": "Rokusho",
-  "tagline": "SPEED / BLADE",
+  "tagline": "Sword / Dual Leg (GRP)",
   "visual": {
     "type": "sprite",
     "url": "/assets/characters/hd2d/medabots-atlas.png",

@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "babbyblu-legs",
+  "kind": "part",
+  "originalId": 7,
+  "displayName": "Umbilical",
+  "slot": "legs",
+  "armor": 80,
+  "defense": 7,
+  "selectionRank": 0,
+  "locomotion": 6,
+  "speedIndex": 1,
+  "attackRanks": [0, 0, 5],
+  "defenseRank": 1,
+}

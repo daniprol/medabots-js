@@ -7,6 +7,7 @@
     "id",
     "kind",
     "originalId",
+    "selectionRank",
     "displayName",
     "defense",
     "locomotion",
@@ -32,6 +33,11 @@
     "originalId": {
       "minimum": 0,
       "maximum": 31,
+      "type": "integer"
+    },
+    "selectionRank": {
+      "minimum": 0,
+      "maximum": 255,
       "type": "integer"
     },
     "displayName": {

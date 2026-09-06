@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "crimson-king",
+  "kind": "character",
+  "displayName": "Crimson King",
+  "tagline": "Destroy / Flight",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-5.png",
+    "frames": [
+      {
+        "x": 27,
+        "y": 452,
+        "width": 379,
+        "height": 401,
+      },
+      {
+        "x": 487,
+        "y": 492,
+        "width": 342,
+        "height": 305,
+      },
+      {
+        "x": 921,
+        "y": 442,
+        "width": 370,
+        "height": 390,
+      },
+      {
+        "x": 1353,
+        "y": 514,
+        "width": 405,
+        "height": 328,
+      },
+    ],
+    "frameSize": 401,
+    "color": "#e85353",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "crimson-king-head",
+    "leftArm": "crimson-king-left-arm",
+    "rightArm": "crimson-king-right-arm",
+    "legs": "crimson-king-legs",
+  },
+  "specialAbilityId": "medaforce-7",
+  "medalId": "devil-medal",
+  "medalLevel": 1,
+  "originalSetId": 28,
+}

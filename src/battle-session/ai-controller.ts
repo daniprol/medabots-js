@@ -1,169 +1,225 @@
 import { emptyCommand, type BattleSnapshot, type CombatantCommand } from '../battle-core';
-import { nextRandom } from '../battle-core/random';
-import type { ContentCatalog, RuntimeAI } from '../content/catalog';
+import { recoverySeverity } from '../battle-core/statuses';
+import type { ContentCatalog, RuntimeAI, RuntimeAbility } from '../content/catalog';
+import { chooseAIAction, type AttackSlot } from './ai-weapons';
 
-export type AIState = { rng: number; nextReaction: number; command: CombatantCommand };
-
+export type AIState = {
+  rng: number;
+  previous: CombatantCommand;
+  moveX: -1 | 0 | 1;
+  moveTicks: number;
+  jumpTicks: number;
+  heldAttackTicks: number;
+  releaseTicks: number;
+  guardReaction: number;
+  obstacleTicks: number;
+  lastX: number;
+  specialDelay: number;
+  cooldowns: Record<AttackSlot, number>;
+};
 export const createAIState = (seed: number): AIState => ({
-  rng: seed >>> 0,
-  nextReaction: 0,
-  command: emptyCommand(),
+  rng: seed & 255,
+  previous: emptyCommand(),
+  moveX: 0,
+  moveTicks: 0,
+  jumpTicks: 0,
+  heldAttackTicks: 0,
+  releaseTicks: 0,
+  guardReaction: 0,
+  obstacleTicks: 0,
+  lastX: 0,
+  specialDelay: -1,
+  cooldowns: { head: 0, rightArm: 0, leftArm: 0 },
 });
 
+/** AI emits ordinary held/edge commands; its randomness can share the authoritative stream. */
 export function aiCommand(
   snapshot: BattleSnapshot,
   id: string,
   content: ContentCatalog,
   profile: RuntimeAI,
   memory: AIState,
+  draw?: () => number,
 ): CombatantCommand {
-  const combatant = snapshot.combatants.find((combatant) => combatant.id === id)!;
-
-  if (combatant.knockedOut) {
-    return emptyCommand();
+  const actor = snapshot.combatants.find((candidate) => candidate.id === id)!;
+  const command = emptyCommand();
+  if (actor.knockedOut || snapshot.specialFreezeTicks > 0) {
+    return command;
   }
-
-  if (snapshot.tick < memory.nextReaction) {
-    return {
-      ...emptyCommand(),
-      moveX: memory.command.moveX,
-      guardHeld: memory.command.guardHeld,
-      chargeHeld: false,
-      jumpHeld: memory.command.jumpHeld,
-      attackHeld: combatant.attack?.slot === 'head' && combatant.attack.chargeTicks < 90,
-      dropHeld: memory.command.dropHeld,
-    };
-  }
-
-  memory.nextReaction = snapshot.tick + profile.reactionTicks;
-
-  const random = () => {
-    const r = nextRandom(memory.rng);
-    memory.rng = r.state;
-
-    return r.value;
-  };
-  const ownLeader = snapshot.combatants.find(
-    (candidate) => candidate.teamId === combatant.teamId && candidate.role === 'leader',
-  )!;
+  const random =
+    draw ??
+    (() => {
+      const value = content.rules[snapshot.rulesId]!.original.battleRandom[memory.rng & 255]!;
+      memory.rng = (memory.rng + 1) & 255;
+      return value;
+    });
+  const medal = content.medals[actor.medalId]!.levels[actor.medalLevel - 1]!;
+  const ranks = [medal.shooting, medal.grappling, medal.support];
+  const dominant = ranks.indexOf(Math.max(...ranks));
+  const group = dominant * 5 + Math.min(4, Math.floor(actor.medalLevel / 10));
+  const variant = profile.variant;
+  const behavior = profile.original.profiles[group]![variant]!;
+  const delays = profile.original.cooldowns[group]![0]!;
   const enemies = snapshot.combatants.filter(
-    (candidate) => candidate.teamId !== combatant.teamId && !candidate.knockedOut,
+    (candidate) => candidate.teamId !== actor.teamId && !candidate.knockedOut,
   );
-  const score = (candidate: typeof combatant) =>
-    Math.abs(candidate.x - combatant.x) * profile.strategyWeights.proximity +
-    Math.abs(candidate.y - combatant.y) * 2 -
-    ((combatant.panel === 6 || combatant.strategy === 'ATTACK_LEADER') &&
-    candidate.role === 'leader'
-      ? profile.strategyWeights.leader * 5
-      : 0) +
-    (combatant.strategy === 'PROTECT_LEADER' ? Math.abs(candidate.x - ownLeader.x) * 1.5 : 0) -
-    profile.strategyWeights.weakness *
-      (1 - candidate.parts.head.currentArmor / candidate.parts.head.maxArmor) *
-      5;
-  enemies.sort((a, b) => score(a) - score(b) || a.id.localeCompare(b.id));
-
+  enemies.sort(
+    (a, b) =>
+      Math.abs(a.x - actor.x) +
+        Math.abs(a.y - actor.y) -
+        (Math.abs(b.x - actor.x) + Math.abs(b.y - actor.y)) || a.actorIndex - b.actorIndex,
+  );
   const target =
-    (combatant.panel === 30
+    (actor.panel === 30
       ? enemies.find((enemy) => enemy.role === 'partner')
-      : combatant.panel === 6
+      : [6, 29].includes(actor.panel) || behavior[0]
         ? enemies.find((enemy) => enemy.role === 'leader')
         : undefined) ?? enemies[0];
-
   if (!target) {
-    return emptyCommand();
+    return command;
   }
 
-  const targetOffsetX = target.x - combatant.x;
-  const targetOffsetY = target.y - combatant.y;
-  const distance = Math.abs(targetOffsetX);
-  const arm = content.abilities[content.parts[combatant.parts.rightArm.definitionId]!.abilityId!]!;
-  const melee = arm.delivery === 'melee';
-  const preferred = melee
-    ? Math.max(0.7, arm.hitbox.x + arm.hitbox.width / 2 - 0.75)
-    : profile.preferredDistance;
-  const command = emptyCommand();
-
-  if (
-    combatant.strategy === 'PROTECT_LEADER' &&
-    Math.abs(combatant.x - ownLeader.x) > 6 &&
-    distance > 5
-  ) {
-    command.moveX = Math.sign(ownLeader.x - combatant.x) as -1 | 1;
-  } else if (
-    distance > preferred + 0.4 ||
-    (Math.sign(targetOffsetX) !== combatant.facing && distance > 0.4)
-  ) {
-    command.moveX = Math.sign(targetOffsetX) as -1 | 1;
-  } else if (!melee && distance < 2.3) {
-    command.moveX = -Math.sign(targetOffsetX) as -1 | 1;
+  const abilityFor = (slot: AttackSlot): RuntimeAbility =>
+    content.abilities[
+      actor.parts[slot].destroyed && slot !== 'head'
+        ? 'frame-attack'
+        : content.parts[actor.parts[slot].definitionId]!.abilityId!
+    ]!;
+  const offensive = (['head', 'rightArm', 'leftArm'] as const)
+    .map(abilityFor)
+    .filter((ability) => ability.original.category <= 1 || ability.original.family === 'frame');
+  const range = offensive.length
+    ? Math.min(15, Math.max(...offensive.map((ability) => ability.original.rangePixels / 8)))
+    : 10;
+  const distance = Math.abs(target.x - actor.x);
+  const dy = target.y - actor.y;
+  if (memory.moveTicks-- <= 0) {
+    memory.moveTicks = (random() + 10) & 15;
+    const direction = Math.sign(target.x - actor.x) as -1 | 1;
+    memory.moveX =
+      distance > range * 0.65
+        ? direction
+        : distance < Math.min(3, range * 0.3)
+          ? (-direction as -1 | 1)
+          : 0;
+    if (!offensive.length) {
+      memory.moveX = distance < 8 ? (-direction as -1 | 1) : 0;
+    }
+    if (actor.panel === 9) {
+      memory.moveX = -direction as -1 | 1;
+    }
+    if (actor.panel === 5) {
+      const leader = snapshot.combatants.find(
+        (candidate) => candidate.teamId === actor.teamId && candidate.role === 'leader',
+      )!;
+      memory.moveX = Math.sign((leader.x + target.x) / 2 - actor.x) as -1 | 0 | 1;
+    }
   }
-
-  command.jumpPressed = combatant.grounded && targetOffsetY > profile.jumpThreshold;
-  command.dropHeld = combatant.grounded && targetOffsetY < -1.5;
-  command.jumpPressed ||= command.dropHeld;
-  command.jumpHeld = command.jumpPressed && !command.dropHeld;
-  command.attackHeld = combatant.attack?.slot === 'head' && combatant.attack.chargeTicks < 90;
-
-  if (
-    combatant.grounded &&
-    Math.abs(combatant.vx) < 0.3 &&
-    distance > preferred + 2 &&
-    random() < 0.25
-  ) {
-    command.jumpPressed = true;
+  const xPixels = actor.x * 8 + 216;
+  const boundary = Math.abs(dy) < 2 ? 8 : 24;
+  if (xPixels <= boundary) {
+    memory.moveX = 1;
   }
-
-  const threatened =
-    (distance < 3 && !!target.attack) ||
-    snapshot.projectiles.some(
-      (projectile) =>
-        projectile.teamId !== combatant.teamId &&
-        Math.abs(projectile.x - combatant.x) < 3 &&
-        Math.abs(projectile.y - (combatant.y + 1.4)) < 1,
+  if (xPixels >= 432 - boundary) {
+    memory.moveX = -1;
+  }
+  command.moveX = memory.moveX;
+  memory.obstacleTicks =
+    command.moveX !== 0 && Math.abs(actor.x - memory.lastX) < 0.04 ? memory.obstacleTicks + 1 : 0;
+  memory.lastX = actor.x;
+  if (actor.grounded && !actor.attack && (dy > 1.5 || memory.obstacleTicks > 12)) {
+    command.jumpPressed = !memory.previous.jumpHeld;
+    if (command.jumpPressed) {
+      memory.jumpTicks = 12;
+    }
+  }
+  if (actor.grounded && dy < -2) {
+    command.dropHeld = true;
+    command.jumpPressed = !memory.previous.jumpHeld;
+  }
+  command.jumpHeld = memory.jumpTicks-- > 0 && !command.dropHeld;
+  if (behavior[1]) {
+    const threat = snapshot.projectiles.find(
+      (shot) =>
+        shot.teamId !== actor.teamId &&
+        Math.abs(shot.x - actor.x) < 5 &&
+        Math.abs(shot.y - (actor.y + 2)) < 2,
     );
-  command.guardHeld = threatened && random() < profile.guardProbability;
-
-  const canHit =
-    Math.abs(targetOffsetY) < 1.3 &&
-    distance < (melee ? 3.1 : 15) &&
-    Math.sign(targetOffsetX) === combatant.facing;
-  const available = (['head', 'leftArm', 'rightArm', 'rightArm'] as const).filter((slot) => {
-    const part = combatant.parts[slot];
-    const ability = content.abilities[content.parts[part.definitionId]!.abilityId!]!;
-
-    return (
-      (slot !== 'head' || !part.destroyed) &&
-      part.cooldownTicks === 0 &&
-      (ability.maxUses === 0 || part.uses < ability.maxUses)
-    );
-  });
-
-  if (canHit && !command.guardHeld && random() < profile.aggression) {
-    const choice = available[Math.floor(random() * available.length)];
-    command.headPressed = choice === 'head';
-    command.leftArmPressed = choice === 'leftArm';
-    command.rightArmPressed = choice === 'rightArm';
-    command.specialPressed =
-      combatant.specialMeter >= content.rules[snapshot.rulesId]!.specialMaximum;
+    const threatened = !!threat || (distance < 4 && !!target.attack);
+    memory.guardReaction = threatened ? memory.guardReaction + 1 : 0;
+    const threatDirection = threat ? Math.sign(threat.x - actor.x) : Math.sign(target.x - actor.x);
+    if (threatened && threatDirection !== actor.facing) {
+      command.moveX = threatDirection as -1 | 1;
+    } else {
+      command.guardHeld = threatened && memory.guardReaction >= behavior[2]!;
+    }
   }
-
-  command.chargeHeld =
-    (!canHit || available.length === 0) &&
-    combatant.grounded &&
-    distance < preferred + 1 &&
-    combatant.specialMeter < content.rules[snapshot.rulesId]!.specialMaximum &&
-    !command.guardHeld;
-  if (combatant.panel === 1 && available.includes('rightArm') && canHit) {
-    command.rightArmPressed = true;
+  if (actor.attack) {
+    if (memory.heldAttackTicks > 0) {
+      command.attackHeld = true;
+      memory.heldAttackTicks--;
+    } else if (
+      actor.attack.slot === 'rightArm' &&
+      abilityFor('rightArm').original.comboStages.length &&
+      snapshot.tick & 1
+    ) {
+      command.rightArmPressed = !memory.previous.attackHeld;
+    }
+  } else if (memory.releaseTicks > 0) {
+    memory.releaseTicks--;
+  } else if (!command.guardHeld) {
+    const selected = chooseAIAction(snapshot, actor, target, content, memory, random);
+    if (selected) {
+      const ability = abilityFor(selected);
+      if (memory.cooldowns[selected] > 0) {
+        memory.cooldowns[selected]--;
+      } else if (actor.parts[selected].readiness >= 320) {
+        const directional =
+          ability.original.category <= 1 ||
+          [22, 23, 24, 25, 26].includes(ability.original.actionType);
+        if (directional && Math.sign(target.x - actor.x) !== actor.facing && distance > 0.1) {
+          command.moveX = Math.sign(target.x - actor.x) as -1 | 1;
+        } else {
+          command.headPressed = selected === 'head';
+          command.leftArmPressed = selected === 'leftArm';
+          command.rightArmPressed = selected === 'rightArm';
+          const category = ability.original.category === 255 ? 0 : ability.original.category;
+          memory.cooldowns[selected] =
+            [1, 2, 3][['rightArm', 'leftArm', 'head'].indexOf(selected)] === actor.panel
+              ? 10
+              : delays[category]!;
+          if ([3, 4].includes(ability.original.actionType) && random() & 1) {
+            memory.heldAttackTicks = 200;
+          }
+          memory.releaseTicks = 1;
+        }
+      }
+    }
   }
-  if (combatant.panel === 2 && available.includes('leftArm') && canHit) {
-    command.leftArmPressed = true;
+  if (actor.displayMeter >= 51 && actor.panel !== 15 && !actor.attack) {
+    if (memory.specialDelay < 0) {
+      memory.specialDelay =
+        actor.panel === 14 ? 1 : actor.panel === 16 ? 10 : random() + delays[3]! * 10;
+    }
+    if (--memory.specialDelay <= 0) {
+      const special = content.abilities[content.characters[actor.characterId]!.specialAbilityId]!;
+      const useful =
+        special.original.family === 'all-recovery'
+          ? snapshot.combatants.some(
+              (friend) => friend.teamId === actor.teamId && recoverySeverity(friend) > 0,
+            )
+          : distance < range + 5;
+      command.specialPressed = useful;
+      memory.specialDelay = useful ? -1 : 20;
+    }
+  } else if (actor.displayMeter < 51) {
+    memory.specialDelay = -1;
   }
-  if (combatant.panel === 3 && available.includes('head') && canHit) {
-    command.headPressed = true;
-  }
-  command.jumpHeld ||= command.jumpPressed && !command.dropHeld;
-  memory.command = command;
-
+  command.attackHeld ||= command.rightArmPressed || command.headPressed || command.leftArmPressed;
+  command.upHeld = command.headPressed;
+  command.dropHeld ||= command.leftArmPressed;
+  command.upPressed = command.upHeld && !memory.previous.upHeld;
+  command.downPressed = command.dropHeld && !memory.previous.dropHeld;
+  memory.previous = { ...command };
   return command;
 }

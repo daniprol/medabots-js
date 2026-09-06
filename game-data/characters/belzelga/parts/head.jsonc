@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "belzelga-head",
+  "kind": "part",
+  "originalId": 20,
+  "displayName": "Helmet",
+  "slot": "head",
+  "armor": 25,
+  "defense": 4,
+  "selectionRank": 2,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "belzelga-head-attack",
+}

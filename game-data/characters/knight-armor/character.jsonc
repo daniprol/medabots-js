@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "knight-armor",
+  "kind": "character",
+  "displayName": "Knight Armor",
+  "tagline": "Defense / Vehicle",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-4.png",
+    "frames": [
+      {
+        "x": 37,
+        "y": 1267,
+        "width": 197,
+        "height": 232,
+      },
+      {
+        "x": 282,
+        "y": 1286,
+        "width": 219,
+        "height": 212,
+      },
+      {
+        "x": 534,
+        "y": 1222,
+        "width": 234,
+        "height": 286,
+      },
+      {
+        "x": 768,
+        "y": 1294,
+        "width": 240,
+        "height": 211,
+      },
+    ],
+    "frameSize": 286,
+    "color": "#bbc7bd",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "knight-armor-head",
+    "leftArm": "knight-armor-left-arm",
+    "rightArm": "knight-armor-right-arm",
+    "legs": "knight-armor-legs",
+  },
+  "specialAbilityId": "medaforce-6",
+  "medalId": "monkey-medal",
+  "medalLevel": 1,
+  "originalSetId": 26,
+}

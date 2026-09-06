@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "nin-ninja-legs",
+  "kind": "part",
+  "originalId": 13,
+  "displayName": "Tiptoe",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 4,
+  "selectionRank": 4,
+  "locomotion": 1,
+  "speedIndex": 5,
+  "attackRanks": [0, 3, 0],
+  "defenseRank": 1,
+}

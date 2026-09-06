@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "sumilidon-left-arm",
+  "kind": "part",
+  "originalId": 4,
+  "displayName": "Straw Hammer",
+  "slot": "leftArm",
+  "armor": 35,
+  "defense": 8,
+  "selectionRank": 2,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "sumilidon-left-arm-attack",
+}

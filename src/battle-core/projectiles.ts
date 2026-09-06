@@ -1,9 +1,9 @@
 import type { RuntimeAbility } from '../content/catalog';
 import { moveBarrage } from './barrage';
 import { overlaps } from './collisions';
-import { applyDamage } from './damage';
 import { selectHitPart } from './part-selection';
 import type { BattleContext, CombatantSnapshot, ProjectileSnapshot } from './types';
+import { resolveWeaponHit } from './weapon-impact';
 
 export function updateProjectiles(context: BattleContext) {
   context.state.projectiles = context.state.projectiles.filter((projectile) => {
@@ -34,11 +34,15 @@ export function updateProjectiles(context: BattleContext) {
           ? 10
           : ability.hitbox.height;
     const box = { x: projectile.x, y: projectile.y, width, height };
-    for (const target of context.state.combatants) {
+    const targets = [...context.state.combatants].sort(
+      (a, b) => projectile.facing * (a.x - b.x) || a.actorIndex - b.actorIndex,
+    );
+    for (const target of targets) {
       if (
         target.teamId === projectile.teamId ||
         target.knockedOut ||
-        target.invulnerabilityTicks > 0
+        target.invulnerabilityTicks > 0 ||
+        projectile.hitIds.includes(target.id)
       ) {
         continue;
       }
@@ -46,7 +50,8 @@ export function updateProjectiles(context: BattleContext) {
         continue;
       }
       const source = context.state.combatants.find((actor) => actor.id === projectile.ownerId)!;
-      applyDamage(
+      projectile.hitIds.push(target.id);
+      resolveWeaponHit(
         context,
         target,
         selectHitPart(
@@ -61,6 +66,13 @@ export function updateProjectiles(context: BattleContext) {
         projectile.facing,
         projectile.powerMultiplier,
       );
+      if (
+        !special &&
+        ability.original.family === 'laser' &&
+        !(target.guarding && target.facing !== projectile.facing)
+      ) {
+        continue;
+      }
       if (special) {
         projectile.hitTicks = 32;
         return true;
@@ -90,14 +102,31 @@ function moveProjectile(
   projectile: ProjectileSnapshot,
   ability: RuntimeAbility,
 ) {
-  if (ability.original.family === 'barrage') {
+  if (['barrage', 'question', 'power-drain', 'double-trap'].includes(ability.original.family)) {
     moveBarrage(context, projectile);
     return;
   }
-  if (projectile.age <= 2 && ability.abilityKind !== 'special') {
+  if (ability.original.family === 'break') {
+    if (projectile.age > 1) {
+      projectile.y +=
+        context.content.rules[context.setup.rulesId]!.original.breakWave[
+          Math.floor((projectile.age - 1) / 2) % 22
+        ]! / 8;
+    }
+  }
+  if (['melee-trap', 'shot-trap'].includes(ability.original.family)) {
+    const age = projectile.age;
+    projectile.vy =
+      age < 20 ? Math.trunc((20 - age) / 4) : age < 40 ? -Math.trunc((age - 20) / 4) : -5;
+  }
+  if (
+    projectile.age <= 2 &&
+    ability.abilityKind !== 'special' &&
+    ability.original.family !== 'break'
+  ) {
     return;
   }
-  if (ability.original.family === 'missile') {
+  if (['missile', 'ineffective', 'indefensible'].includes(ability.original.family)) {
     const enemy = context.state.combatants.find(
       (actor) => actor.teamId !== projectile.teamId && !actor.knockedOut && actor.role === 'leader',
     );
@@ -116,12 +145,17 @@ export function spawnProjectile(
   powerMultiplier = 1,
   index = 0,
 ) {
-  if (context.state.projectiles.length >= 20) {
+  if (
+    context.state.projectiles.length >= 20 ||
+    context.state.projectiles.filter((projectile) => projectile.ownerId === attacker.id).length >= 4
+  ) {
     return;
   }
   const id = `projectile-${context.nextEntityId++}`;
   const special = ability.abilityKind === 'special';
-  const barrage = ability.original.family === 'barrage';
+  const barrage = ['barrage', 'question', 'power-drain', 'meltian'].includes(
+    ability.original.family,
+  );
   const offsetX = barrage ? [8, 11, 11, 8][index]! / 8 : special ? 2 : 2.5;
   const offsetY = barrage ? [8, 3, -3, -8][index]! / 8 : 0;
   const x = attacker.x + attacker.facing * offsetX;
@@ -129,6 +163,7 @@ export function spawnProjectile(
   const headBias = attacker.attack?.headBias ?? 0;
   context.state.projectiles.push({
     id,
+    hitIds: [],
     ownerId: attacker.id,
     teamId: attacker.teamId,
     abilityId: ability.id,
@@ -136,7 +171,8 @@ export function spawnProjectile(
     y,
     originX: x,
     headBias: special ? Math.trunc(headBias / 2) : headBias,
-    powerMultiplier,
+    powerMultiplier:
+      powerMultiplier * (attacker.beneficialStatus?.kind === 'amplify' && !special ? 2 : 1),
     vx: attacker.facing * ability.original.speedPixels,
     vy: 0,
     age: 0,

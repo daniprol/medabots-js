@@ -1,3 +1,4 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/ability.schema.json",
   "id": "metabee-medaforce",
@@ -28,5 +29,7 @@
     "movementAllowed": false,
     "verified": false,
     "comboStages": [],
+    "category": 1,
+    "statusGroup": 255,
   },
 }

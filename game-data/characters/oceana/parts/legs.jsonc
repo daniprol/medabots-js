@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "oceana-legs",
+  "kind": "part",
+  "originalId": 14,
+  "displayName": "Purple Fin",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 8,
+  "selectionRank": 2,
+  "locomotion": 7,
+  "speedIndex": 3,
+  "attackRanks": [0, 1, 4],
+  "defenseRank": 0,
+}

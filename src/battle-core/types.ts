@@ -39,12 +39,18 @@ export const emptyCommand = (): CombatantCommand => ({
   strategyPressed: false,
 });
 
-export type CommandFrame = { tick: number; commands: Record<string, CombatantCommand> };
+export type CommandFrame = {
+  tick: number;
+  commands: Record<string, CombatantCommand>;
+  aiRandomDraws?: number;
+};
 
 export type Strategy = 'ATTACK_LEADER' | 'PROTECT_LEADER' | 'AGGRESSIVE';
 
 export type PartState = {
   definitionId: string;
+  originalDefinitionId: string;
+  transformationTicks: number;
   currentArmor: number;
   readiness: number;
   maxArmor: number;
@@ -84,6 +90,7 @@ export type CombatantSnapshot = {
   guarding: boolean;
   charging: boolean;
   specialMeter: number;
+  lastActivatedSpecialId: string;
   parts: Record<PartSlot, PartState>;
   attack: AttackState | null;
   staggerTicks: number;
@@ -130,12 +137,39 @@ export type CombatantSnapshot = {
   waterToggle: boolean;
   transported: boolean;
   iceMomentum: number;
-  supportStatus: 'none' | 'scouting' | 'speed';
-  supportMagnitude: number;
-  supportTicks: number;
+  beneficialStatus: StatusState | null;
+  harmfulStatus: StatusState | null;
+};
+
+export type StatusKind =
+  | 'defense'
+  | 'full-defense'
+  | 'regeneration'
+  | 'scouting'
+  | 'speed'
+  | 'amplify'
+  | 'burning'
+  | 'stun'
+  | 'slow'
+  | 'meter-control'
+  | 'confusion'
+  | 'ineffective'
+  | 'indefensible'
+  | 'melee-trap'
+  | 'shot-trap'
+  | 'double-trap'
+  | 'freeze';
+export type StatusState = {
+  kind: StatusKind;
+  magnitude: number;
+  remainingTicks: number;
+  sourceId: string;
+  part: PartSlot;
+  locked: boolean;
 };
 
 export type ProjectileSnapshot = {
+  hitIds: string[];
   spawnTick: number;
   hitTicks: number;
   index: number;
@@ -186,7 +220,8 @@ export type BattleSnapshot = {
     id: string;
     ownerId: string;
     teamId: string;
-    family: 'scouting' | 'charge';
+    abilityId: string;
+    slot: PartSlot | 'special';
     magnitude: number;
     remainingTicks: number;
   }[];
@@ -202,6 +237,8 @@ export type BattleSnapshot = {
 export type BattleEvent = {
   tick: number;
   type:
+    | 'repaired'
+    | 'statusApplied'
     | 'attackStarted'
     | 'projectileSpawned'
     | 'hit'

@@ -1,9 +1,10 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../schemas/character.schema.json",
   "id": "warbandit",
   "kind": "character",
   "displayName": "Warbandit",
-  "tagline": "PRESSURE / LANCE",
+  "tagline": "Rifle / Dual Leg (SHT)",
   "visual": {
     "type": "sprite",
     "url": "/assets/characters/hd2d/arcbeetle-warbandit-atlas.png",

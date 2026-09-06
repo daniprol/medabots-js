@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "gorem-2",
+  "kind": "character",
+  "displayName": "Gorem-2",
+  "tagline": "Void Optic / Float",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-4.png",
+    "frames": [
+      {
+        "x": 45,
+        "y": 1030,
+        "width": 175,
+        "height": 214,
+      },
+      {
+        "x": 295,
+        "y": 1047,
+        "width": 201,
+        "height": 184,
+      },
+      {
+        "x": 528,
+        "y": 996,
+        "width": 206,
+        "height": 210,
+      },
+      {
+        "x": 786,
+        "y": 1044,
+        "width": 217,
+        "height": 185,
+      },
+    ],
+    "frameSize": 214,
+    "color": "#ad8457",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "gorem-2-head",
+    "leftArm": "gorem-2-left-arm",
+    "rightArm": "gorem-2-right-arm",
+    "legs": "gorem-2-legs",
+  },
+  "specialAbilityId": "medaforce-8",
+  "medalId": "unicorn-medal",
+  "medalLevel": 1,
+  "originalSetId": 25,
+}

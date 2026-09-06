@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "gorem-2-legs",
+  "kind": "part",
+  "originalId": 25,
+  "displayName": "Dokan",
+  "slot": "legs",
+  "armor": 80,
+  "defense": 6,
+  "selectionRank": 0,
+  "locomotion": 6,
+  "speedIndex": 1,
+  "attackRanks": [0, 0, 5],
+  "defenseRank": 0,
+}

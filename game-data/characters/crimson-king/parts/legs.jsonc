@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "crimson-king-legs",
+  "kind": "part",
+  "originalId": 28,
+  "displayName": "Manafly",
+  "slot": "legs",
+  "armor": 20,
+  "defense": 3,
+  "selectionRank": 3,
+  "locomotion": 5,
+  "speedIndex": 4,
+  "attackRanks": [1, 3, 0],
+  "defenseRank": 2,
+}

@@ -1,15 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-head",
   "kind": "part",
-  "slot": "head",
-  "armor": 45,
-  "abilityId": "metabee-head-attack",
   "originalId": 0,
   "displayName": "Missile",
+  "slot": "head",
+  "armor": 45,
   "defense": 3,
+  "selectionRank": 2,
   "locomotion": 0,
   "speedIndex": 0,
   "attackRanks": [0, 0, 0],
   "defenseRank": 0,
+  "abilityId": "metabee-head-attack",
 }

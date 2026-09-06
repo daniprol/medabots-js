@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "knight-armor-legs",
+  "kind": "part",
+  "originalId": 26,
+  "displayName": "Trojan Horse",
+  "slot": "legs",
+  "armor": 55,
+  "defense": 2,
+  "selectionRank": 4,
+  "locomotion": 3,
+  "speedIndex": 5,
+  "attackRanks": [1, 0, 0],
+  "defenseRank": 5,
+}

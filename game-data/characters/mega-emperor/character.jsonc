@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "mega-emperor",
+  "kind": "character",
+  "displayName": "Mega-Emperor",
+  "tagline": "Missile / Multi Leg",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 9,
+        "y": 762,
+        "width": 246,
+        "height": 237,
+      },
+      {
+        "x": 266,
+        "y": 799,
+        "width": 246,
+        "height": 194,
+      },
+      {
+        "x": 512,
+        "y": 738,
+        "width": 256,
+        "height": 258,
+      },
+      {
+        "x": 768,
+        "y": 770,
+        "width": 248,
+        "height": 234,
+      },
+    ],
+    "frameSize": 258,
+    "color": "#8f64b8",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "mega-emperor-head",
+    "leftArm": "mega-emperor-left-arm",
+    "rightArm": "mega-emperor-right-arm",
+    "legs": "mega-emperor-legs",
+  },
+  "specialAbilityId": "medaforce-7",
+  "medalId": "devil-medal",
+  "medalLevel": 1,
+  "originalSetId": 6,
+}

@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "neutranurse-legs",
+  "kind": "part",
+  "originalId": 3,
+  "displayName": "Petticoat",
+  "slot": "legs",
+  "armor": 35,
+  "defense": 4,
+  "selectionRank": 4,
+  "locomotion": 1,
+  "speedIndex": 5,
+  "attackRanks": [0, 0, 3],
+  "defenseRank": 1,
+}

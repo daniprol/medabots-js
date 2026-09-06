@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "monoklar-legs",
+  "kind": "part",
+  "originalId": 24,
+  "displayName": "Pertoauto",
+  "slot": "legs",
+  "armor": 45,
+  "defense": 1,
+  "selectionRank": 5,
+  "locomotion": 3,
+  "speedIndex": 6,
+  "attackRanks": [2, 0, 1],
+  "defenseRank": 2,
+}

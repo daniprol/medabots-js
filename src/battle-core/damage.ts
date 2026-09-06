@@ -1,6 +1,7 @@
 import type { RuntimeAbility } from '../content/catalog';
 import type { PartSlot } from '../content/schemas';
-import { finishBattle } from './results';
+import { damageArmor } from './armor';
+import { meterBlocked } from './statuses';
 import type { BattleContext, CombatantSnapshot } from './types';
 
 const RANK_ADJUSTMENT = [0, 2, 4, 6, 8, 10];
@@ -36,9 +37,7 @@ export function applyDamage(
   const definition = context.content.parts[part.definitionId]!;
   const legs = context.content.parts[target.parts.legs.definitionId]!;
   const sourceLegs = context.content.parts[source.parts.legs.definitionId]!;
-  const category = ['sword', 'hammer', 'frame', 'vertical-line'].includes(ability.original.family)
-    ? 1
-    : 0;
+  const category = ability.original.category === 0 ? 1 : 0;
   const sourceMedal = context.content.medals[source.medalId]!.levels[source.medalLevel - 1]!;
   const targetMedal = context.content.medals[target.medalId]!.levels[target.medalLevel - 1]!;
   const special = ability.abilityKind === 'special';
@@ -52,7 +51,8 @@ export function applyDamage(
   }
   let damage = calculateDamage(
     power,
-    definition.defense,
+    definition.defense +
+      (target.beneficialStatus?.kind === 'defense' ? target.beneficialStatus.magnitude & 255 : 0),
     sourceMedal[category === 1 ? 'grappling' : 'shooting'] +
       (special || source.parts.legs.destroyed
         ? 0
@@ -65,8 +65,9 @@ export function applyDamage(
   } else if (amplified) {
     damage = Math.max(3, damage);
   }
-  part.currentArmor = Math.max(0, part.currentArmor - damage);
-  target.specialMeter = Math.min(51, target.specialMeter + Math.floor(damage / 3));
+  if (!meterBlocked(target)) {
+    target.specialMeter = Math.min(51, target.specialMeter + Math.floor(damage / 3));
+  }
   target.attack = null;
   target.charging = false;
   target.idleTicks = 0;
@@ -86,32 +87,5 @@ export function applyDamage(
     strong: amplified || damage > 30 || ability.abilityKind === 'special',
     facing,
   });
-  if (part.currentArmor > 0) {
-    return;
-  }
-  part.destroyed = true;
-  context.events.push({
-    type: 'partDestroyed',
-    tick: context.state.tick,
-    combatantId: target.id,
-    part: slot,
-    x: target.x,
-    y: target.y + (slot === 'legs' ? 0.8 : 2.5),
-  });
-  if (slot !== 'head') {
-    return;
-  }
-  target.knockedOut = true;
-  target.guarding = false;
-  target.charging = false;
-  context.events.push({
-    type: 'combatantKnockedOut',
-    tick: context.state.tick,
-    combatantId: target.id,
-    x: target.x,
-    y: target.y,
-  });
-  if (target.role === 'leader') {
-    finishBattle(context, source.teamId, 'leader-head-destroyed');
-  }
+  damageArmor(context, target, slot, damage, source);
 }

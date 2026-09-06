@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "octoclam",
+  "kind": "character",
+  "displayName": "Octoclam",
+  "tagline": "Hold / Multi Leg",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-2.png",
+    "frames": [
+      {
+        "x": 28,
+        "y": 284,
+        "width": 208,
+        "height": 212,
+      },
+      {
+        "x": 286,
+        "y": 290,
+        "width": 215,
+        "height": 201,
+      },
+      {
+        "x": 534,
+        "y": 263,
+        "width": 212,
+        "height": 214,
+      },
+      {
+        "x": 770,
+        "y": 291,
+        "width": 239,
+        "height": 205,
+      },
+    ],
+    "frameSize": 214,
+    "color": "#eb652d",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "octoclam-head",
+    "leftArm": "octoclam-left-arm",
+    "rightArm": "octoclam-right-arm",
+    "legs": "octoclam-legs",
+  },
+  "specialAbilityId": "medaforce-7",
+  "medalId": "devil-medal",
+  "medalLevel": 1,
+  "originalSetId": 10,
+}

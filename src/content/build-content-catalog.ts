@@ -60,10 +60,7 @@ function addRuntimeDefinition(catalog: ContentCatalog, definition: Definition) {
       catalog.abilities[definition.id] = definition;
       break;
     case 'ai':
-      catalog.ai[definition.id] = {
-        ...definition,
-        reactionTicks: millisecondsToTicks(definition.reactionMs),
-      };
+      catalog.ai[definition.id] = definition;
       break;
     case 'part':
       catalog.parts[definition.id] = definition;

@@ -1,10 +1,14 @@
 import type { RuntimeAbility } from '../content/catalog';
+import { damageArmor } from './armor';
 import { movePixels } from './ax-movement';
 import { overlaps, worldRegion } from './collisions';
-import { applyDamage } from './damage';
 import { selectHitPart } from './part-selection';
 import { spawnProjectile } from './projectiles';
+import { activateMedaforce } from './specials';
+import { meterBlocked, triggerTrap, updateStatuses } from './statuses';
+import { isSupport } from './support-effects';
 import type { AttackState, BattleContext, CombatantCommand, CombatantSnapshot } from './types';
+import { resolveWeaponHit } from './weapon-impact';
 
 export function updateAttack(
   context: BattleContext,
@@ -15,10 +19,7 @@ export function updateAttack(
     return;
   }
   const rules = context.content.rules[context.setup.rulesId]!;
-  if (actor.supportTicks > 0 && --actor.supportTicks === 0) {
-    actor.supportStatus = 'none';
-    actor.supportMagnitude = 0;
-  }
+  updateStatuses(context, actor);
   if (actor.invulnerabilityTicks > 0) {
     actor.invulnerabilityTicks--;
   }
@@ -40,13 +41,17 @@ export function updateAttack(
     }
     part.cooldownTicks = Math.ceil((320 - part.readiness) / Math.max(1, increment));
   }
-  if (!pendingRefill) {
+  if (!pendingRefill && !meterBlocked(actor)) {
     if (++actor.passiveChargeTicks >= rules.original.passiveChargeTicks) {
       actor.passiveChargeTicks = 0;
       actor.specialMeter = Math.min(51, actor.specialMeter + 1);
     }
   }
-  actor.guarding = command.guardHeld && !actor.attack && actor.staggerTicks === 0;
+  actor.guarding =
+    command.guardHeld &&
+    !actor.attack &&
+    actor.staggerTicks === 0 &&
+    !['indefensible', 'freeze', 'stun'].includes(actor.harmfulStatus?.kind ?? '');
   const idle =
     actor.grounded &&
     !actor.attack &&
@@ -57,6 +62,7 @@ export function updateAttack(
   actor.charging = actor.idleTicks >= rules.original.idleChargeTicks && actor.specialMeter < 51;
   if (
     actor.charging &&
+    !meterBlocked(actor) &&
     (actor.idleTicks - rules.original.idleChargeTicks + 1) % rules.original.chargePulseTicks === 0
   ) {
     actor.specialMeter = Math.min(51, actor.specialMeter + 1);
@@ -114,6 +120,22 @@ function startAttack(context: BattleContext, actor: CombatantSnapshot, slot: Att
   if (slot === 'head' && (actor.parts.head.destroyed || actor.parts.head.uses >= ability.maxUses)) {
     return;
   }
+  if (
+    ['stun', 'freeze'].includes(actor.harmfulStatus?.kind ?? '') ||
+    (special && meterBlocked(actor))
+  ) {
+    return;
+  }
+  if (!special && ability.original.actionType >= 31 && ability.original.actionType <= 33) {
+    return;
+  }
+  if (
+    !special &&
+    actor.harmfulStatus?.kind === 'ineffective' &&
+    ability.original.family !== 'frame'
+  ) {
+    return;
+  }
   actor.attack = {
     abilityId: ability.id,
     slot,
@@ -123,7 +145,7 @@ function startAttack(context: BattleContext, actor: CombatantSnapshot, slot: Att
     initialized: false,
     chargeTicks: 0,
     releasing: false,
-    headBias: actor.supportStatus === 'scouting' ? actor.supportMagnitude : 0,
+    headBias: actor.beneficialStatus?.kind === 'scouting' ? actor.beneficialStatus.magnitude : 0,
     comboStage: 0,
     comboBuffered: false,
     hitIds: [],
@@ -172,26 +194,20 @@ export function advanceAttack(
   const age = attack.age++;
   const original = ability.original;
   const timing = original.comboStages[attack.comboStage - 1] ?? original;
-  if (original.family === 'scouting' || original.family === 'charge') {
+  if (isSupport(ability)) {
     if (age === original.shotTick) {
-      const legs = context.content.parts[actor.parts.legs.definitionId]!;
-      const magnitude = Math.trunc(
-        (ability.damage *
-          (50 +
-            (actor.parts.legs.destroyed ? 0 : legs.attackRanks[2]! * 2) +
-            context.content.medals[actor.medalId]!.levels[actor.medalLevel - 1]!.support)) /
-          50,
-      );
       context.state.supportEffects.push({
         id: `support-${context.nextEntityId++}`,
         ownerId: actor.id,
         teamId: actor.teamId,
-        family: original.family,
-        magnitude,
-        remainingTicks: original.family === 'scouting' ? 16 : 25,
+        abilityId: ability.id,
+        slot: attack.slot,
+        magnitude: 0,
+        remainingTicks:
+          original.family === 'scouting' ? 16 : original.family === 'charge' ? 25 : 12,
       });
     }
-  } else if (attack.slot === 'head' && original.actionType === 4) {
+  } else if ([3, 4].includes(original.actionType)) {
     if (age >= original.actionTicks && !attack.releasing) {
       if (command.attackHeld) {
         attack.chargeTicks++;
@@ -211,20 +227,19 @@ export function advanceAttack(
     return;
   } else {
     if (age === timing.contactTick && !attack.contactFired) {
+      if (attack.slot !== 'special' && triggerTrap(context, actor, attack.slot, ability)) {
+        return;
+      }
       resolveMeleeHits(context, actor, attack, ability);
       attack.contactFired = true;
     }
     if (age === timing.shotTick && ability.delivery === 'projectile' && !attack.fired) {
-      const count = original.family === 'barrage' ? 4 : 1;
-      for (let index = 0; index < count; index++) {
-        spawnProjectile(context, actor, ability, 1, index);
-      }
       if (attack.slot === 'special') {
-        context.state.specialFreezeTicks = 0;
-        actor.specialMeter = 0;
-        actor.displayMeter = 0;
-        for (const part of Object.values(actor.parts)) {
-          part.readiness = 0;
+        activateMedaforce(context, actor, ability);
+      } else {
+        spawnProjectile(context, actor, ability);
+        if (original.actionType === 6) {
+          damageArmor(context, actor, attack.slot, actor.parts[attack.slot].currentArmor, actor);
         }
       }
       attack.fired = true;
@@ -278,7 +293,7 @@ function resolveMeleeHits(
     const body = { x: target.x, y: target.y + 2, width: 2, height: 4 };
     if (overlaps(body, hitbox)) {
       attack.hitIds.push(target.id);
-      applyDamage(
+      resolveWeaponHit(
         context,
         target,
         selectHitPart(
@@ -291,6 +306,7 @@ function resolveMeleeHits(
         attacker,
         ability,
         attacker.facing,
+        attacker.beneficialStatus?.kind === 'amplify' ? 2 : 1,
       );
     }
   }

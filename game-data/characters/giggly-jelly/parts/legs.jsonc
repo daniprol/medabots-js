@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "giggly-jelly-legs",
+  "kind": "part",
+  "originalId": 17,
+  "displayName": "Limp tank",
+  "slot": "legs",
+  "armor": 115,
+  "defense": 0,
+  "selectionRank": 0,
+  "locomotion": 4,
+  "speedIndex": 1,
+  "attackRanks": [3, 0, 0],
+  "defenseRank": 3,
+}

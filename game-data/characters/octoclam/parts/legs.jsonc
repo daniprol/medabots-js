@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "octoclam-legs",
+  "kind": "part",
+  "originalId": 10,
+  "displayName": "Swick",
+  "slot": "legs",
+  "armor": 30,
+  "defense": 6,
+  "selectionRank": 2,
+  "locomotion": 2,
+  "speedIndex": 3,
+  "attackRanks": [0, 4, 0],
+  "defenseRank": 1,
+}

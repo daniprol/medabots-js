@@ -1,15 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-head",
   "kind": "part",
-  "slot": "head",
-  "armor": 45,
-  "abilityId": "arcbeetle-head-attack",
   "originalId": 29,
   "displayName": "Prominence",
+  "slot": "head",
+  "armor": 45,
   "defense": 3,
+  "selectionRank": 1,
   "locomotion": 0,
   "speedIndex": 0,
   "attackRanks": [0, 0, 0],
   "defenseRank": 0,
+  "abilityId": "arcbeetle-head-attack",
 }

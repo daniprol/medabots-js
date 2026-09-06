@@ -2,7 +2,11 @@ import { updateAttack, advanceAttack } from './combat';
 import { moveCombatant } from './movement';
 import { updatePlatforms } from './platforms';
 import { updateProjectiles } from './projectiles';
+import { battleRandom } from './random';
 import { finishAtTimeout } from './results';
+import { resolveSpecialSupport } from './specials';
+import { statusCommand } from './statuses';
+import { resolveSupport } from './support-effects';
 import type { BattleContext, CommandFrame, Strategy } from './types';
 import { emptyCommand } from './types';
 
@@ -16,6 +20,13 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
   }
 
   validateFrame(context, frame);
+  const draws = frame.aiRandomDraws ?? 0;
+  if (!Number.isInteger(draws) || draws < 0 || draws > 1024) {
+    throw new Error('Invalid AI random draw count');
+  }
+  for (let index = 0; index < draws; index++) {
+    battleRandom(context);
+  }
   cyclePartnerStrategies(context, frame);
 
   context.state.tick = frame.tick;
@@ -36,7 +47,8 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
     if (combatant.panelPendingTicks > 0 && --combatant.panelPendingTicks === 0) {
       combatant.panel = [1, 2, 3, 6, 30][combatant.panelIndex]!;
     }
-    updateAttack(context, combatant, frame.commands[combatant.id]!);
+    const command = statusCommand(combatant, frame.commands[combatant.id]!);
+    updateAttack(context, combatant, command);
 
     if (context.state.specialFreezeTicks > 0) {
       return;
@@ -45,7 +57,7 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
       break;
     }
 
-    moveCombatant(context, combatant, frame.commands[combatant.id]!);
+    moveCombatant(context, combatant, command);
   }
 
   if (!context.state.result) {
@@ -53,11 +65,13 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
       if (--effect.remainingTicks > 0) {
         return true;
       }
-      for (const actor of context.state.combatants) {
-        if (actor.teamId === effect.teamId && !actor.knockedOut) {
-          actor.supportStatus = effect.family === 'scouting' ? 'scouting' : 'speed';
-          actor.supportMagnitude = effect.magnitude;
-          actor.supportTicks = effect.family === 'scouting' ? 600 : effect.magnitude * 60;
+      const owner = context.state.combatants.find((actor) => actor.id === effect.ownerId)!;
+      const ability = context.content.abilities[effect.abilityId]!;
+      if (!owner.knockedOut) {
+        if (ability.abilityKind === 'special') {
+          resolveSpecialSupport(context, owner, ability);
+        } else {
+          resolveSupport(context, owner, ability, effect.slot);
         }
       }
       return false;

@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "cleobattler",
+  "kind": "character",
+  "displayName": "Cleobattler",
+  "tagline": "Change / Float",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-2.png",
+    "frames": [
+      {
+        "x": 41,
+        "y": 14,
+        "width": 173,
+        "height": 233,
+      },
+      {
+        "x": 297,
+        "y": 38,
+        "width": 170,
+        "height": 207,
+      },
+      {
+        "x": 569,
+        "y": 15,
+        "width": 180,
+        "height": 194,
+      },
+      {
+        "x": 777,
+        "y": 61,
+        "width": 237,
+        "height": 190,
+      },
+    ],
+    "frameSize": 233,
+    "color": "#e0bd48",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "cleobattler-head",
+    "leftArm": "cleobattler-left-arm",
+    "rightArm": "cleobattler-right-arm",
+    "legs": "cleobattler-legs",
+  },
+  "specialAbilityId": "medaforce-11",
+  "medalId": "alien-medal",
+  "medalLevel": 1,
+  "originalSetId": 9,
+}

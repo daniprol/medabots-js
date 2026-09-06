@@ -364,10 +364,10 @@ describe('headless match and action lifecycle', () => {
       battle.step(frame(tick));
     }
     const actors = battle.getSnapshot().combatants;
-    expect(actors[1]!.supportStatus).toBe('scouting');
-    expect(actors[1]!.supportMagnitude).toBe(41);
-    expect(actors[3]!.supportStatus).toBe('scouting');
-    expect(actors[0]!.supportStatus).toBe('none');
+    expect(actors[1]!.beneficialStatus?.kind).toBe('scouting');
+    expect(actors[1]!.beneficialStatus?.magnitude).toBe(41);
+    expect(actors[3]!.beneficialStatus?.kind).toBe('scouting');
+    expect(actors[0]!.beneficialStatus).toBeNull();
   });
 
   it('replays identical command frames deterministically and rejects incomplete frames', () => {
@@ -413,8 +413,8 @@ describe('headless match and action lifecycle', () => {
     for (let tick = 2; tick <= 10; tick++) {
       battle.step(frame(tick));
     }
-    expect(battle.getSnapshot().combatants[2]!.panel).toBe(1);
+    expect(battle.getSnapshot().combatants[2]!.panel).toBe(6);
     battle.step(frame(11));
-    expect(battle.getSnapshot().combatants[2]!.panel).toBe(2);
+    expect(battle.getSnapshot().combatants[2]!.panel).toBe(30);
   });
 });

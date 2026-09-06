@@ -93,6 +93,12 @@ export const RulesSchema = strictObject({
   ...base,
   kind: Type.Literal('rules'),
   original: strictObject({
+    breakWave: Type.Array(integer(-8, 8), { minItems: 22, maxItems: 22 }),
+    transformCandidates: strictObject({
+      change: Type.Array(integer(0, 29), { minItems: 1 }),
+      attackHead: Type.Array(integer(0, 29), { minItems: 1 }),
+      attackArm: Type.Array(integer(0, 29), { minItems: 1 }),
+    }),
     speedRows: Type.Array(Type.Array(integer(0, 40), { minItems: 9, maxItems: 9 }), {
       minItems: 8,
       maxItems: 8,
@@ -123,6 +129,8 @@ export const AbilitySchema = strictObject({
   kind: Type.Literal('ability'),
   original: strictObject({
     actionType: integer(0, 34),
+    category: Type.Union([Type.Literal(0), Type.Literal(1), Type.Literal(2), Type.Literal(255)]),
+    statusGroup: integer(0, 255),
     family: Type.Union(
       (
         [
@@ -138,6 +146,41 @@ export const AbilitySchema = strictObject({
           'support',
           'barrage',
           'vertical-line',
+          'laser',
+          'break',
+          'sacrifice',
+          'fire',
+          'thunder',
+          'freeze',
+          'hold',
+          'wave',
+          'destroy',
+          'defense',
+          'full-defense',
+          'recovery',
+          'regeneration',
+          'revive',
+          'cleanse',
+          'meter-control',
+          'confusion',
+          'ineffective',
+          'indefensible',
+          'melee-trap',
+          'shot-trap',
+          'change',
+          'attack-change',
+          'void-explode',
+          'void-optic',
+          'void-gravity',
+          'all-recovery',
+          'question',
+          'double-trap',
+          'giga-break',
+          'plus-counter',
+          'demolition',
+          'power-drain',
+          'meltian',
+          'random-change',
         ] as const
       ).map((value) => Type.Literal(value)),
     ),
@@ -169,7 +212,7 @@ export const AbilitySchema = strictObject({
     Type.Literal('special'),
   ]),
   delivery: Type.Union([Type.Literal('projectile'), Type.Literal('melee')]),
-  damage: boundedNumber(1, 1000),
+  damage: boundedNumber(0, 1000),
   hitbox: RegionSchema,
   specialCost: boundedNumber(),
   maxUses: integer(),
@@ -180,6 +223,7 @@ export const PartSchema = strictObject({
   ...base,
   kind: Type.Literal('part'),
   originalId: integer(0, 31),
+  selectionRank: integer(0, 255),
   displayName: Type.String(),
   defense: integer(0, 255),
   locomotion: integer(0, 7),
@@ -234,6 +278,7 @@ export const MedalSchema = strictObject({
   kind: Type.Literal('medal'),
   originalId: integer(0, 11),
   displayName: Type.String(),
+  preference: integer(0, 7),
   preferredParts: Type.Array(Type.Union(PART_SLOTS.map((slot) => Type.Literal(slot))), {
     uniqueItems: true,
   }),
@@ -289,15 +334,22 @@ export const GamepadSchema = strictObject({
 export const AISchema = strictObject({
   ...base,
   kind: Type.Literal('ai'),
-  reactionMs: integer(1, 3000),
-  preferredDistance: boundedNumber(0, 30),
-  aggression: boundedNumber(0, 1),
-  guardProbability: boundedNumber(0, 1),
-  jumpThreshold: boundedNumber(0, 10),
-  strategyWeights: strictObject({
-    leader: boundedNumber(0, 10),
-    proximity: boundedNumber(0, 10),
-    weakness: boundedNumber(0, 10),
+  variant: integer(0, 5),
+  original: strictObject({
+    profiles: Type.Array(
+      Type.Array(Type.Array(integer(0, 255), { minItems: 7, maxItems: 7 }), {
+        minItems: 6,
+        maxItems: 6,
+      }),
+      { minItems: 15, maxItems: 15 },
+    ),
+    cooldowns: Type.Array(
+      Type.Array(Type.Array(integer(0, 1000), { minItems: 4, maxItems: 4 }), {
+        minItems: 6,
+        maxItems: 6,
+      }),
+      { minItems: 15, maxItems: 15 },
+    ),
   }),
 });
 

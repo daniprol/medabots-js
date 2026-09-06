@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "crimson-king-right-arm",
+  "kind": "part",
+  "originalId": 28,
+  "displayName": "Dondon Punch",
+  "slot": "rightArm",
+  "armor": 20,
+  "defense": 3,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "crimson-king-right-arm-attack",
+}

@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "saldron-legs",
+  "kind": "part",
+  "originalId": 18,
+  "displayName": "Sala-Tail",
+  "slot": "legs",
+  "armor": 55,
+  "defense": 6,
+  "selectionRank": 2,
+  "locomotion": 6,
+  "speedIndex": 3,
+  "attackRanks": [0, 0, 4],
+  "defenseRank": 1,
+}

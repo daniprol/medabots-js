@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "phoenix",
+  "kind": "character",
+  "displayName": "Phoenix",
+  "tagline": "Fire / Flight",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-4.png",
+    "frames": [
+      {
+        "x": 22,
+        "y": 50,
+        "width": 195,
+        "height": 189,
+      },
+      {
+        "x": 283,
+        "y": 66,
+        "width": 182,
+        "height": 171,
+      },
+      {
+        "x": 561,
+        "y": 13,
+        "width": 191,
+        "height": 224,
+      },
+      {
+        "x": 798,
+        "y": 42,
+        "width": 211,
+        "height": 198,
+      },
+    ],
+    "frameSize": 224,
+    "color": "#ed6535",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "phoenix-head",
+    "leftArm": "phoenix-left-arm",
+    "rightArm": "phoenix-right-arm",
+    "legs": "phoenix-legs",
+  },
+  "specialAbilityId": "medaforce-9",
+  "medalId": "phoenix-medal",
+  "medalLevel": 1,
+  "originalSetId": 21,
+}

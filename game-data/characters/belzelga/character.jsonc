@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "belzelga",
+  "kind": "character",
+  "displayName": "Belzelga",
+  "tagline": "Sacrifice / Dual Leg (SHT)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-3.png",
+    "frames": [
+      {
+        "x": 13,
+        "y": 1219,
+        "width": 212,
+        "height": 298,
+      },
+      {
+        "x": 265,
+        "y": 1264,
+        "width": 233,
+        "height": 234,
+      },
+      {
+        "x": 525,
+        "y": 1232,
+        "width": 222,
+        "height": 263,
+      },
+      {
+        "x": 778,
+        "y": 1226,
+        "width": 230,
+        "height": 285,
+      },
+    ],
+    "frameSize": 298,
+    "color": "#634d8e",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "belzelga-head",
+    "leftArm": "belzelga-left-arm",
+    "rightArm": "belzelga-right-arm",
+    "legs": "belzelga-legs",
+  },
+  "specialAbilityId": "medaforce-7",
+  "medalId": "devil-medal",
+  "medalLevel": 1,
+  "originalSetId": 20,
+}

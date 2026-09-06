@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "orkamar",
+  "kind": "character",
+  "displayName": "Orkamar",
+  "tagline": "Wave / Diving",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-4.png",
+    "frames": [
+      {
+        "x": 14,
+        "y": 274,
+        "width": 203,
+        "height": 218,
+      },
+      {
+        "x": 273,
+        "y": 317,
+        "width": 231,
+        "height": 170,
+      },
+      {
+        "x": 527,
+        "y": 258,
+        "width": 241,
+        "height": 229,
+      },
+      {
+        "x": 768,
+        "y": 317,
+        "width": 248,
+        "height": 170,
+      },
+    ],
+    "frameSize": 229,
+    "color": "#35485e",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "orkamar-head",
+    "leftArm": "orkamar-left-arm",
+    "rightArm": "orkamar-right-arm",
+    "legs": "orkamar-legs",
+  },
+  "specialAbilityId": "medaforce-5",
+  "medalId": "bear-medal",
+  "medalLevel": 1,
+  "originalSetId": 22,
+}

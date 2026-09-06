@@ -1,15 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "rokusho-left-arm",
   "kind": "part",
-  "slot": "leftArm",
-  "armor": 35,
-  "abilityId": "rokusho-left-arm-attack",
   "originalId": 1,
   "displayName": "PiPo Hammer",
+  "slot": "leftArm",
+  "armor": 35,
   "defense": 7,
+  "selectionRank": 2,
   "locomotion": 0,
   "speedIndex": 0,
   "attackRanks": [0, 0, 0],
   "defenseRank": 0,
+  "abilityId": "rokusho-left-arm-attack",
 }

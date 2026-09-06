@@ -1,15 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-left-arm",
   "kind": "part",
-  "slot": "leftArm",
-  "armor": 40,
-  "abilityId": "warbandit-left-arm-attack",
   "originalId": 5,
   "displayName": "Range Shooter",
+  "slot": "leftArm",
+  "armor": 40,
   "defense": 7,
+  "selectionRank": 1,
   "locomotion": 0,
   "speedIndex": 0,
   "attackRanks": [0, 0, 0],
   "defenseRank": 0,
+  "abilityId": "warbandit-left-arm-attack",
 }

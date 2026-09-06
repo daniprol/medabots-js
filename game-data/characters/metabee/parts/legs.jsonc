@@ -1,12 +1,14 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-legs",
   "kind": "part",
-  "slot": "legs",
-  "armor": 50,
   "originalId": 0,
   "displayName": "Ochitsuka",
+  "slot": "legs",
+  "armor": 50,
   "defense": 3,
+  "selectionRank": 2,
   "locomotion": 0,
   "speedIndex": 3,
   "attackRanks": [5, 0, 0],

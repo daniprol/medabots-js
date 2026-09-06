@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "monoklar-right-arm",
+  "kind": "part",
+  "originalId": 24,
+  "displayName": "Judge Shield",
+  "slot": "rightArm",
+  "armor": 70,
+  "defense": 2,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "monoklar-right-arm-attack",
+}

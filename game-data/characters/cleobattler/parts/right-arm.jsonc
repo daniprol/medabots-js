@@ -1,0 +1,17 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "cleobattler-right-arm",
+  "kind": "part",
+  "originalId": 9,
+  "displayName": "Pride Viper",
+  "slot": "rightArm",
+  "armor": 50,
+  "defense": 6,
+  "selectionRank": 1,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
+  "abilityId": "cleobattler-right-arm-attack",
+}

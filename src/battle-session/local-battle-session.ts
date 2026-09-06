@@ -105,6 +105,14 @@ export class LocalBattleSession {
   private createCommandFrame(): CommandFrame {
     const frame: CommandFrame = { tick: this.current.tick + 1, commands: {} };
 
+    let cursor = this.current.randomCursor;
+    frame.aiRandomDraws = 0;
+    const draw = () => {
+      const value = this.content.rules[this.setup.rulesId]!.original.battleRandom[cursor]!;
+      cursor = (cursor + 1) & 255;
+      frame.aiRandomDraws!++;
+      return value;
+    };
     for (const combatant of this.current.combatants) {
       const assignment = this.assignments[combatant.id]!;
       const command =
@@ -115,6 +123,7 @@ export class LocalBattleSession {
               this.content,
               this.content.ai[assignment.aiProfileId]!,
               this.aiStates[combatant.id]!,
+              draw,
             )
           : this.input.read(combatant.id)!.command;
       const partner = this.current.combatants.find(

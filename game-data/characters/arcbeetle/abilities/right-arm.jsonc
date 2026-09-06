@@ -1,8 +1,9 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
 {
   "$schema": "../../../schemas/ability.schema.json",
   "id": "arcbeetle-right-arm-attack",
   "kind": "ability",
-  "displayName": "Ignition",
+  "displayName": "Rifle",
   "abilityKind": "projectile",
   "delivery": "projectile",
   "damage": 7,
@@ -14,19 +15,16 @@
   },
   "specialCost": 0,
   "maxUses": 0,
-  "color": "#ffdf65",
+  "color": "#ef5627",
   "original": {
     "actionType": 0,
+    "category": 1,
     "family": "rifle",
     "refill": 7,
     "readinessReset": 213,
     "actionTicks": 16,
     "contactTick": 0,
     "shotTick": 2,
-    "rangePixels": 84,
-    "speedPixels": 3,
-    "movementAllowed": true,
-    "verified": true,
     "comboStages": [
       {
         "actionTicks": 16,
@@ -39,5 +37,10 @@
         "shotTick": 2,
       },
     ],
+    "rangePixels": 84,
+    "speedPixels": 3,
+    "movementAllowed": true,
+    "verified": true,
+    "statusGroup": 255,
   },
 }

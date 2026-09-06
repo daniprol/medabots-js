@@ -34,6 +34,8 @@
       "type": "object",
       "required": [
         "actionType",
+        "category",
+        "statusGroup",
         "family",
         "refill",
         "readinessReset",
@@ -50,6 +52,31 @@
         "actionType": {
           "minimum": 0,
           "maximum": 34,
+          "type": "integer"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "const": 0,
+              "type": "number"
+            },
+            {
+              "const": 1,
+              "type": "number"
+            },
+            {
+              "const": 2,
+              "type": "number"
+            },
+            {
+              "const": 255,
+              "type": "number"
+            }
+          ]
+        },
+        "statusGroup": {
+          "minimum": 0,
+          "maximum": 255,
           "type": "integer"
         },
         "family": {
@@ -100,6 +127,146 @@
             },
             {
               "const": "vertical-line",
+              "type": "string"
+            },
+            {
+              "const": "laser",
+              "type": "string"
+            },
+            {
+              "const": "break",
+              "type": "string"
+            },
+            {
+              "const": "sacrifice",
+              "type": "string"
+            },
+            {
+              "const": "fire",
+              "type": "string"
+            },
+            {
+              "const": "thunder",
+              "type": "string"
+            },
+            {
+              "const": "freeze",
+              "type": "string"
+            },
+            {
+              "const": "hold",
+              "type": "string"
+            },
+            {
+              "const": "wave",
+              "type": "string"
+            },
+            {
+              "const": "destroy",
+              "type": "string"
+            },
+            {
+              "const": "defense",
+              "type": "string"
+            },
+            {
+              "const": "full-defense",
+              "type": "string"
+            },
+            {
+              "const": "recovery",
+              "type": "string"
+            },
+            {
+              "const": "regeneration",
+              "type": "string"
+            },
+            {
+              "const": "revive",
+              "type": "string"
+            },
+            {
+              "const": "cleanse",
+              "type": "string"
+            },
+            {
+              "const": "meter-control",
+              "type": "string"
+            },
+            {
+              "const": "confusion",
+              "type": "string"
+            },
+            {
+              "const": "ineffective",
+              "type": "string"
+            },
+            {
+              "const": "indefensible",
+              "type": "string"
+            },
+            {
+              "const": "melee-trap",
+              "type": "string"
+            },
+            {
+              "const": "shot-trap",
+              "type": "string"
+            },
+            {
+              "const": "change",
+              "type": "string"
+            },
+            {
+              "const": "attack-change",
+              "type": "string"
+            },
+            {
+              "const": "void-explode",
+              "type": "string"
+            },
+            {
+              "const": "void-optic",
+              "type": "string"
+            },
+            {
+              "const": "void-gravity",
+              "type": "string"
+            },
+            {
+              "const": "all-recovery",
+              "type": "string"
+            },
+            {
+              "const": "question",
+              "type": "string"
+            },
+            {
+              "const": "double-trap",
+              "type": "string"
+            },
+            {
+              "const": "giga-break",
+              "type": "string"
+            },
+            {
+              "const": "plus-counter",
+              "type": "string"
+            },
+            {
+              "const": "demolition",
+              "type": "string"
+            },
+            {
+              "const": "power-drain",
+              "type": "string"
+            },
+            {
+              "const": "meltian",
+              "type": "string"
+            },
+            {
+              "const": "random-change",
               "type": "string"
             }
           ]
@@ -210,7 +377,7 @@
       ]
     },
     "damage": {
-      "minimum": 1,
+      "minimum": 0,
       "maximum": 1000,
       "type": "number",
       "description": "Armor points removed before guard reduction; damage applies to one overlapping part."

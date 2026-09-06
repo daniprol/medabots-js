@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "brass-legs",
+  "kind": "part",
+  "originalId": 2,
+  "displayName": "Flare Gather",
+  "slot": "legs",
+  "armor": 40,
+  "defense": 5,
+  "selectionRank": 3,
+  "locomotion": 0,
+  "speedIndex": 4,
+  "attackRanks": [3, 0, 0],
+  "defenseRank": 2,
+}

@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "krosserdog",
+  "kind": "character",
+  "displayName": "Krosserdog",
+  "tagline": "Rifle / Dual Leg (SHT)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-3.png",
+    "frames": [
+      {
+        "x": 25,
+        "y": 264,
+        "width": 205,
+        "height": 233,
+      },
+      {
+        "x": 278,
+        "y": 287,
+        "width": 206,
+        "height": 203,
+      },
+      {
+        "x": 552,
+        "y": 261,
+        "width": 207,
+        "height": 194,
+      },
+      {
+        "x": 784,
+        "y": 281,
+        "width": 223,
+        "height": 216,
+      },
+    ],
+    "frameSize": 233,
+    "color": "#5086c2",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "krosserdog-head",
+    "leftArm": "krosserdog-left-arm",
+    "rightArm": "krosserdog-right-arm",
+    "legs": "krosserdog-legs",
+  },
+  "specialAbilityId": "medaforce-6",
+  "medalId": "monkey-medal",
+  "medalLevel": 1,
+  "originalSetId": 16,
+}

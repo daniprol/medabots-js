@@ -1,0 +1,81 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../schemas/character.schema.json",
+  "id": "neutranurse",
+  "kind": "character",
+  "displayName": "Neutranurse",
+  "tagline": "Minute Recov / Dual Leg (GRP)",
+  "visual": {
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/roster-1.png",
+    "frames": [
+      {
+        "x": 56,
+        "y": 272,
+        "width": 151,
+        "height": 225,
+      },
+      {
+        "x": 296,
+        "y": 284,
+        "width": 183,
+        "height": 212,
+      },
+      {
+        "x": 565,
+        "y": 253,
+        "width": 146,
+        "height": 230,
+      },
+      {
+        "x": 797,
+        "y": 284,
+        "width": 201,
+        "height": 218,
+      },
+    ],
+    "frameSize": 230,
+    "color": "#f0a8c7",
+    "accent": "#f1e7b2",
+  },
+  "collider": {
+    "width": 2,
+    "height": 4,
+  },
+  "hitRegions": {
+    "head": {
+      "x": 0,
+      "y": 1.98,
+      "width": 1.05,
+      "height": 0.7,
+    },
+    "leftArm": {
+      "x": -0.43,
+      "y": 1.27,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "rightArm": {
+      "x": 0.43,
+      "y": 1.33,
+      "width": 0.56,
+      "height": 0.66,
+    },
+    "legs": {
+      "x": 0,
+      "y": 0.44,
+      "width": 1.1,
+      "height": 0.88,
+    },
+  },
+  "defaultLoadout": {
+    "head": "neutranurse-head",
+    "leftArm": "neutranurse-left-arm",
+    "rightArm": "neutranurse-right-arm",
+    "legs": "neutranurse-legs",
+  },
+  "specialAbilityId": "medaforce-2",
+  "medalId": "mermaid-medal",
+  "medalLevel": 1,
+  "originalSetId": 3,
+}

@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "acehorn-legs",
+  "kind": "part",
+  "originalId": 8,
+  "displayName": "Ace Hooves",
+  "slot": "legs",
+  "armor": 40,
+  "defense": 7,
+  "selectionRank": 1,
+  "locomotion": 2,
+  "speedIndex": 2,
+  "attackRanks": [0, 1, 4],
+  "defenseRank": 0,
+}

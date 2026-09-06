@@ -1,0 +1,16 @@
+// AX numeric source facts; see docs/ax-full-roster-evidence.md.
+{
+  "$schema": "../../../schemas/part.schema.json",
+  "id": "totalizer-legs",
+  "kind": "part",
+  "originalId": 11,
+  "displayName": "Roller tank",
+  "slot": "legs",
+  "armor": 105,
+  "defense": 2,
+  "selectionRank": 0,
+  "locomotion": 4,
+  "speedIndex": 1,
+  "attackRanks": [3, 0, 0],
+  "defenseRank": 3,
+}
