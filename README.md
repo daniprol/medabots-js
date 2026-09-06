@@ -8,7 +8,7 @@ An unofficial browser-game fan prototype inspired by **Medabots AX for Game Boy 
 
 ## Try it
 
-You need [Node.js](https://nodejs.org/en/download) and pnpm 10. Use Node 24 from `.nvmrc` (Node 22.12+ is required). No ROM, emulator, account, or gamepad is required.
+You need [Node.js](https://nodejs.org/en/download) and pnpm 10.17. `pnpm install` downloads the locked Node 24 runtime used by project scripts and Git hooks. No ROM, emulator, account, or gamepad is required.
 
 1. Download or clone this repository and open a terminal in its folder.
 2. Install pnpm if you do not already have it: `npm install --global pnpm@10`.

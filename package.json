@@ -56,9 +56,16 @@
     "vite": "^7.1.5",
     "vitest": "^3.2.4"
   },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.x",
+      "onFail": "download"
+    }
+  },
   "engines": {
     "node": ">=22.12.0",
-    "pnpm": ">=10 <11"
+    "pnpm": ">=10.14 <11"
   },
   "packageManager": "pnpm@10.17.0"
 }

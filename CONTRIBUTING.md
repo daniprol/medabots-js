@@ -4,7 +4,7 @@ Improvements to combat feel, accessibility, controller support, documentation, a
 
 ## Work locally
 
-Follow the [README](README.md) to install and run the game. The pnpm version is pinned in `package.json`; dependencies are pinned by `pnpm-lock.yaml`.
+Follow the [README](README.md) to install and run the game. The pnpm version and Node runtime are declared in `package.json`; exact dependency and runtime versions are locked in `pnpm-lock.yaml`. Run `pnpm install` after runtime changes so scripts and Git hooks use the supported Node version even when your shell uses an older one.
 
 ```sh
 pnpm format                  # Format TypeScript, CSS, HTML, JSONC, Markdown, and YAML
