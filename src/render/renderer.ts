@@ -4,37 +4,34 @@ import type { BattleSnapshot, BattleEvent } from '../battle-core';
 import type { ContentCatalog } from '../content/catalog';
 import { createArena } from './arena-view';
 import { CharacterView, disposeModel } from './character-view';
+import { slashTexture } from './effect-textures';
 import { Effects } from './effects';
-import { material } from './models/primitives';
-
-const portraitCache = new WeakMap<object, string>();
+import { spritePortrait } from './sprite-assets';
 
 export class BattleRenderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.OrthographicCamera(-18, 18, 10, -10, 0.1, 120);
+  readonly camera = new THREE.OrthographicCamera(-15, 15, 10, -10, 0.1, 140);
   private views = new Map<string, CharacterView>();
   private projectiles = new Map<string, THREE.Mesh>();
+  private labels = new Map<string, HTMLElement>();
+  private shadows = new Map<string, THREE.Mesh>();
   private effects: Effects;
   private arena;
-  private resizeObserver: ResizeObserver;
+  private observer: ResizeObserver;
   private width = 1;
   private height = 1;
-  private worldWidth: number;
   private time = 0;
-  private focusX = 0;
-  private shotGeometry = new THREE.SphereGeometry(1, 10, 6);
-  private labels = new Map<string, HTMLElement>();
-  private rings = new Map<string, THREE.Mesh>();
-  private shadows = new Map<string, THREE.Mesh>();
-  private shadowGeometry = new THREE.CircleGeometry(0.73, 24);
-  private shadowMaterial = new THREE.MeshBasicMaterial({
-    color: '#172a40',
-    transparent: true,
-    opacity: 0.23,
-    depthWrite: false,
-  });
-  private auraGeometry = new THREE.TorusGeometry(0.86, 0.035, 5, 36);
+  private lookAhead = 0;
+  private sharedCenterY = 15;
+  private sharedHalfWidth = 27;
+  private focusId: string;
+  private shared: boolean;
+  private slashGeometry = new THREE.PlaneGeometry(3.5, 10);
+  private slashMap = slashTexture();
+  private shotGeometry = new THREE.SphereGeometry(1, 16, 8);
+  private shadowGeometry = new THREE.PlaneGeometry(2.5, 0.7);
+  private shadowTexture: THREE.CanvasTexture;
 
   constructor(
     private container: HTMLElement,
@@ -42,70 +39,60 @@ export class BattleRenderer {
     snapshot: BattleSnapshot,
     humans: string[],
   ) {
-    this.worldWidth = content.arenas[snapshot.arenaId]!.width + 1;
+    this.shared = humans.length > 1;
+    this.focusId = humans[0] ?? 'A1';
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: false,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-    this.renderer.setClearColor('#8acdf2');
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.shadowMap.enabled = false;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.domElement.setAttribute('aria-label', 'Three-dimensional Robattle arena');
-    this.container.append(this.renderer.domElement);
-    this.camera.position.set(0, 10.1, 42);
-    this.camera.lookAt(0, 6.1, 0);
-    this.scene.add(new THREE.HemisphereLight('#eefaff', '#6b7fa3', 0.7));
-
-    const sun = new THREE.DirectionalLight('#fff2d9', 2.1);
-    sun.position.set(-10, 20, 16);
-    sun.castShadow = false;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -20;
-    sun.shadow.camera.right = 20;
-    sun.shadow.camera.top = 15;
-    sun.shadow.camera.bottom = -10;
-    sun.shadow.normalBias = 0.035;
-    this.scene.add(sun);
-
-    const rim = new THREE.DirectionalLight('#7bddff', 0.55);
-    rim.position.set(5, 8, -7);
+    this.renderer.setClearColor('#b9cfbf');
+    this.renderer.domElement.setAttribute('aria-label', 'HD-2D Medabots battle arena');
+    container.append(this.renderer.domElement);
+    this.scene.add(new THREE.HemisphereLight('#fff2d9', '#65868c', 2));
+    const sunlight = new THREE.DirectionalLight('#ffe7b6', 1.6);
+    sunlight.position.set(-12, 28, 15);
+    this.scene.add(sunlight);
+    const rim = new THREE.DirectionalLight('#b4e5ec', 0.65);
+    rim.position.set(8, 14, -8);
     this.scene.add(rim);
     this.arena = createArena(content.arenas[snapshot.arenaId]!);
     this.scene.add(this.arena.root);
     this.effects = new Effects(this.scene, content);
-
-    for (const c of snapshot.combatants) {
-      const view = new CharacterView(content.characters[c.characterId]!);
-      this.views.set(c.id, view);
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d')!;
+    const gradient = ctx.createRadialGradient(64, 16, 0, 64, 16, 64);
+    gradient.addColorStop(0, '#19362b99');
+    gradient.addColorStop(1, '#19362b00');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 128, 32);
+    this.shadowTexture = new THREE.CanvasTexture(canvas);
+    for (const actor of snapshot.combatants) {
+      const view = new CharacterView(content.characters[actor.characterId]!);
+      this.views.set(actor.id, view);
       this.scene.add(view.root);
-
       const label = document.createElement('div');
-      label.dataset.testid = `combatant-label-${c.id}`;
-      label.className = `robot-label ${c.teamId === snapshot.combatants[0]!.teamId ? 'cyan' : 'coral'}`;
-      label.textContent = `${c.role === 'leader' ? '◆ ' : ''}${c.id}${humans.includes(c.id) ? ' · YOU' : ''}`;
-      this.container.append(label);
-      this.labels.set(c.id, label);
-
-      const ring = new THREE.Mesh(
-        this.auraGeometry,
-        new THREE.MeshBasicMaterial({ color: '#6feaff', transparent: true, opacity: 0.7 }),
+      label.className = `robot-label ${actor.teamId === snapshot.combatants[0]!.teamId ? 'cyan' : 'coral'}`;
+      label.dataset.testid = `combatant-label-${actor.id}`;
+      label.textContent = `${actor.role === 'leader' ? '◆ ' : ''}${actor.id}${humans.includes(actor.id) ? ' · YOU' : ''}`;
+      container.append(label);
+      this.labels.set(actor.id, label);
+      const shadow = new THREE.Mesh(
+        this.shadowGeometry,
+        new THREE.MeshBasicMaterial({
+          map: this.shadowTexture,
+          transparent: true,
+          depthWrite: false,
+        }),
       );
-      ring.visible = false;
-      this.scene.add(ring);
-      this.rings.set(c.id, ring);
-
-      const shadow = new THREE.Mesh(this.shadowGeometry, this.shadowMaterial);
-      shadow.rotation.x = -Math.PI / 2;
-      shadow.scale.set(1.15, 0.7, 1);
       this.scene.add(shadow);
-      this.shadows.set(c.id, shadow);
+      this.shadows.set(actor.id, shadow);
     }
-
-    this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(container);
+    this.observer = new ResizeObserver(() => this.resize());
+    this.observer.observe(container);
     this.resize();
   }
 
@@ -113,14 +100,12 @@ export class BattleRenderer {
     this.width = this.container.clientWidth;
     this.height = this.container.clientHeight;
     this.renderer.setSize(this.width, this.height);
-
-    const aspect = this.width / this.height;
-    const worldWidth = Math.max(this.worldWidth, 17 * aspect);
-    const worldHeight = worldWidth / aspect;
-    this.camera.left = -worldWidth / 2;
-    this.camera.right = worldWidth / 2;
-    this.camera.top = worldHeight / 2;
-    this.camera.bottom = -worldHeight / 2;
+    const halfWidth = this.shared ? this.sharedHalfWidth : 15;
+    const halfHeight = (halfWidth * this.height) / Math.max(1, this.width);
+    this.camera.left = -halfWidth;
+    this.camera.right = halfWidth;
+    this.camera.top = halfHeight;
+    this.camera.bottom = -halfHeight;
     this.camera.updateProjectionMatrix();
   }
 
@@ -134,188 +119,158 @@ export class BattleRenderer {
     dt = THREE.MathUtils.clamp(dt, 0, 0.1);
     this.time += dt;
     this.effects.emit(events);
-
-    const freeze = this.effects.freezeSeconds > 0;
     this.effects.update(dt);
-    this.frameAction(current, dt);
-
     const blend = THREE.MathUtils.clamp(alpha, 0, 1);
-    const animationDt = this.effects.finalSlowSeconds > 0 ? dt * 0.22 : dt;
-    const placedLabels: { x: number; y: number }[] = [];
-
-    for (const c of current.combatants) {
-      const old = previous.combatants.find((p) => p.id === c.id) ?? c;
-      const view = this.views.get(c.id)!;
-
-      if (!freeze) {
-        view.update(
-          old,
-          c,
-          blend,
-          animationDt,
-          false,
-          c.attack ? this.content.abilities[c.attack.abilityId] : undefined,
+    this.arena.update(previous, current, blend);
+    const focus =
+      current.combatants.find((actor) => actor.id === this.focusId) ?? current.combatants[0]!;
+    if (this.shared) {
+      const living = current.combatants.filter((actor) => !actor.knockedOut);
+      if (living.length) {
+        const lowest = Math.min(...living.map((actor) => actor.y));
+        const highest = Math.max(...living.map((actor) => actor.y + 4.5));
+        const aspect = this.width / Math.max(1, this.height);
+        const halfHeight = Math.max(27 / aspect, (highest - lowest) / 2 + 5);
+        const targetY = Math.max(15, (highest + lowest) / 2);
+        this.sharedCenterY = THREE.MathUtils.damp(this.sharedCenterY, targetY, 5, dt);
+        // Widen promptly for separated players; close in gently after they regroup.
+        const targetWidth = halfHeight * aspect;
+        this.sharedHalfWidth = THREE.MathUtils.damp(
+          this.sharedHalfWidth,
+          targetWidth,
+          targetWidth > this.sharedHalfWidth ? 10 : 2,
+          dt,
         );
+        this.camera.left = -this.sharedHalfWidth;
+        this.camera.right = this.sharedHalfWidth;
+        this.camera.top = this.sharedHalfWidth / aspect;
+        this.camera.bottom = -this.camera.top;
+        this.camera.updateProjectionMatrix();
       }
-
-      const shadow = this.shadows.get(c.id)!;
+    }
+    this.lookAhead = THREE.MathUtils.damp(this.lookAhead, focus.facing * 6, 4, dt);
+    const centerX = this.shared ? 0 : THREE.MathUtils.clamp(focus.x + this.lookAhead, -12, 12);
+    const centerY = this.shared
+      ? this.sharedCenterY
+      : THREE.MathUtils.clamp(focus.y, 9.875, 35.875);
+    const shake = this.effects.shake;
+    this.camera.position.set(
+      centerX + Math.sin(this.time * 117) * shake,
+      centerY + Math.cos(this.time * 91) * shake,
+      50,
+    );
+    this.camera.lookAt(centerX, centerY, 0);
+    this.camera.updateMatrixWorld();
+    this.arena.distant.position.set(centerX * 0.22, centerY * 0.06, 0);
+    for (const actor of current.combatants) {
+      const old = previous.combatants.find((candidate) => candidate.id === actor.id) ?? actor;
+      const view = this.views.get(actor.id)!;
+      if (this.effects.freezeSeconds <= 0) {
+        view.update(old, actor, blend, dt, false);
+      }
+      const position = view.root.position
+        .clone()
+        .add(new THREE.Vector3(0, 4.55, 0))
+        .project(this.camera);
+      const label = this.labels.get(actor.id)!;
+      const x = THREE.MathUtils.clamp((position.x * 0.5 + 0.5) * this.width, 40, this.width - 40);
+      const y = THREE.MathUtils.clamp(
+        (-position.y * 0.5 + 0.5) * this.height,
+        92,
+        this.height - 115,
+      );
+      label.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px)`;
+      label.style.opacity = actor.knockedOut ? '0' : Math.abs(position.x) > 1 ? '.45' : '1';
+      const shadow = this.shadows.get(actor.id)!;
       shadow.position.set(
         view.root.position.x,
-        (c.grounded ? c.y : 0) + 0.025,
-        view.root.position.z,
+        actor.grounded ? actor.y + 0.03 : Math.max(0, actor.y - 2),
+        0.22,
       );
-      shadow.visible = !c.knockedOut;
-
-      const label = this.labels.get(c.id)!;
-      const p = view.root.position
-        .clone()
-        .add(new THREE.Vector3(0, 3.5, 0))
-        .project(this.camera);
-      const labelX = (p.x * 0.5 + 0.5) * this.width;
-      let labelY = (-p.y * 0.5 + 0.5) * this.height;
-
-      while (
-        placedLabels.some(
-          (other) => Math.abs(other.x - labelX) < 90 && Math.abs(other.y - labelY) < 23,
-        )
-      ) {
-        labelY -= 24;
-      }
-
-      placedLabels.push({ x: labelX, y: labelY });
-      label.style.transform = `translate(-50%,-50%) translate(${labelX}px,${labelY}px)`;
-      label.style.opacity = c.knockedOut ? '.3' : '1';
-
-      const ring = this.rings.get(c.id)!;
-      ring.visible = c.guarding || c.charging;
-      ring.position.copy(view.root.position).add(new THREE.Vector3(0, 1.25, 0.8));
-      ring.scale.setScalar(c.guarding ? 1.55 : 1.25 + Math.sin(this.time * 9) * 0.1);
-      ring.rotation.z = this.time * 2;
-      (ring.material as THREE.MeshBasicMaterial).color.set(c.guarding ? '#66d8ff' : '#ffce54');
+      shadow.visible = !actor.knockedOut;
+      shadow.scale.setScalar(actor.grounded ? 1 : 0.6);
     }
-
-    const active = new Set(current.projectiles.map((p) => p.id));
-
+    const active = new Set(current.projectiles.map((projectile) => projectile.id));
     for (const [id, mesh] of this.projectiles) {
       if (!active.has(id)) {
         this.scene.remove(mesh);
+        (mesh.material as THREE.Material).dispose();
         this.projectiles.delete(id);
       }
     }
-
-    for (const p of current.projectiles) {
-      const a = this.content.abilities[p.abilityId]!;
-      let mesh = this.projectiles.get(p.id);
-
+    for (const projectile of current.projectiles) {
+      const ability = this.content.abilities[projectile.abilityId]!;
+      let mesh = this.projectiles.get(projectile.id);
       if (!mesh) {
-        mesh = new THREE.Mesh(this.shotGeometry, material(a.color));
-        mesh.scale.set(a.hitbox.width * 0.8, a.hitbox.height * 0.45, 0.13);
+        const slash = ability.original.family === 'vertical-line';
+        mesh = new THREE.Mesh(
+          slash ? this.slashGeometry : this.shotGeometry,
+          new THREE.MeshBasicMaterial({
+            color: slash ? '#ffffff' : ability.color,
+            map: slash ? this.slashMap : null,
+            transparent: true,
+            depthWrite: false,
+            toneMapped: false,
+            side: THREE.DoubleSide,
+          }),
+        );
+        if (!slash) {
+          mesh.scale.set(
+            ability.original.family === 'barrage'
+              ? 0.5
+              : ability.original.family === 'beam'
+                ? 1.7
+                : 0.65,
+            ability.original.family === 'barrage' ? 0.4 : 0.15,
+            0.1,
+          );
+        }
         this.scene.add(mesh);
-        this.projectiles.set(p.id, mesh);
+        this.projectiles.set(projectile.id, mesh);
       }
-
-      const old = previous.projectiles.find((o) => o.id === p.id) ?? p;
+      if (ability.original.family === 'vertical-line') {
+        mesh.scale.x = projectile.facing;
+      }
+      (mesh.material as THREE.MeshBasicMaterial).opacity = projectile.hitTicks
+        ? projectile.hitTicks / 32
+        : 1;
+      const old =
+        previous.projectiles.find((candidate) => candidate.id === projectile.id) ?? projectile;
       mesh.position.set(
-        THREE.MathUtils.lerp(old.x, p.x, blend),
-        THREE.MathUtils.lerp(old.y, p.y, blend),
+        THREE.MathUtils.lerp(old.x, projectile.x, blend),
+        THREE.MathUtils.lerp(old.y, projectile.y, blend),
         1,
       );
     }
-
-    const focus = current.combatants.reduce((n, c) => n + c.x, 0) / 4;
-    this.arena.distant.position.x = -focus * 0.035;
-
     this.renderer.render(this.scene, this.camera);
   }
 
-  /** Keep the floor anchored and fit all active robots, with a modest close-up during a clustered fight. */
-  private frameAction(snapshot: BattleSnapshot, dt: number) {
-    const actors = snapshot.combatants.filter((c) => !c.knockedOut);
-
-    if (!actors.length) {
-      return;
-    }
-
-    const left = Math.min(...actors.map((c) => c.x));
-    const right = Math.max(...actors.map((c) => c.x));
-    const top = Math.max(...actors.map((c) => c.y + 3.6));
-    const worldWidth = this.camera.right - this.camera.left;
-    const widthFit = worldWidth / Math.max(1, right - left + 4);
-    const heightFit =
-      (((this.height - Math.min(185, this.height * 0.25)) / (top + 1.0)) * worldWidth) / this.width;
-    const targetZoom = THREE.MathUtils.clamp(Math.min(widthFit, heightFit), 0.72, 1.32);
-    this.camera.zoom = THREE.MathUtils.damp(this.camera.zoom, targetZoom, 3.5, dt);
-
-    const arenaHalf = this.content.arenas[snapshot.arenaId]!.width / 2;
-    const allowedPan = Math.max(0, arenaHalf - worldWidth / (2 * this.camera.zoom));
-    const center = THREE.MathUtils.clamp((left + right) / 2, -allowedPan, allowedPan);
-    this.focusX = THREE.MathUtils.damp(this.focusX, center, 3.5, dt);
-
-    const centerY = (this.camera.top - this.camera.bottom) / (2 * this.camera.zoom) - 1.0;
-    const shake = this.effects.shake;
-    const x = this.focusX + Math.sin(this.time * 117) * shake;
-    const y = centerY + Math.cos(this.time * 91) * shake;
-    this.camera.position.set(x, y + 4, 42);
-    this.camera.lookAt(x, y, 0);
-    this.camera.updateProjectionMatrix();
-    this.camera.updateMatrixWorld();
-  }
-
-  portrait(characterId: string): string {
-    const cached = portraitCache.get(this.content.characters[characterId]!);
-
-    if (cached) {
-      return cached;
-    }
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#142b42');
-
-    const light = new THREE.DirectionalLight('#fff3d5', 1.8);
-    light.position.set(-3, 5, 8);
-    scene.add(light, new THREE.HemisphereLight('#e3f6ff', '#63829b', 0.9));
-
-    const view = new CharacterView(this.content.characters[characterId]!);
-    view.model.root.rotation.y = -0.32;
-    scene.add(view.root);
-
-    const camera = new THREE.OrthographicCamera(-1.02, 1.02, 1.21, -1.21, 0.1, 20);
-    camera.position.set(0, 2.15, 8);
-    camera.lookAt(0, 2.0, 0);
-
-    const size = this.renderer.getSize(new THREE.Vector2());
-    this.renderer.setSize(160, 190, false);
-    this.renderer.render(scene, camera);
-
-    const image = this.renderer.domElement.toDataURL();
-    this.renderer.setSize(size.x, size.y, false);
-    view.dispose();
-    portraitCache.set(this.content.characters[characterId]!, image);
-
-    return image;
+  portrait(characterId: string) {
+    return spritePortrait(this.content.characters[characterId]!);
   }
 
   dispose() {
-    this.resizeObserver.disconnect();
+    this.observer.disconnect();
     this.effects.dispose();
-
     for (const view of this.views.values()) {
       view.dispose();
     }
-
     for (const label of this.labels.values()) {
       label.remove();
     }
-
-    for (const ring of this.rings.values()) {
-      (ring.material as THREE.Material).dispose();
+    for (const mesh of this.projectiles.values()) {
+      (mesh.material as THREE.Material).dispose();
     }
-
+    for (const mesh of this.shadows.values()) {
+      (mesh.material as THREE.Material).dispose();
+    }
     disposeModel(this.arena.root);
+    this.arena.dispose();
     this.shotGeometry.dispose();
-    this.auraGeometry.dispose();
+    this.slashGeometry.dispose();
+    this.slashMap.dispose();
     this.shadowGeometry.dispose();
-    this.shadowMaterial.dispose();
+    this.shadowTexture.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

@@ -8,7 +8,7 @@ describe('content pipeline', () => {
   it('discovers and validates all four complete characters, with frozen definitions', () => {
     expect(Object.keys(content.characters)).toHaveLength(4);
     expect(Object.isFrozen(content.parts['metabee-head'])).toBe(true);
-    expect(content.abilities['metabee-head-attack']!.startupTicks).toBe(6);
+    expect(content.abilities['metabee-head-attack']!.original.actionTicks).toBe(32);
   });
   it('parses comments and trailing commas', () => {
     const doc = documents.find((d) => d.path.endsWith('balanced.jsonc'))!;
@@ -84,10 +84,10 @@ describe('content pipeline', () => {
     expect(() =>
       fixture((d) => {
         if (d.kind === 'part' && d.id === 'metabee-legs') {
-          delete d.movement;
+          delete (d as Record<string, unknown>).speedIndex;
         }
       }),
-    ).toThrow(/leg movement/);
+    ).toThrow(/speedIndex/);
     expect(() =>
       fixture((d) => {
         if (d.kind === 'character' && d.id === 'metabee') {
@@ -151,7 +151,7 @@ describe('content pipeline', () => {
         d.damage = 42;
       }
       if (d.kind === 'part' && d.id === 'metabee-legs') {
-        d.movement!.speed = 12;
+        d.speedIndex = 6;
       }
       if (d.kind === 'keyboard' && d.id === 'keyboard-1') {
         d.bindings.jump = ['Space', 'KeyW'];
@@ -159,7 +159,7 @@ describe('content pipeline', () => {
     });
     expect(changed.parts['metabee-head']!.armor).toBe(200);
     expect(changed.abilities['metabee-head-attack']!.damage).toBe(42);
-    expect(changed.parts['metabee-legs']!.movement!.speed).toBe(12);
+    expect(changed.parts['metabee-legs']!.speedIndex).toBe(6);
     expect(changed.keyboards['keyboard-1']!.bindings.jump).toEqual(['Space', 'KeyW']);
   });
   it('rounds duration upward into exact 60Hz ticks', () => {

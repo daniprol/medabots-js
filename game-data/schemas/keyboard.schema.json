@@ -32,6 +32,7 @@
         "moveLeft",
         "moveRight",
         "jump",
+        "aimUp",
         "dropThroughPlatform",
         "rightArm",
         "leftArm",
@@ -44,7 +45,7 @@
       ],
       "properties": {
         "moveLeft": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -53,7 +54,7 @@
           }
         },
         "moveRight": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -62,7 +63,16 @@
           }
         },
         "jump": {
-          "minItems": 1,
+          "minItems": 0,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "pattern": "^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Enter|Escape|Tab|Backspace|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|Numpad([0-9]|Add|Subtract|Multiply|Divide|Decimal|Enter)|Semicolon|Quote|Comma|Period|Slash|Backslash|Bracket(Left|Right)|Minus|Equal|Backquote)$",
+            "type": "string"
+          }
+        },
+        "aimUp": {
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -71,7 +81,7 @@
           }
         },
         "dropThroughPlatform": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -80,7 +90,7 @@
           }
         },
         "rightArm": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -89,7 +99,7 @@
           }
         },
         "leftArm": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -98,7 +108,7 @@
           }
         },
         "head": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -107,7 +117,7 @@
           }
         },
         "guard": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -116,7 +126,7 @@
           }
         },
         "chargeSpecial": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -125,7 +135,7 @@
           }
         },
         "activateSpecial": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -134,7 +144,7 @@
           }
         },
         "partnerStrategy": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -143,7 +153,7 @@
           }
         },
         "pause": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {

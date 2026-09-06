@@ -1,4 +1,3 @@
-// Armor regions use local centers; X mirrors with facing. Feet are Y = 0.
 {
   "$schema": "../../schemas/character.schema.json",
   "id": "warbandit",
@@ -6,14 +5,41 @@
   "displayName": "Warbandit",
   "tagline": "PRESSURE / LANCE",
   "visual": {
-    "type": "procedural",
-    "model": "warbandit",
-    "color": "#e84432",
-    "accent": "#ffad25",
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/arcbeetle-warbandit-atlas.png",
+    "frameSize": 440,
+    "color": "#e9a42c",
+    "accent": "#64d4ff",
+    "frames": [
+      {
+        "x": 47,
+        "y": 434,
+        "width": 321,
+        "height": 426,
+      },
+      {
+        "x": 455,
+        "y": 433,
+        "width": 374,
+        "height": 421,
+      },
+      {
+        "x": 928,
+        "y": 416,
+        "width": 317,
+        "height": 381,
+      },
+      {
+        "x": 1344,
+        "y": 456,
+        "width": 422,
+        "height": 402,
+      },
+    ],
   },
   "collider": {
-    "width": 1.5,
-    "height": 2.4,
+    "width": 2,
+    "height": 4,
   },
   "hitRegions": {
     "head": {
@@ -48,4 +74,7 @@
     "legs": "warbandit-legs",
   },
   "specialAbilityId": "warbandit-medaforce",
+  "medalId": "kabuto-medal",
+  "medalLevel": 1,
+  "originalSetId": 5,
 }

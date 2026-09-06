@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 
+import { TICK_DURATION_SECONDS } from '../src/battle-core/timing';
 import { LocalBattleSession } from '../src/battle-session/local-battle-session';
 import type { Assignments } from '../src/input/bindings';
 import { GamepadInput } from '../src/input/gamepad-input';
@@ -49,15 +50,17 @@ describe('local session controller lifecycle', () => {
     Object.defineProperty(key, 'code', { value: 'KeyD' });
     window.dispatchEvent(key);
     for (let i = 0; i < 20; i++) {
-      session.advance(1 / 60);
+      session.advance(TICK_DURATION_SECONDS);
     }
-    expect(session.current.combatants[0]!.x).toBeGreaterThan(-9);
-    expect(session.current.combatants[1]!.x).toBeGreaterThan(-12);
-    expect(session.current.combatants[2]!.x).toBeLessThan(8);
-    expect(session.current.combatants[3]!.x).toBe(12);
+    expect(session.current.combatants.find((actor) => actor.id === 'A1')!.x).toBeGreaterThan(
+      -18.375,
+    );
+    expect(session.current.combatants.find((actor) => actor.id === 'A2')!.x).toBeGreaterThan(-23.5);
+    expect(session.current.combatants.find((actor) => actor.id === 'B1')!.x).toBeLessThan(18.375);
+    expect(session.current.combatants.find((actor) => actor.id === 'B2')!.x).toBe(23.5);
     pads[0]!.connected = false;
     const tick = session.current.tick;
-    session.advance(1 / 60);
+    session.advance(TICK_DURATION_SECONDS);
     expect(session.paused).toBe(true);
     expect(session.pauseReason).toContain('Controller 1 disconnected');
     session.resume();
@@ -65,7 +68,7 @@ describe('local session controller lifecycle', () => {
     expect(session.current.tick).toBe(tick);
     pads[0]!.connected = true;
     session.resume();
-    session.advance(1 / 60);
+    session.advance(TICK_DURATION_SECONDS);
     expect(session.current.tick).toBe(tick + 1);
     session.dispose();
   });
@@ -79,13 +82,13 @@ describe('local session controller lifecycle', () => {
     const event = new Event('keydown');
     Object.defineProperty(event, 'code', { value: 'KeyD' });
     window.dispatchEvent(event);
-    session.advance(1 / 60);
+    session.advance(TICK_DURATION_SECONDS);
     window.dispatchEvent(new Event('blur'));
     expect(session.paused).toBe(true);
     expect(session.pauseReason).toContain('focus');
     session.resume();
     for (let i = 0; i < 12; i++) {
-      session.advance(1 / 60);
+      session.advance(TICK_DURATION_SECONDS);
     }
     expect(session.current.combatants[0]!.vx).toBe(0);
     session.dispose();
@@ -100,10 +103,10 @@ describe('local session controller lifecycle', () => {
       content,
     );
     const event = new Event('keydown');
-    Object.defineProperty(event, 'code', { value: 'KeyP' });
+    Object.defineProperty(event, 'code', { value: 'KeyT' });
     window.dispatchEvent(event);
-    session.advance(1 / 60);
-    expect(session.current.combatants[1]!.strategy).toBe('ATTACK_LEADER');
+    session.advance(TICK_DURATION_SECONDS);
+    expect(session.current.combatants.find((actor) => actor.id === 'A2')!.panelIndex).toBe(0);
     session.dispose();
   });
 });

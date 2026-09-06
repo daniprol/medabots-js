@@ -1,27 +1,38 @@
 # Editing game content
 
-All nested `game-data/**/*.jsonc` files are discovered by Vite without a manifest. `src/content/load-bundled-content.ts` only discovers raw documents. `buildContentCatalog([{ path, text }])` parses, validates, checks references, converts milliseconds to ticks, and freezes the catalog. That function also runs in Node without Vite.
+Vite discovers nested `game-data/**/*.jsonc` files automatically. `loadBundledContent()` only discovers documents; pure `buildContentCatalog([{ path, text }])` parses, validates, resolves references, and freezes definitions. The same catalog builder runs in Node without Vite.
 
-TypeBox in `src/content/schemas.ts` is the source for content types, runtime validation, and generated editor schemas. `pnpm schemas` writes `game-data/schemas/*.schema.json`. Every document has `$schema`, a globally unique kebab-case `id`, and explicit `kind`. Unknown properties, duplicate IDs, bad loadouts, missing references, invalid numeric ranges, keys, and controller indices are rejected. Errors include the file, property path, expected value, and received value. The app shows validation errors instead of starting a broken match.
+TypeBox in `src/content/schemas.ts` is the source for TypeScript content types, runtime validation, and generated editor schemas. Run `pnpm schemas` after schema changes. Every document has `$schema`, a globally unique kebab-case `id`, and a `kind`. Errors report file path, property path, expected value, and received value. Unknown properties, invalid values, missing references, duplicate IDs and invalid loadouts are rejected.
 
-| Change                                                                                                     | Where                                                |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| Damage, knockback, stagger, attack area                                                                    | `game-data/characters/<character>/abilities/*.jsonc` |
-| Armor                                                                                                      | `game-data/characters/<character>/parts/*.jsonc`     |
-| Run, jump and dash speed                                                                                   | The character’s `parts/legs.jsonc`                   |
-| Startup, active, recovery, projectile lifetime                                                             | Ability files, in milliseconds                       |
-| Gravity, acceleration, friction, dash window, broken-leg penalties, guard, meter, head protection, timeout | `game-data/rules/battle-rules.jsonc`                 |
-| AI reaction, aggression, guard probability, target weights                                                 | `game-data/ai/*.jsonc`                               |
-| Platforms, dimensions, spawns                                                                              | `game-data/arenas/*.jsonc`                           |
-| Default roster, loadouts, roles, seed, arena                                                               | `game-data/matches/local-default.jsonc`              |
+| Change                                     | File / property                                                                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Base attack power                          | Character `abilities/*.jsonc`, `damage` (before medal/leg scaling and defense)                       |
+| Armor / defense                            | Character `parts/*.jsonc`, `armor` / `defense`                                                       |
+| Movement                                   | Leg `speedIndex`, `locomotion`; rule `original.speedRows` and `jumpCurves`                           |
+| Weapon timing / refill                     | Ability `original.actionTicks`, `contactTick`, `shotTick`, `comboStages`, `refill`, `readinessReset` |
+| Medal stats                                | `game-data/medals/*.jsonc`, level-indexed shooting/grappling/support/defense                         |
+| Guard / automatic meter / random table     | `rules/battle-rules.jsonc`                                                                           |
+| AI reaction / aggression / preferences     | `ai/*.jsonc`                                                                                         |
+| Field collision / water / moving platforms | Arena `original.tiles`, `waterY`, `movingPlatforms`                                                  |
+| Rendered platform runs / spawn positions   | Arena `platforms`, `spawns`                                                                          |
+| Default teams / seed / field               | `matches/local-default.jsonc`                                                                        |
+| Input                                      | `controls/**/*.jsonc`                                                                                |
 
-**Add an ability:** copy an ability JSONC, give it a unique ID, and configure its required values. The three kinds are `projectile`, `melee`, and `special`; a special chooses either existing delivery mechanism. `maxUses: 0` means unlimited. Reference the ID from a part, or from a character’s `specialAbilityId`.
+Original movement uses pixel tables and discrete states, not gravity/acceleration tuning. World units are eight original pixels: `worldX=(pixelX-216)/8`, `worldY=(367-bottomY)/8`. Most actor positions use world coordinates; dynamic platform records explicitly use original pixels. Movement tables use quarter-pixels. Attack timing uses integer updates directly; AI reaction and round duration use milliseconds converted to nominal 60-update counts. The local session uses the actual GBA frame cadence.
 
-**Add a part:** add a `kind: "part"` JSONC with its slot and armor. Heads/arms need an ability; legs need movement values. Reference it in a character’s default loadout or a `BattleSetup` loadout override. Destroying a part changes runtime armor/availability, never its loaded definition.
+Leg `attackRanks` are ordered **shooting, grappling, support**; defense has a separate rank. Normal attack damage includes medal stats and leg ranks; specials omit leg ranks. See the [source evidence](ax-roster-evidence.md) and [implementation status](ax-remaster-status.md) before interpreting a value as fully verified gameplay.
 
-**Add a character:** create a directory under `game-data/characters/` with a character JSONC, any new part/ability files, collider dimensions, hit regions, and a loadout. You can reuse existing parts and abilities. It appears automatically in the roster picker. You can also reference the character ID in a match or an externally supplied `BattleSetup`. Existing mechanics require no battle-code changes. A new procedural appearance requires a renderer entry; the four built-ins are ordinary Three.js code, not a procedural-model language.
+## Add definitions
 
-**Use a GLB:** place an original model in `public/assets/characters/<name>/model.glb` and use this visual definition:
+**Ability:** copy a supported ability, assign a unique ID, and configure required values. `abilityKind` remains projectile, melee, or special; `original.family` selects an implemented AX behavior. A new ID using existing behavior needs no battle-code change. A new mechanic does require code and tests. A source action-type number alone does not implement that handler. `verified` records timing provenance, not whole-handler parity. Reference normal abilities from parts and specials from characters. `comboStages` is an empty array for non-combo weapons; otherwise it contains the second and third right-arm stage timings. A new button press must buffer each follow-up.
+
+**Part:** add its slot, armor, defense, original numeric ID, leg metadata and optional normal ability. Heads/arms require an ability. Legs do not. Reference it from a character loadout or an external `BattleSetup` override. Parts and characters are composition, not subclasses.
+
+**Character:** add `characters/<id>/character.jsonc`, any new parts/abilities, medal reference/level, collider metadata, default loadout and visual. It appears in the roster automatically. Reuse existing mechanics without changing battle rules. Only four complete art/loadout entries are currently included; unsupported original sets are not populated with guessed values.
+
+**Sprite art:** place an atlas under `public/assets/characters/`. A `sprite` visual supplies its URL, four pixel rectangles (`frames`: idle, run, jump, attack), a common `frameSize`, color and accent. Rectangles need not form a regular grid. Leave transparent padding and use consistent scale. The renderer subdivides each pose into armor regions; more elaborate independently animated armor will need authored art improvements. Portraits use the same atlas.
+
+**GLB:** the optional model path remains available without changing simulation:
 
 ```jsonc
 "visual": {
@@ -37,10 +48,8 @@ TypeBox in `src/content/schemas.ts` is the source for content types, runtime val
 }
 ```
 
-Author feet at Y=0, face +Z, and size the body to the JSONC collider (the initial robots’ bodies are about 2.4 world units tall, excluding horns). Give each destructible armor section the configured node name; keep the exposed frame separate. `GLTFLoader` resolves those nodes and controls visibility from snapshots. Missing nodes produce a useful console error and retain the procedural fallback. The loader does not change collision or battle rules. No extracted sprites, ROM data, game audio, or official models are bundled. See [NOTICE](../NOTICE.md) for franchise rights and attribution.
+Author feet at Y=0, face +Z, and size the body to its collider. Each configured armor node is hidden when destroyed. The loader reports missing nodes and retains a procedural fallback. The four older procedural renderers remain optional; initial characters use sprite artwork. Neither geometry nor alpha pixels determine collision or damage.
 
-**Character art:** the four procedural models use individually drawn, beveled armor profiles and tapered shells, recessed eyes, hollow barrels, and segmented hands/feet. `src/render/models/armor.ts` contains the geometry helpers; `robot-frame.ts` contains the articulated inner frame; each character file owns its external silhouette. Hip/knee and shoulder poses animate from snapshots, including the exposed inner frame after destruction. Rigid geometry is batched by material while the damage groups and joint pivots remain separate. Toon materials use a nearest-filtered four-band gradient and simple back-face outlines. The orthographic camera gently tightens around active fighters while retaining room for jumps and the HUD.
+**Arena:** add 46×54 numeric surface tiles, four spawns in A1/B1/A2/B2 order, visible platform runs, water level or null, zero to three moving-platform records, and a field theme. Static geometry is one-way surface traversal, not solid wall boxes. The renderer follows tile slope profiles and snapshot platform positions. The current AI uses simple navigation; test reachability in an actual match.
 
-See [character art research](character-art-research.md) for official visual references and the deliberate differences in the supplied target (including its Arcbeetle/Warbandit naming). Reference photographs are not bundled assets. To inspect the current roster and battle, run `pnpm exec tsx scripts/inspect-characters.ts` with the dev server running; captures go into ignored `.artifacts/`.
-
-**Add an arena:** add an arena JSONC with four spawns and uniquely named horizontal platforms. The industrial renderer builds those platforms from data. Keep jumps reachable: approximate apex is `jumpSpeed² / (2 × gravity)`. The main floor belongs at Y=0. AI navigation intentionally uses straightforward chasing, jumping, and dropping.
+Read [Architecture](architecture.md) for the mounting boundary and future server integration, and [art provenance](hd2d-art.md) for asset sources. No ROM or extracted original artwork is bundled.

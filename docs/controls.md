@@ -1,29 +1,40 @@
 # Controls and local multiplayer
 
-Open **Controls** to assign a keyboard profile, connected gamepad, or CPU independently to A1, A2, B1, and B2. **2 on one keyboard** assigns opposing leaders to the two shared presets. The controls dialog also offers a three-player preset (requires a numpad) and automatic gamepad assignment. Choose any team slot for co-op instead. Leaders are marked ◆. Slots without an assignment in the mounting API become AI. Duplicate keyboard profiles and gamepads are blocked; overlapping keys between active profiles are reported and must be resolved before starting. Up to four humans can play, including three keyboards plus a gamepad, or four gamepads. New keyboard profiles appear automatically after adding a JSONC file.
+Choose a character and field, then press **Start Robattle**. Open **Controls** to assign a keyboard profile, connected gamepad, or CPU independently to A1, A2, B1, and B2. Leaders are marked ◆. Any unassigned slot uses AI.
 
-Connect USB/Bluetooth controllers, focus the browser, and **press a controller button** so the browser exposes them. The setup screen updates automatically. An assigned controller disconnect pauses the match and names the missing device. Reconnect it and resume, or return to setup to choose another controller. Browser-assigned indices can change after reconnection. Use localhost or HTTPS for reliable Gamepad API access.
+**2 on one keyboard** assigns the opposing leaders to separate shared presets. The dialog also has a three-player preset and automatic gamepad assignment. Choose team slots individually for co-op. Duplicate keyboard profiles and gamepads are blocked, and overlapping active keys are reported. Up to four humans can play on the same computer.
 
-Shared keyboard hardware may suppress certain simultaneous combinations (“ghosting”). This is a physical keyboard limit, not an input-profile conflict; use different combinations, an anti-ghosting keyboard, or gamepads if necessary. The keyboard adapter uses physical `KeyboardEvent.code`, independent of keyboard language, and supports multiple keys per action.
+## Original-style input
 
-| Action                         | Solo (default)  | Shared: left | Shared: right | Shared: numpad |
-| ------------------------------ | --------------- | ------------ | ------------- | -------------- |
-| Move left / right              | ← / →           | A / D        | ← / →         | Num 4 / 6      |
-| Jump                           | ↑ or Space      | W            | ↑             | Num 8          |
-| Drop through platform          | ↓               | S            | ↓             | Num 5          |
-| Right arm                      | F               | F            | J             | Num 1          |
-| Left arm                       | G               | G            | K             | Num 2          |
-| Head weapon                    | H               | H            | L             | Num 3          |
-| Guard (hold)                   | Left Shift      | Left Shift   | Right Shift   | Num 0          |
-| Charge (hold on ground)        | R               | Q            | U             | Num 7          |
-| Special (release charge first) | T               | E            | O             | Num 9          |
-| Cycle AI partner strategy      | Q               | R            | P             | Num +          |
-| Pause / resume                 | Escape or Enter | Escape       | Enter         | Num Enter      |
+| Action            | Solo default   | Shared left | Shared right | Shared numpad |
+| ----------------- | -------------- | ----------- | ------------ | ------------- |
+| Left / right      | ← / →          | A / D       | ← / →        | Num 4 / 6     |
+| Up / down         | ↑ / ↓          | W / S       | ↑ / ↓        | Num 8 / 5     |
+| A: jump           | G              | G           | L            | Num 3         |
+| B: attack         | F              | F           | K            | Num 1         |
+| L: guard          | D              | R           | I            | Num 7         |
+| R: partner panel  | S              | T           | O            | Num 9         |
+| Select: Medaforce | A              | E           | P            | Num 0         |
+| Start: pause      | Enter / Escape | Tab         | Enter        | Num Enter     |
 
-Double-tap a direction to **dash**. Grounded bodies separate; jump or dash to cross another robot. Tap attacks; each weapon has startup and recovery. Right-arm attacks strike arm height, left-arm attacks strike low, and head weapons aim at helmets. Jumping changes which part a shot can hit. Head weapons have limited uses; arms are unlimited until destroyed. The HUD marks the head as **protected** while any limb remains, then **exposed**. Helmet hits damage the right arm, then left arm, then legs; direct limb hits still damage their own region. Broken legs reduce speed, jumping and dashing. Guard reduces damage and knockback. Charge on the ground to fill Medaforce, then release charge and activate your special. Hitting and taking damage also add meter.
+B uses the right arm. **Up+B** uses the head; **Down+B** uses the left arm. Up takes priority if both vertical directions are held. **Down+A** drops through a droppable platform. Hold A for a higher jump. Double-tap a horizontal direction within 16 updates to dash. Some leg types have additional double-tap maneuvers; not all original leg families are fully implemented yet.
 
-A human leader’s strategy button cycles **Attack leader → Protect leader → Aggressive** for its AI partner. It has no effect on a human partner.
+Each weapon refills independently. Readiness must reach full before starting another normal action, with a separate buffer for right-arm combos. Head weapons have limited uses. Broken arms retain a weak frame strike. Heads can receive unguarded damage before other parts break; the earlier prototype's global head shield was incorrect. Facing an incoming attack while guarding reduces its power and redirects selection toward the strongest surviving limb.
 
-Standard controller mapping uses left stick / D-pad to move, south face button (A / Cross) to jump, west (X / Square) for right arm, north (Y / Triangle) for left arm, east (B / Circle) for head, LB to guard, LT to charge, RB for special, Back/View for strategy, Start/Menu to pause, and D-pad down to drop. Mapping indices are zero-based in JSONC; the HUD labels physical pads starting at 1.
+Medaforce fills passively and while standing idle. At full displayed meter, press Select to activate it. There is no charge button in this original-style layout. R cycles five AI-partner panels: right arm, left arm, head, enemy leader, enemy partner. Panel changes take effect after a short delay. A human partner ignores the leader's panel input. AI behavior is still an approximation of AX.
 
-Edit `game-data/controls/keyboards/*.jsonc` to change keyboard bindings. Each action takes an array, such as `"jump": ["KeyW", "Space"]`. Edit `game-data/controls/gamepads/standard-gamepad.jsonc` for button arrays, horizontal stick axis, deadzone, and activation threshold. **Controls → Keyboard** lets you click any binding and press a replacement key, or use **+** for an alternative. Escape cancels capture. **Gamepad** exposes button indices, axis, deadzone, and activation threshold, with a live input tester. **Reset** restores the selected preset; **Apply controls** accepts validated edits and **Cancel** discards them. Menu edits last for this page session, including rematches and return to setup; reload restores JSONC defaults. Edit the JSONC files for permanent changes. The setup/HUD read the same definitions.
+## Gamepads
+
+Connect USB/Bluetooth controllers, focus the browser, and **press a controller button** so the browser exposes them. The setup screen refreshes automatically. Use localhost or HTTPS for reliable Gamepad API access.
+
+Default standard mapping: left stick/D-pad for directions; south face button (A/Cross) for jump; east (B/Circle) for attack; LB guard; RB partner panel; Back/View Medaforce; Start/Menu pause. Direction-plus-button chords work exactly as on the keyboard adapter. JSONC indices are zero-based; HUD pad numbers start at 1.
+
+A disconnected assigned pad pauses the match and identifies the device. Reconnect and resume, or return to setup to select another pad. Browser-assigned indices may change on reconnection. Losing window focus also pauses and clears held keyboard input.
+
+## Customize
+
+Edit `game-data/controls/keyboards/*.jsonc` or `gamepads/standard-gamepad.jsonc` for permanent bindings. Actions use arrays, such as `"jump": ["KeyG", "Space"]`; an empty array leaves an optional shortcut unbound. Keyboard input uses physical `KeyboardEvent.code`, independent of keyboard language. Gamepads expose horizontal/vertical axis indices, button arrays, deadzone, and activation threshold.
+
+The controls dialog supports session-only key editing, alternate keys, gamepad mapping, and a live input tester. **Apply controls** validates edits; **Cancel** discards them; **Reset** restores a preset. Reloading restores JSONC values.
+
+A shared keyboard can suppress simultaneous combinations due to hardware ghosting. Non-overlapping profiles prevent software conflicts, but cannot remove that hardware limitation. Use different combinations, an anti-ghosting keyboard, or gamepads when needed. Touch and online play are not implemented.

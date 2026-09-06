@@ -6,6 +6,11 @@ export type BattleSetup = Pick<MatchDefinition, 'seed' | 'arenaId' | 'rulesId' |
 export type CombatantCommand = {
   moveX: -1 | 0 | 1;
   jumpPressed: boolean;
+  jumpHeld: boolean;
+  attackHeld: boolean;
+  upHeld: boolean;
+  upPressed: boolean;
+  downPressed: boolean;
   dropHeld: boolean;
   rightArmPressed: boolean;
   leftArmPressed: boolean;
@@ -19,6 +24,11 @@ export type CombatantCommand = {
 export const emptyCommand = (): CombatantCommand => ({
   moveX: 0,
   jumpPressed: false,
+  jumpHeld: false,
+  attackHeld: false,
+  upHeld: false,
+  upPressed: false,
+  downPressed: false,
   dropHeld: false,
   rightArmPressed: false,
   leftArmPressed: false,
@@ -36,6 +46,7 @@ export type Strategy = 'ATTACK_LEADER' | 'PROTECT_LEADER' | 'AGGRESSIVE';
 export type PartState = {
   definitionId: string;
   currentArmor: number;
+  readiness: number;
   maxArmor: number;
   cooldownTicks: number;
   destroyed: boolean;
@@ -47,6 +58,13 @@ export type AttackState = {
   slot: PartSlot | 'special';
   age: number;
   fired: boolean;
+  initialized: boolean;
+  contactFired: boolean;
+  chargeTicks: number;
+  releasing: boolean;
+  headBias: number;
+  comboStage: number;
+  comboBuffered: boolean;
   hitIds: string[];
 };
 
@@ -76,9 +94,53 @@ export type CombatantSnapshot = {
   lastTapLeft: number;
   lastTapRight: number;
   strategy: Strategy;
+  actorIndex: number;
+  medalId: string;
+  medalLevel: number;
+  movementState:
+    | 'idle'
+    | 'walk'
+    | 'dash'
+    | 'jump'
+    | 'fall'
+    | 'land'
+    | 'crouch'
+    | 'backhop'
+    | 'hover'
+    | 'dive'
+    | 'retreat';
+  movementTicks: number;
+  residualX: number;
+  residualY: number;
+  jumpHoldTicks: number;
+  jumpFinalized: boolean;
+  jumpCurve: string;
+  carryDirection: -1 | 0 | 1;
+  carryMode: number;
+  extraJumpUsed: boolean;
+  lastTapUp: number;
+  lastTapDown: number;
+  idleTicks: number;
+  passiveChargeTicks: number;
+  displayMeter: number;
+  panelIndex: number;
+  panelPendingTicks: number;
+  panel: number;
+  invulnerabilityTicks: number;
+  waterToggle: boolean;
+  transported: boolean;
+  iceMomentum: number;
+  supportStatus: 'none' | 'scouting' | 'speed';
+  supportMagnitude: number;
+  supportTicks: number;
 };
 
 export type ProjectileSnapshot = {
+  spawnTick: number;
+  hitTicks: number;
+  index: number;
+  heading: number;
+  steered: boolean;
   id: string;
   ownerId: string;
   teamId: string;
@@ -87,6 +149,11 @@ export type ProjectileSnapshot = {
   y: number;
   vx: number;
   remainingTicks: number;
+  age: number;
+  originX: number;
+  headBias: number;
+  powerMultiplier: number;
+  vy: number;
   facing: -1 | 1;
 };
 
@@ -97,8 +164,32 @@ export type BattleResult = {
   finalCombatants: CombatantSnapshot[];
 };
 
+/** Platform coordinates use original screen pixels: x is the left edge, y points down. */
+export type PlatformSnapshot = {
+  id: string;
+  x: number;
+  y: number;
+  direction: number;
+  minimum: number;
+  maximum: number;
+  width: number;
+  endpointWaitTicks: number;
+  waitTicks: number;
+};
+
 export type BattleSnapshot = {
+  platforms: PlatformSnapshot[];
   tick: number;
+  randomCursor: number;
+  specialFreezeTicks: number;
+  supportEffects: {
+    id: string;
+    ownerId: string;
+    teamId: string;
+    family: 'scouting' | 'charge';
+    magnitude: number;
+    remainingTicks: number;
+  }[];
   arenaId: string;
   rulesId: string;
   remainingTicks: number;

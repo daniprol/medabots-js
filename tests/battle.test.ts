@@ -1,409 +1,420 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { createBattle, emptyCommand } from '../src/battle-core';
-import { nextRandom } from '../src/battle-core/random';
-import { aiCommand, createAIState } from '../src/battle-session/ai-controller';
-import { content, setup, frame, fixture, closeArena, runBattleScenario } from './helpers';
-const shootHead = (s: ReturnType<ReturnType<typeof createBattle>['getSnapshot']>) =>
-  frame(s.tick + 1, { A1: { headPressed: s.tick % 30 === 0 } });
-describe('battle integration in Node without browser globals', () => {
-  it('instantiates all four characters; snapshots are detached, serializable, and stable', () => {
+import { createBattle } from '../src/battle-core';
+import { emptyCommand } from '../src/battle-core';
+import { quarterPixels } from '../src/battle-core/ax-movement';
+import { updateAttack } from '../src/battle-core/combat';
+import { calculateDamage, applyDamage } from '../src/battle-core/damage';
+import { moveCombatant } from '../src/battle-core/movement';
+import { selectHitPart } from '../src/battle-core/part-selection';
+import { battleRandom } from '../src/battle-core/random';
+import { finishAtTimeout } from '../src/battle-core/results';
+import type { BattleContext } from '../src/battle-core/types';
+import jumpTrace from './fixtures/ax-clear-jump.json';
+import { content, setup, fixture, frame, runBattleScenario } from './helpers';
+
+function contextFixture(): BattleContext {
+  return {
+    setup,
+    content,
+    state: createBattle({ setup, content }).getSnapshot(),
+    events: [],
+    nextEntityId: 1,
+    rngState: setup.seed,
+  };
+}
+
+function flatField() {
+  return fixture((definition) => {
+    if (definition.kind === 'arena') {
+      definition.spawns = [
+        { x: -4, y: 0 },
+        { x: 4, y: 0 },
+        { x: -24, y: 0 },
+        { x: 24, y: 0 },
+      ];
+      definition.original.tiles = Array.from({ length: 46 }, () => Array<number>(54).fill(0));
+    }
+  });
+}
+
+describe('source-derived AX movement', () => {
+  it('matches every recorded original full-jump position, including the landing', () => {
+    const catalog = fixture((definition) => {
+      if (definition.kind === 'arena') {
+        definition.spawns[0] = { x: (81 - 216) / 8, y: 7 };
+      }
+    });
+    const battle = createBattle({ setup, content: catalog });
+    for (const [index, sample] of jumpTrace.samples.entries()) {
+      battle.step(
+        frame(index + 1, { A1: { jumpPressed: index === 0, jumpHeld: sample.jumpHeld } }),
+      );
+      const actor = battle.getSnapshot().combatants[0]!;
+      expect(
+        { x: actor.x * 8 + 216, bottomY: 367 - actor.y * 8 },
+        `Original frame ${jumpTrace.startFrame + index}`,
+      ).toEqual({ x: sample.x, bottomY: sample.bottomY });
+    }
+    expect(battle.getSnapshot().combatants[0]!.grounded).toBe(true);
+  });
+
+  it.each([
+    [1, 52],
+    [7, 78],
+    [12, 108],
+  ])('holding A for %i ticks gives the original %i-pixel height', (heldTicks, height) => {
+    const battle = createBattle({ setup, content: flatField() });
+    let peak = 0;
+    for (let tick = 1; tick <= 70; tick++) {
+      battle.step(frame(tick, { A1: { jumpPressed: tick === 1, jumpHeld: tick <= heldTicks } }));
+      peak = Math.max(peak, battle.getSnapshot().combatants[0]!.y * 8);
+    }
+    expect(peak).toBe(height);
+    expect(battle.getSnapshot().combatants[0]!.y).toBe(0);
+  });
+
+  it('uses asymmetric quarter-pixel residual arithmetic', () => {
+    let residual = 4;
+    const pixels = Array.from({ length: 4 }, () => {
+      const result = quarterPixels(11, residual, true);
+      residual = result.residual;
+      return result.pixels;
+    });
+    expect(pixels).toEqual([2, 3, 3, 3]);
+    expect(quarterPixels(6, 2, false)).toEqual({ pixels: 2, residual: 4 });
+  });
+
+  it('walks immediately after its transition and stops without an acceleration tail', () => {
+    const battle = createBattle({ setup, content: flatField() });
+    battle.step(frame(1, { A1: { moveX: 1 } }));
+    expect(battle.getSnapshot().combatants[0]!.x).toBe(-4);
+    battle.step(frame(2, { A1: { moveX: 1 } }));
+    expect(battle.getSnapshot().combatants[0]!.x).toBe(-3.75);
+    battle.step(frame(3));
+    expect(battle.getSnapshot().combatants[0]!.vx).toBe(0);
+  });
+
+  it('detects a double tap from tick commands, and supports drop through a one-way platform', () => {
+    const battle = createBattle({ setup, content });
+    battle.step(frame(1, { A1: { moveX: 1 } }));
+    battle.step(frame(2));
+    battle.step(frame(3, { A1: { moveX: 1 } }));
+    expect(battle.getSnapshot().combatants[0]!.movementState).toBe('dash');
+    battle.step(frame(4, { A2: { dropHeld: true, jumpPressed: true } }));
+    expect(battle.getSnapshot().combatants.find((actor) => actor.id === 'A2')!.y).toBeLessThan(16);
+  });
+
+  it('broken starting legs keep jump height and switch to speed row 2', () => {
+    const context = contextFixture();
+    const actor = context.state.combatants[0]!;
+    actor.parts.legs.destroyed = true;
+    actor.parts.legs.currentArmor = 0;
+    actor.x = (81 - 216) / 8;
+    const start = actor.y;
+    let peak = start;
+    for (let tick = 1; tick <= 65; tick++) {
+      context.state.tick = tick;
+      moveCombatant(context, actor, {
+        ...emptyCommand(),
+        jumpPressed: tick === 1,
+        jumpHeld: tick <= 12,
+      });
+      peak = Math.max(peak, actor.y);
+    }
+    expect((peak - start) * 8).toBe(108);
+    moveCombatant(context, actor, { ...emptyCommand(), moveX: 1 });
+    const x = actor.x;
+    for (let index = 0; index < 4; index++) {
+      moveCombatant(context, actor, { ...emptyCommand(), moveX: 1 });
+    }
+    // Ground movement applies a further half-pixel adjustment below two pixels.
+    expect((actor.x - x) * 8).toBe(8);
+  });
+});
+
+describe('AX damage and part selection', () => {
+  it('applies integer defense arithmetic with a minimum of two', () => {
+    expect(calculateDamage(40, 3)).toBe(37);
+    expect(calculateDamage(40, 6)).toBe(34);
+    expect(calculateDamage(1, 10)).toBe(2);
+  });
+
+  it('heads are eligible while every limb is intact; starter medals prefer legs', () => {
+    const context = contextFixture();
+    const actor = context.state.combatants[1]!;
+    const slots = new Set<string>();
+    for (let index = 0; index < 256; index++) {
+      slots.add(selectHitPart(context, actor, false));
+    }
+    expect([...slots].sort()).toEqual(['head', 'leftArm', 'legs', 'rightArm']);
+    expect(selectHitPart(context, actor, true)).toBe('legs');
+    actor.parts.legs.destroyed = true;
+    actor.parts.leftArm.destroyed = true;
+    actor.parts.rightArm.destroyed = true;
+    expect(selectHitPart(context, actor, false)).toBe('head');
+  });
+
+  it('Scouting increases head weight, without turning weight into a percentage', () => {
+    const normal = contextFixture();
+    const scouting = contextFixture();
+    let normalHeads = 0;
+    let scoutingHeads = 0;
+    for (let index = 0; index < 256; index++) {
+      normalHeads += Number(selectHitPart(normal, normal.state.combatants[1]!, false) === 'head');
+      scoutingHeads += Number(
+        selectHitPart(scouting, scouting.state.combatants[1]!, false, 41) === 'head',
+      );
+    }
+    expect(scoutingHeads).toBeGreaterThan(normalHeads);
+  });
+
+  it('head KO ends a leader battle immediately but partner KO does not', () => {
+    for (const index of [1, 3]) {
+      const context = contextFixture();
+      const target = context.state.combatants[index]!;
+      target.parts.head.currentArmor = 1;
+      applyDamage(
+        context,
+        target,
+        'head',
+        context.state.combatants[0]!,
+        content.abilities['metabee-head-attack']!,
+        1,
+      );
+      expect(target.knockedOut).toBe(true);
+      expect(Boolean(context.state.result)).toBe(index === 1);
+      expect(context.events.filter((event) => event.type === 'partDestroyed')).toHaveLength(1);
+    }
+  });
+
+  it('limb overkill never spills into the head, and broken arms retain their frame strike', () => {
+    const context = contextFixture();
+    const actor = context.state.combatants[0]!;
+    actor.parts.rightArm.currentArmor = 1;
+    applyDamage(
+      context,
+      actor,
+      'rightArm',
+      context.state.combatants[1]!,
+      content.abilities['metabee-head-attack']!,
+      -1,
+    );
+    expect(actor.parts.head.currentArmor).toBe(45);
+    expect(actor.parts.rightArm.destroyed).toBe(true);
+    actor.parts.rightArm.readiness = 320;
+    actor.staggerTicks = 0;
+    updateAttack(context, actor, { ...emptyCommand(), rightArmPressed: true });
+    expect(actor.attack?.abilityId).toBe('frame-attack');
+  });
+
+  it('guard quarters power before defense, only from the front, and blocks actions', () => {
+    const damages: number[] = [];
+    for (const facing of [-1, 1] as const) {
+      const context = contextFixture();
+      const target = context.state.combatants[1]!;
+      target.guarding = true;
+      target.facing = facing;
+      const before = target.parts.head.currentArmor;
+      applyDamage(
+        context,
+        target,
+        'head',
+        context.state.combatants[0]!,
+        content.abilities['metabee-head-attack']!,
+        1,
+      );
+      damages.push(before - target.parts.head.currentArmor);
+    }
+    expect(damages[0]).toBeLessThan(damages[1]!);
+    const context = contextFixture();
+    const actor = context.state.combatants[0]!;
+    actor.parts.rightArm.readiness = 320;
+    updateAttack(context, actor, { ...emptyCommand(), guardHeld: true, rightArmPressed: true });
+    expect(actor.attack).toBeNull();
+  });
+});
+
+describe('headless match and action lifecycle', () => {
+  it('uses distinct Sword combo timing and readiness for each buffered attack press', () => {
+    const battle = createBattle({ setup, content: flatField() });
+    const contacts: number[] = [];
+    const stages: number[] = [];
+    let previousContact = false;
+    let previousStage = -1;
+    for (let tick = 1; tick <= 144; tick++) {
+      battle.step(frame(tick, { B1: { rightArmPressed: [81, 87, 103].includes(tick) } }));
+      const actor = battle.getSnapshot().combatants[1]!;
+      if (actor.attack?.contactFired && !previousContact) {
+        contacts.push(tick);
+      }
+      if (actor.attack && actor.attack.comboStage !== previousStage) {
+        stages.push(actor.parts.rightArm.readiness);
+        previousStage = actor.attack.comboStage;
+      }
+      previousContact = actor.attack?.contactFired ?? false;
+    }
+    expect(contacts).toEqual([85, 103, 125]);
+    expect(stages).toEqual([213, 106, 0]);
+    expect(battle.getSnapshot().combatants[1]!.attack).toBeNull();
+  });
+
+  it('a single B press cannot start the second Sword combo stage', () => {
+    const battle = createBattle({ setup, content: flatField() });
+    for (let tick = 1; tick <= 96; tick++) {
+      battle.step(frame(tick, { B1: { rightArmPressed: tick === 81 } }));
+    }
+    expect(battle.getSnapshot().combatants[1]!.attack).toBeNull();
+    expect(battle.getSnapshot().combatants[1]!.parts.rightArm.readiness).toBe(213);
+  });
+
+  it('uses original actor ordering, stats and detached serializable snapshots', () => {
     const battle = createBattle({ setup, content });
     const snapshot = battle.getSnapshot();
-    expect(snapshot.combatants.map((c) => c.characterId)).toEqual([
-      'metabee',
-      'arcbeetle',
-      'rokusho',
-      'warbandit',
-    ]);
+    expect(snapshot.combatants.map((actor) => actor.id)).toEqual(['A1', 'B1', 'A2', 'B2']);
+    expect(snapshot.combatants[0]!.parts.head.currentArmor).toBe(45);
+    expect(snapshot.combatants[0]!.x).toBe(-18.375);
     expect(JSON.parse(JSON.stringify(snapshot))).toEqual(snapshot);
     snapshot.combatants[0]!.parts.head.currentArmor = 0;
-    snapshot.combatants[0]!.x = 999;
-    expect(battle.getSnapshot().combatants[0]!.parts.head.currentArmor).toBe(600);
-    expect(battle.getSnapshot().combatants[0]!.x).toBe(-9);
+    expect(battle.getSnapshot().combatants[0]!.parts.head.currentArmor).toBe(45);
     expect(typeof window).toBe('undefined');
   });
-  it('scripted projectile hits the head and ends a match when leader head is destroyed', () => {
-    const run = runBattleScenario({
-      content: closeArena(false, true),
-      maxTicks: 1500,
-      commandFrames: shootHead,
-    });
-    expect(run.result, JSON.stringify(run.snapshot)).toMatchObject({
-      winnerTeamId: 'team-a',
-      reason: 'leader-head-destroyed',
-    });
-    expect(run.events.some((e) => e.type === 'partDestroyed' && e.part === 'head')).toBe(true);
-    expect(run.result!.finalCombatants.find((c) => c.id === 'B1')!.knockedOut).toBe(true);
-  });
-  it('partner head knockout does not end the match', () => {
-    const run = runBattleScenario({
-      content: closeArena(true, true),
-      maxTicks: 650,
-      commandFrames: (s) =>
-        s.combatants.find((c) => c.id === 'B2')!.knockedOut ? frame(s.tick + 1) : shootHead(s),
-    });
-    expect(run.snapshot.combatants.find((c) => c.id === 'B2')!.knockedOut).toBe(true);
-    expect(run.result).toBeNull();
-  });
-  it('helmet hits protect the head, damage a surviving limb, and ignore teammates', () => {
-    const run = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 25,
-      commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
-    });
-    const target = run.snapshot.combatants.find((c) => c.id === 'B1')!;
-    expect(target.parts.head.currentArmor).toBe(600);
-    expect(target.parts.legs.currentArmor).toBe(520);
-    expect(target.parts.rightArm.currentArmor).toBe(385);
-    expect(run.snapshot.combatants[1]!.parts.head.currentArmor).toBe(700);
-  });
-  it('projects stable IDs through a JSON round trip and consumes a projectile once', () => {
-    const run = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 8,
-      commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
-    });
-    expect(run.snapshot.projectiles[0]?.id).toBe('projectile-1');
-    expect(JSON.parse(JSON.stringify(run.snapshot)).projectiles[0].id).toBe('projectile-1');
-    for (let t = 9; t < 40; t++) {
-      run.battle.step(frame(t));
+
+  it('refills weapons separately from animation and emits stable projectiles', () => {
+    const battle = createBattle({ setup, content: flatField() });
+    for (let tick = 1; tick <= 80; tick++) {
+      battle.step(frame(tick));
     }
-    expect(run.battle.getSnapshot().projectiles).toHaveLength(0);
-    expect(run.battle.getSnapshot().combatants[2]!.parts.rightArm.currentArmor).toBe(385);
+    battle.step(frame(81, { A1: { rightArmPressed: true } }));
+    expect(battle.getSnapshot().combatants[0]!.parts.rightArm.readiness).toBe(213);
+    for (let tick = 82; tick <= 87; tick++) {
+      battle.step(frame(tick));
+    }
+    const snapshot = battle.getSnapshot();
+    expect(snapshot.projectiles[0]!.id).toBe('projectile-1');
+    expect(JSON.parse(JSON.stringify(snapshot)).projectiles[0].id).toBe('projectile-1');
+    for (let tick = 88; tick <= 120; tick++) {
+      battle.step(frame(tick));
+    }
+    expect(battle.getSnapshot().combatants[0]!.attack).toBeNull();
+    expect(battle.getSnapshot().combatants[0]!.parts.rightArm.readiness).toBe(320);
   });
-  it('guard reduces damage and knockback and prevents attacks', () => {
-    const guard = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 20,
-      commandFrames: (s) =>
-        frame(s.tick + 1, {
-          A1: { headPressed: s.tick === 0 },
-          B1: { guardHeld: true, headPressed: true },
+
+  it('projectiles damage opponents, expire once, and scripted commands finish a battle', () => {
+    const catalog = flatField();
+    const run = runBattleScenario({
+      content: catalog,
+      maxTicks: 9000,
+      commandFrames: (snapshot) =>
+        frame(snapshot.tick + 1, {
+          A1: {
+            moveX: snapshot.combatants[1]!.x - snapshot.combatants[0]!.x > 6 ? 1 : 0,
+            rightArmPressed: snapshot.tick > 80 && snapshot.tick % 40 === 0,
+            headPressed: snapshot.tick > 80 && snapshot.tick % 201 === 0,
+          },
         }),
     });
-    const target = guard.snapshot.combatants[2]!;
-    expect(target.parts.head.currentArmor).toBe(600);
-    expect(target.parts.rightArm.currentArmor).toBe(396);
-    expect(target.attack).toBeNull();
-    expect(target.parts.head.uses).toBe(0);
-    const unguarded = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 20,
-      commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
-    });
-    expect(target.x - 2).toBeLessThan(unguarded.snapshot.combatants[2]!.x - 2);
+    expect(run.events.some((event) => event.type === 'hit' && event.targetId === 'B1')).toBe(true);
+    expect(run.events.some((event) => event.type === 'hit' && event.targetId === 'A2')).toBe(false);
+    expect(run.result?.winnerTeamId, JSON.stringify(run.snapshot)).toBe('team-a');
   });
-  it('executes startup, active, recovery and returns to ready on tick boundaries', () => {
-    const b = createBattle({ setup, content: closeArena() });
-    b.step(frame(1, { A1: { headPressed: true } }));
-    expect(b.getSnapshot().combatants[0]!.attack?.age).toBe(1);
-    for (let t = 2; t <= 6; t++) {
-      b.step(frame(t));
-    }
-    expect(b.getSnapshot().projectiles).toHaveLength(0);
-    b.step(frame(7));
-    expect(b.getSnapshot().projectiles).toHaveLength(1);
-    for (let t = 8; t <= 21; t++) {
-      b.step(frame(t));
-    }
-    expect(b.getSnapshot().combatants[0]!.attack).not.toBeNull();
-    b.step(frame(22));
-    expect(b.getSnapshot().combatants[0]!.attack).not.toBeNull();
-    b.step(frame(23));
-    expect(b.getSnapshot().combatants[0]!.attack).toBeNull();
-  });
-  it('melee activation hits each target once even across multiple active ticks', () => {
-    const local = fixture((d) => {
-      if (d.kind === 'arena') {
-        d.spawns = [
-          { x: -0.5, y: 0 },
-          { x: -13, y: 0 },
-          { x: 1.5, y: 0 },
-          { x: 14, y: 0 },
+
+  it('normal melee contact damages a target at most once per activation', () => {
+    const catalog = fixture((definition) => {
+      if (definition.kind === 'arena') {
+        definition.spawns = [
+          { x: -1, y: 0 },
+          { x: 1, y: 0 },
+          { x: -24, y: 0 },
+          { x: 24, y: 0 },
         ];
+        definition.original.tiles = Array.from({ length: 46 }, () => Array<number>(54).fill(0));
       }
     });
     const run = runBattleScenario({
-      content: local,
-      maxTicks: 22,
-      commandFrames: (s) => frame(s.tick + 1, { B1: { rightArmPressed: s.tick === 0 } }),
-    });
-    const hits = run.events.filter((e) => e.type === 'hit' && e.targetId === 'A1');
-    expect(hits).toHaveLength(1);
-    expect(hits[0]!.part).toBe('rightArm');
-    expect(run.snapshot.combatants[0]!.parts.rightArm.currentArmor).toBe(378);
-  });
-  it('destroyed arms disable their ability and emit destruction once', () => {
-    const local = fixture((d) => {
-      if (d.kind === 'arena') {
-        d.spawns = [
-          { x: -0.5, y: 0 },
-          { x: -13, y: 0 },
-          { x: 1.5, y: 0 },
-          { x: 14, y: 0 },
-        ];
-      }
-      if (d.kind === 'part' && d.id === 'metabee-right-arm') {
-        d.armor = 10;
-      }
-    });
-    const run = runBattleScenario({
-      content: local,
-      maxTicks: 40,
-      commandFrames: (s) =>
-        frame(s.tick + 1, {
-          B1: { rightArmPressed: s.tick === 0 },
-          A1: { rightArmPressed: s.tick === 30 },
-        }),
-    });
-    expect(run.snapshot.combatants[0]!.parts.rightArm.destroyed).toBe(true);
-    expect(run.snapshot.combatants[0]!.parts.rightArm.uses).toBe(0);
-    expect(run.events.filter((e) => e.type === 'partDestroyed')).toHaveLength(1);
-  });
-  it('charges only grounded idle combatants and consumes the meter for a special', () => {
-    const b = createBattle({ setup, content });
-    for (let t = 1; t <= 260; t++) {
-      b.step(frame(t, { A1: { chargeHeld: true } }));
-    }
-    expect(b.getSnapshot().combatants[0]!.specialMeter).toBe(100);
-    b.step(frame(261, { A1: { specialPressed: true } }));
-    expect(b.getSnapshot().combatants[0]!.attack?.slot).toBe('special');
-    expect(b.getSnapshot().combatants[0]!.specialMeter).toBe(0);
-    expect(b.drainEvents().some((e) => e.type === 'specialActivated')).toBe(true);
-    const airborne = runBattleScenario({
-      maxTicks: 20,
-      commandFrames: (s) =>
-        frame(s.tick + 1, { A1: { jumpPressed: s.tick === 0, chargeHeld: s.tick > 0 } }),
-    });
-    expect(airborne.snapshot.combatants[0]!.specialMeter).toBe(0);
-  });
-  it('times out by total remaining armor percentage, including draws', () => {
-    const timeout = fixture((d) => {
-      if (d.kind === 'rules') {
-        d.roundTimeMs = 1000;
-      }
-      if (d.kind === 'arena') {
-        d.spawns = [
-          { x: -2, y: 0 },
-          { x: -13, y: 0 },
-          { x: 2, y: 0 },
-          { x: 14, y: 0 },
-        ];
-      }
-    });
-    expect(runBattleScenario({ content: timeout, maxTicks: 60 }).result).toMatchObject({
-      winnerTeamId: null,
-      reason: 'draw',
-      elapsedTicks: 60,
+      content: catalog,
+      maxTicks: 110,
+      commandFrames: (snapshot) =>
+        frame(snapshot.tick + 1, { B1: { rightArmPressed: snapshot.tick === 80 } }),
     });
     expect(
-      runBattleScenario({
-        content: timeout,
-        maxTicks: 60,
-        commandFrames: (s) => frame(s.tick + 1, { A1: { headPressed: s.tick === 0 } }),
-      }).result,
-    ).toMatchObject({ winnerTeamId: 'team-a', reason: 'timeout' });
+      run.events.filter((event) => event.type === 'hit' && event.targetId === 'A1'),
+    ).toHaveLength(1);
   });
-  it('same setup, seed and command frames produce identical snapshots/results', () => {
-    const first = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 1400,
-      commandFrames: shootHead,
-    });
-    const second = runBattleScenario({
-      content: closeArena(),
-      maxTicks: 1400,
-      commandFrames: shootHead,
-    });
+
+  it('idle charging reaches 51 without a charge button; special resets meter and readiness', () => {
+    const battle = createBattle({ setup, content });
+    for (let tick = 1; tick <= 1000; tick++) {
+      battle.step(frame(tick));
+    }
+    expect(battle.getSnapshot().combatants[0]!.displayMeter).toBe(51);
+    battle.step(frame(1001, { A1: { specialPressed: true } }));
+    expect(battle.getSnapshot().combatants[0]!.specialMeter).toBe(51);
+    expect(battle.getSnapshot().specialFreezeTicks).toBeGreaterThan(0);
+    expect(battle.drainEvents().some((event) => event.type === 'specialActivated')).toBe(true);
+  });
+
+  it('support effects survive the head animation and buff both teammates', () => {
+    const battle = createBattle({ setup, content: flatField() });
+    for (let tick = 1; tick <= 80; tick++) {
+      battle.step(frame(tick));
+    }
+    battle.step(frame(81, { B1: { headPressed: true } }));
+    for (let tick = 82; tick <= 140; tick++) {
+      battle.step(frame(tick));
+    }
+    const actors = battle.getSnapshot().combatants;
+    expect(actors[1]!.supportStatus).toBe('scouting');
+    expect(actors[1]!.supportMagnitude).toBe(41);
+    expect(actors[3]!.supportStatus).toBe('scouting');
+    expect(actors[0]!.supportStatus).toBe('none');
+  });
+
+  it('replays identical command frames deterministically and rejects incomplete frames', () => {
+    const commands = (snapshot: ReturnType<ReturnType<typeof createBattle>['getSnapshot']>) =>
+      frame(snapshot.tick + 1, {
+        A1: { moveX: snapshot.tick < 30 ? 1 : 0, rightArmPressed: snapshot.tick % 60 === 0 },
+      });
+    const first = runBattleScenario({ maxTicks: 400, commandFrames: commands });
+    const second = runBattleScenario({ maxTicks: 400, commandFrames: commands });
     expect(first.snapshot).toEqual(second.snapshot);
     expect(first.events).toEqual(second.events);
+    expect(() => first.battle.step({ tick: 401, commands: {} })).toThrow(
+      /Invalid or missing command/,
+    );
   });
-  it('AI plays a complete deterministic match from real content', () => {
-    const run = () => {
-      const memories = Object.fromEntries(
-        ['A1', 'A2', 'B1', 'B2'].map((id, i) => [id, createAIState(setup.seed + i * 7919)]),
-      );
-      return runBattleScenario({
-        commandFrames: (s) => ({
-          tick: s.tick + 1,
-          commands: Object.fromEntries(
-            s.combatants.map((c) => [
-              c.id,
-              aiCommand(s, c.id, content, content.ai['ai-balanced']!, memories[c.id]!),
-            ]),
-          ),
-        }),
-      });
-    };
-    const a = run(),
-      b = run();
-    expect(a.result).not.toBeNull();
-    expect(a.result!.elapsedTicks).toBeLessThan(10800);
-    expect(a.snapshot).toEqual(b.snapshot);
-    expect(a.events.filter((e) => e.type === 'hit').length).toBeGreaterThan(10);
-  });
-  it('rejects out-of-order frames and missing commands without partially stepping', () => {
-    const b = createBattle({ setup, content });
-    expect(() => b.step(frame(2))).toThrow(/Expected tick 1/);
-    expect(() => b.step({ tick: 1, commands: { A1: emptyCommand() } })).toThrow(/missing command/);
-    expect(b.getSnapshot().tick).toBe(0);
-  });
-});
-describe('kinematic movement', () => {
-  it('accelerates, brakes, and stays inside arena bounds', () => {
-    const b = createBattle({ setup, content });
-    for (let t = 1; t <= 240; t++) {
-      b.step(frame(t, { A1: { moveX: 1 } }));
-    }
-    expect(b.getSnapshot().combatants[0]!.x).toBeLessThanOrEqual(15.25);
-    for (let t = 241; t <= 260; t++) {
-      b.step(frame(t));
-    }
-    expect(b.getSnapshot().combatants[0]!.vx).toBe(0);
-  });
-  it('passes upward through a one-way platform, lands on it, and drops through', () => {
-    const b = createBattle({ setup, content });
-    b.step(frame(1, { A1: { jumpPressed: true } }));
-    let highest = 0;
-    for (let t = 2; t <= 90; t++) {
-      b.step(frame(t));
-      highest = Math.max(highest, b.getSnapshot().combatants[0]!.y);
-    }
-    expect(highest).toBeGreaterThan(4);
-    expect(b.getSnapshot().combatants[0]!).toMatchObject({
-      y: 4,
-      grounded: true,
-      groundPlatformId: 'left-gantry',
-    });
-    b.step(frame(91, { A1: { dropHeld: true } }));
-    for (let t = 92; t <= 140; t++) {
-      b.step(frame(t));
-    }
-    expect(b.getSnapshot().combatants[0]!).toMatchObject({ y: 0, grounded: true });
-  });
-  it('detects dash from tick-based directional double taps, not held movement', () => {
-    const b = createBattle({ setup, content });
-    b.step(frame(1, { A1: { moveX: 1 } }));
-    b.step(frame(2));
-    b.step(frame(3, { A1: { moveX: 1 } }));
-    expect(b.getSnapshot().combatants[0]!.dashTicks).toBeGreaterThan(0);
-    expect(b.getSnapshot().combatants[0]!.vx).toBe(18);
-    const held = runBattleScenario({
-      maxTicks: 20,
-      commandFrames: (s) => frame(s.tick + 1, { A1: { moveX: 1 } }),
-    });
-    expect(held.snapshot.combatants[0]!.dashTicks).toBe(0);
-  });
-  it('destroyed legs reduce run speed, jump height and dash speed', () => {
-    const local = fixture((d) => {
-      if (d.kind === 'part' && d.id === 'metabee-legs') {
-        d.armor = 1;
-      }
-      if (d.kind === 'arena') {
-        d.spawns = [
-          { x: -0.5, y: 0 },
-          { x: -13, y: 0 },
-          { x: 1.5, y: 0 },
-          { x: 14, y: 0 },
-        ];
-      }
-    });
-    const b = createBattle({ setup, content: local });
-    for (let t = 1; t <= 30; t++) {
-      b.step(frame(t, { B1: { leftArmPressed: t === 1 } }));
-    }
-    expect(b.getSnapshot().combatants[0]!.parts.legs.destroyed).toBe(true);
-    for (let t = 31; t <= 60; t++) {
-      b.step(frame(t, { A1: { moveX: -1 } }));
-    }
-    expect(Math.abs(b.getSnapshot().combatants[0]!.vx)).toBeCloseTo(7.3 * 0.4);
-    b.step(frame(61, { A1: { jumpPressed: true } }));
-    expect(b.getSnapshot().combatants[0]!.vy).toBeLessThan(10);
-    b.step(frame(62, { A1: { moveX: -1 } }));
-    b.step(frame(63));
-    b.step(frame(64, { A1: { moveX: -1 } }));
-    expect(Math.abs(b.getSnapshot().combatants[0]!.vx)).toBeCloseTo(18 * 0.45);
-  });
-});
-describe('deterministic AI and random source', () => {
-  it('repeats seeded random sequences and stays in [0,1)', () => {
-    const series = (seed: number) =>
-      Array.from({ length: 100 }, () => {
-        const r = nextRandom(seed);
-        seed = r.state;
-        return r.value;
-      });
-    expect(series(12)).toEqual(series(12));
-    expect(series(12)).not.toEqual(series(13));
-    expect(series(12).every((x) => x >= 0 && x < 1)).toBe(true);
-  });
-  it('moves toward targets, jumps toward higher platforms, and respects reaction ticks', () => {
-    const s = createBattle({ setup, content }).getSnapshot();
-    const memory = createAIState(9);
-    const cmd = aiCommand(s, 'B1', content, content.ai['ai-balanced']!, memory);
-    expect(cmd.moveX).toBe(-1);
-    s.tick = 1;
-    expect(aiCommand(s, 'B1', content, content.ai['ai-balanced']!, memory).headPressed).toBe(false);
-    s.tick = 50;
-    s.combatants[0]!.y = 4;
-    expect(aiCommand(s, 'B1', content, content.ai['ai-balanced']!, memory).jumpPressed).toBe(true);
-  });
-  it('cycles AI partner strategy through serializable commands', () => {
-    const b = createBattle({ setup, content });
-    b.step(frame(1, { A1: { strategyPressed: true } }));
-    expect(b.getSnapshot().combatants[1]!.strategy).toBe('PROTECT_LEADER');
-    b.step(frame(2, { A1: { strategyPressed: true } }));
-    expect(b.getSnapshot().combatants[1]!.strategy).toBe('AGGRESSIVE');
-  });
-});
 
-describe('limb armor protects the head', () => {
-  it('breaks both arms and legs before any head damage, without overflow, then knocks out the leader', () => {
-    const b = createBattle({ setup, content: closeArena(false, true) });
-    const expected = ['rightArm', 'leftArm', 'legs', 'head', 'head'];
-    for (let shot = 0; shot < 5; shot++) {
-      for (let t = shot * 30 + 1; t <= (shot + 1) * 30 && !b.getResult(); t++) {
-        b.step(frame(t, { A1: { headPressed: t === shot * 30 + 1 } }));
-      }
-      const target = b.getSnapshot().combatants[2]!;
-      expect(target.parts.head.currentArmor, `shot ${shot + 1}`).toBe(
-        shot < 3 ? 30 : shot === 3 ? 15 : 0,
-      );
-      const hit = b.drainEvents().find((e) => e.type === 'hit');
-      expect(hit?.part).toBe(expected[shot]);
-      if (shot < 4) {
-        expect(target.knockedOut).toBe(false);
-      }
-    }
-    expect(b.getResult()?.reason).toBe('leader-head-destroyed');
+  it('timeout uses survival, leader HP, lower medal level and a random final tie; no draw', () => {
+    const context = contextFixture();
+    context.state.combatants[0]!.medalLevel = 2;
+    // Make armor comparisons exactly equal before testing the level criterion.
+    context.state.combatants[1]!.parts = structuredClone(context.state.combatants[0]!.parts);
+    finishAtTimeout(context);
+    expect(context.state.result?.winnerTeamId).toBe('team-b');
+    const tied = contextFixture();
+    tied.state.combatants[1]!.parts = structuredClone(tied.state.combatants[0]!.parts);
+    tied.state.randomCursor = 0;
+    finishAtTimeout(tied);
+    expect(tied.state.result).toMatchObject({ winnerTeamId: 'team-a', reason: 'timeout' });
   });
-  it('never spills excess helmet-hit damage through a destroyed limb into the head', () => {
-    const c = fixture((d) => {
-      if (d.kind === 'part' && d.slot !== 'head') {
-        d.armor = 1;
-      }
-      if (d.kind === 'ability') {
-        d.knockbackX = 0;
-        d.knockbackY = 0;
-      }
-      if (d.kind === 'arena') {
-        d.spawns = [
-          { x: -2, y: 0 },
-          { x: -13, y: 0 },
-          { x: 2, y: 0 },
-          { x: 14, y: 0 },
-        ];
-      }
-    });
-    const run = runBattleScenario({ content: c, maxTicks: 90, commandFrames: shootHead });
-    const target = run.snapshot.combatants[2]!;
-    expect(
-      ['rightArm', 'leftArm', 'legs'].every(
-        (s) => target.parts[s as keyof typeof target.parts].destroyed,
-      ),
-    ).toBe(true);
-    expect(target.parts.head.currentArmor).toBe(600);
-    expect(run.events.filter((e) => e.type === 'hit').map((e) => e.damage)).toEqual([1, 1, 1]);
+
+  it('consumes the original random-byte stream, including its duplicate and wrap', () => {
+    const context = contextFixture();
+    context.state.randomCursor = 0;
+    expect(Array.from({ length: 4 }, () => battleRandom(context))).toEqual([71, 174, 3, 243]);
+    context.state.randomCursor = 255;
+    expect(battleRandom(context)).toBe(11);
+    expect(battleRandom(context)).toBe(71);
+  });
+
+  it('commits a partner panel after ten further updates', () => {
+    const battle = createBattle({ setup, content });
+    battle.step(frame(1, { A1: { strategyPressed: true } }));
+    for (let tick = 2; tick <= 10; tick++) {
+      battle.step(frame(tick));
+    }
+    expect(battle.getSnapshot().combatants[2]!.panel).toBe(1);
+    battle.step(frame(11));
+    expect(battle.getSnapshot().combatants[2]!.panel).toBe(2);
   });
 });

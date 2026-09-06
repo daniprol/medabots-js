@@ -1,13 +1,14 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-legs",
   "kind": "part",
   "slot": "legs",
-  "armor": 520,
-  "movement": {
-    "speed": 7.3,
-    "jumpSpeed": 17.2,
-    "dashSpeed": 18,
-  },
+  "armor": 50,
+  "originalId": 0,
+  "displayName": "Ochitsuka",
+  "defense": 3,
+  "locomotion": 0,
+  "speedIndex": 3,
+  "attackRanks": [5, 0, 0],
+  "defenseRank": 0,
 }

@@ -911,3 +911,244 @@ kbd {
 .head-status.exposed {
   color: #ffae73;
 }
+
+/* The original 3:2 stage stays centered; the surrounding shell absorbs wide screens. */
+.battle-screen {
+  background: radial-gradient(ellipse at center, #273d3b, #111e23 70%);
+}
+.battle-screen .viewport {
+  inset: 0 auto 58px 50%;
+  width: min(100%, calc((100dvh - 58px) * 1.5));
+  transform: translateX(-50%);
+  border-inline: 1px solid #a8bfb222;
+  box-shadow: 0 0 80px #0008;
+}
+.ax-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  text-shadow: 0 1px 2px #001b22;
+}
+.ax-clock {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  text-align: center;
+  gap: 1px;
+  color: #f9f0d4;
+}
+.ax-clock > span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+.ax-clock > strong {
+  font:
+    800 32px 'Barlow Condensed',
+    sans-serif;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.ax-clock > small {
+  font-size: 10px;
+  color: #fff6da;
+  letter-spacing: 1px;
+}
+.ax-clock.urgent {
+  color: #ff9b78;
+}
+.ax-fighter {
+  position: absolute;
+  display: flex;
+  width: 225px;
+  min-height: 105px;
+  gap: 5px;
+  padding: 9px 12px 8px 3px;
+  background: linear-gradient(120deg, #142e31ee, #17333bdc);
+  border: 1px solid #c7dbab90;
+  border-radius: 3px 14px 3px 3px;
+  box-shadow:
+    0 3px 0 #152a2aa0,
+    0 5px 20px #16322830;
+}
+.ax-position-0 {
+  bottom: 14px;
+  left: 14px;
+}
+.ax-position-1 {
+  bottom: 14px;
+  right: 14px;
+  border-color: #f4bb9490;
+}
+.ax-position-2 {
+  top: 14px;
+  left: 14px;
+}
+.ax-position-3 {
+  top: 14px;
+  right: 14px;
+  border-color: #f4bb9490;
+}
+.ax-portrait {
+  width: 67px;
+  height: 82px;
+  object-fit: contain;
+  align-self: center;
+  filter: drop-shadow(0 2px 3px #0008);
+}
+.ax-fighter-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ax-fighter-info > strong {
+  font:
+    italic 800 17px 'Barlow Condensed',
+    sans-serif;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.ax-fighter-info > small {
+  font-size: 8px;
+  font-weight: 700;
+  color: #b6d4cc;
+  white-space: nowrap;
+}
+.ax-armor {
+  display: grid;
+  gap: 2px;
+  margin: 3px 0;
+}
+.ax-armor label {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  font-size: 8px;
+  font-weight: 800;
+}
+.ax-armor label > span {
+  height: 5px;
+  background: #091f2d;
+  box-shadow: 0 0 0 1px #ffffff18;
+  overflow: hidden;
+}
+.ax-armor i {
+  display: block;
+  height: 100%;
+  background: #b7ef6a;
+  transition: width 80ms linear;
+}
+.ax-meter {
+  height: 3px;
+  background: #0c2228;
+}
+.ax-meter i {
+  display: block;
+  height: 100%;
+  background: #74e4eb;
+  box-shadow: 0 0 8px #74e4eb66;
+}
+.ax-ammo {
+  font-size: 8px !important;
+  color: #efdaaa !important;
+}
+.ax-pause {
+  position: absolute;
+  top: 17px;
+  left: calc(50% + 75px);
+  pointer-events: auto;
+  border: 1px solid #f3e6bd66;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  background: #193734aa;
+  color: #f5eed3;
+}
+.ax-readiness {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 155px;
+  display: grid;
+  gap: 4px;
+  background: #14313aaa;
+  padding: 9px 12px;
+  border: 1px solid #d2e4b74d;
+  border-radius: 4px;
+}
+.ax-readiness > span {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+.ax-readiness label {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  font-size: 9px;
+  align-items: center;
+}
+.ax-readiness label > span {
+  height: 5px;
+  background: #0c2026;
+}
+.ax-readiness i {
+  display: block;
+  height: 100%;
+  background: #e4bb64;
+}
+.ax-readiness i.ready {
+  background: #cbf383;
+  box-shadow: 0 0 8px #bbff7744;
+}
+.ax-panel-toast {
+  position: absolute;
+  left: 50%;
+  top: 115px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 800;
+  background: #153b36dd;
+  padding: 8px 15px;
+  border: 1px solid #d8dfb8;
+  border-radius: 3px;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.robot-label {
+  font-size: 9px;
+  border: 0;
+  border-radius: 3px;
+  padding: 3px 6px;
+  background: #122c30c9;
+  box-shadow: none;
+}
+@media (max-width: 900px) {
+  .ax-fighter {
+    width: 180px;
+    min-height: 90px;
+    padding: 7px;
+  }
+  .ax-portrait {
+    width: 45px;
+    height: 65px;
+  }
+  .ax-fighter-info > strong {
+    font-size: 14px;
+  }
+  .ax-fighter-info > small {
+    font-size: 7px;
+  }
+  .ax-clock > small {
+    display: none;
+  }
+  .ax-readiness {
+    width: 120px;
+  }
+}

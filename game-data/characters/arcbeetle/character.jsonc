@@ -1,4 +1,3 @@
-// Armor regions use local centers; X mirrors with facing. Feet are Y = 0.
 {
   "$schema": "../../schemas/character.schema.json",
   "id": "arcbeetle",
@@ -6,14 +5,41 @@
   "displayName": "Arcbeetle",
   "tagline": "POWER / ARTILLERY",
   "visual": {
-    "type": "procedural",
-    "model": "arcbeetle",
-    "color": "#ffb519",
-    "accent": "#e7621f",
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/arcbeetle-warbandit-atlas.png",
+    "frameSize": 440,
+    "color": "#ef5627",
+    "accent": "#ffcc46",
+    "frames": [
+      {
+        "x": 30,
+        "y": 18,
+        "width": 412,
+        "height": 392,
+      },
+      {
+        "x": 455,
+        "y": 25,
+        "width": 452,
+        "height": 395,
+      },
+      {
+        "x": 924,
+        "y": 0,
+        "width": 410,
+        "height": 350,
+      },
+      {
+        "x": 1340,
+        "y": 38,
+        "width": 428,
+        "height": 378,
+      },
+    ],
   },
   "collider": {
-    "width": 1.5,
-    "height": 2.4,
+    "width": 2,
+    "height": 4,
   },
   "hitRegions": {
     "head": {
@@ -48,4 +74,7 @@
     "legs": "arcbeetle-legs",
   },
   "specialAbilityId": "arcbeetle-medaforce",
+  "medalId": "kabuto-medal",
+  "medalLevel": 1,
+  "originalSetId": 29,
 }

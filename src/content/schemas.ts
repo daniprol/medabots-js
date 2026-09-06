@@ -56,6 +56,7 @@ export const INPUT_ACTIONS = [
   'moveLeft',
   'moveRight',
   'jump',
+  'aimUp',
   'dropThroughPlatform',
   'rightArm',
   'leftArm',
@@ -79,7 +80,7 @@ const loadout = strictObject({ head: id, leftArm: id, rightArm: id, legs: id });
 const actionBindings = <T extends TSchema>(item: T) =>
   strictObject(
     Object.fromEntries(
-      INPUT_ACTIONS.map((a) => [a, Type.Array(item, { minItems: 1, uniqueItems: true })]),
+      INPUT_ACTIONS.map((a) => [a, Type.Array(item, { minItems: 0, uniqueItems: true })]),
     ) as unknown as Record<(typeof INPUT_ACTIONS)[number], TArray<T>>,
   );
 
@@ -91,33 +92,76 @@ const key = Type.String({
 export const RulesSchema = strictObject({
   ...base,
   kind: Type.Literal('rules'),
-  tickRate: Type.Literal(60),
-  protectHeadUntilPartsDestroyed: Type.Boolean({
-    description:
-      'Helmet hits are absorbed by surviving limbs until both arms and legs are destroyed. Excess damage never carries into the head.',
+  original: strictObject({
+    speedRows: Type.Array(Type.Array(integer(0, 40), { minItems: 9, maxItems: 9 }), {
+      minItems: 8,
+      maxItems: 8,
+    }),
+    jumpCurves: Type.Record(
+      Type.String(),
+      Type.Array(integer(-16, 16), { minItems: 1, maxItems: 128 }),
+    ),
+    sine: Type.Array(integer(-128, 127), { minItems: 360, maxItems: 360 }),
+    battleRandom: Type.Array(integer(0, 255), { minItems: 256, maxItems: 256 }),
+    partWeights: Type.Array(Type.Array(integer(0, 100), { minItems: 4, maxItems: 4 }), {
+      minItems: 8,
+      maxItems: 8,
+    }),
+    guardPowerDivisor: integer(1, 16),
+    readinessMaximum: integer(1, 1000),
+    idleChargeTicks: integer(1, 1000),
+    passiveChargeTicks: integer(1, 1000),
+    chargePulseTicks: integer(1, 1000),
   }),
+  tickRate: Type.Literal(60),
   roundTimeMs: integer(100, 600000),
-  gravity: boundedNumber(1, 100),
-  acceleration: boundedNumber(1, 200),
-  friction: boundedNumber(1, 200),
-  doubleTapMs: integer(1, 1000),
-  dashDurationMs: integer(1, 1000),
-  dashCooldownMs: integer(1, 5000),
-  dropThroughMs: integer(1, 2000),
-  guardDamageMultiplier: boundedNumber(0, 1),
-  guardKnockbackMultiplier: boundedNumber(0, 1),
-  brokenLegSpeedMultiplier: boundedNumber(0, 1),
-  brokenLegJumpMultiplier: boundedNumber(0, 1),
-  brokenLegDashMultiplier: boundedNumber(0, 1),
-  specialMaximum: boundedNumber(1, 1000),
-  chargePerSecond: boundedNumber(0.1, 1000),
-  meterPerDamageDealt: boundedNumber(0, 10),
-  meterPerDamageReceived: boundedNumber(0, 10),
+  specialMaximum: Type.Literal(51),
 });
 
 export const AbilitySchema = strictObject({
   ...base,
   kind: Type.Literal('ability'),
+  original: strictObject({
+    actionType: integer(0, 34),
+    family: Type.Union(
+      (
+        [
+          'rifle',
+          'gatling',
+          'missile',
+          'sword',
+          'hammer',
+          'frame',
+          'scouting',
+          'charge',
+          'beam',
+          'support',
+          'barrage',
+          'vertical-line',
+        ] as const
+      ).map((value) => Type.Literal(value)),
+    ),
+    refill: integer(0, 320),
+    readinessReset: integer(0, 320),
+    actionTicks: integer(1, 1000),
+    contactTick: integer(0, 1000),
+    shotTick: integer(0, 1000),
+    comboStages: Type.Array(
+      strictObject({
+        actionTicks: integer(1, 1000),
+        contactTick: integer(0, 1000),
+        shotTick: integer(0, 1000),
+      }),
+      {
+        maxItems: 2,
+        description: 'Additional right-arm stages, entered only after another B press.',
+      },
+    ),
+    rangePixels: integer(1, 1000),
+    speedPixels: integer(0, 32),
+    movementAllowed: Type.Boolean(),
+    verified: Type.Boolean(),
+  }),
   displayName: Type.String(),
   abilityKind: Type.Union([
     Type.Literal('projectile'),
@@ -125,15 +169,7 @@ export const AbilitySchema = strictObject({
     Type.Literal('special'),
   ]),
   delivery: Type.Union([Type.Literal('projectile'), Type.Literal('melee')]),
-  startupMs: integer(),
-  activeMs: integer(1),
-  recoveryMs: integer(1),
   damage: boundedNumber(1, 1000),
-  staggerMs: integer(),
-  knockbackX: boundedNumber(),
-  knockbackY: boundedNumber(),
-  projectileSpeed: boundedNumber(0.1, 100),
-  projectileLifetimeMs: integer(1),
   hitbox: RegionSchema,
   specialCost: boundedNumber(),
   maxUses: integer(),
@@ -143,19 +179,35 @@ export const AbilitySchema = strictObject({
 export const PartSchema = strictObject({
   ...base,
   kind: Type.Literal('part'),
+  originalId: integer(0, 31),
+  displayName: Type.String(),
+  defense: integer(0, 255),
+  locomotion: integer(0, 7),
+  speedIndex: integer(0, 7),
+  attackRanks: Type.Array(integer(0, 5), { minItems: 3, maxItems: 3 }),
+  defenseRank: integer(0, 5),
   slot: Type.Union(PART_SLOTS.map((s) => Type.Literal(s))),
-  armor: boundedNumber(1, 10000),
+  armor: boundedNumber(0, 10000),
   abilityId: Type.Optional(id),
-  movement: Type.Optional(
-    strictObject({
-      speed: boundedNumber(0.1, 50),
-      jumpSpeed: boundedNumber(0.1, 50),
-      dashSpeed: boundedNumber(0.1, 80),
-    }),
-  ),
 });
 
 const visual = Type.Union([
+  strictObject({
+    type: Type.Literal('sprite'),
+    url: Type.String({ pattern: '^/assets/.+\\.png$' }),
+    frames: Type.Array(
+      strictObject({
+        x: integer(0, 8192),
+        y: integer(0, 8192),
+        width: integer(1, 8192),
+        height: integer(1, 8192),
+      }),
+      { minItems: 4, maxItems: 4 },
+    ),
+    frameSize: integer(1, 8192),
+    color: Type.String(),
+    accent: Type.String(),
+  }),
   strictObject({
     type: Type.Literal('procedural'),
     model: Type.Union(
@@ -177,9 +229,31 @@ const visual = Type.Union([
   }),
 ]);
 
+export const MedalSchema = strictObject({
+  ...base,
+  kind: Type.Literal('medal'),
+  originalId: integer(0, 11),
+  displayName: Type.String(),
+  preferredParts: Type.Array(Type.Union(PART_SLOTS.map((slot) => Type.Literal(slot))), {
+    uniqueItems: true,
+  }),
+  levels: Type.Array(
+    strictObject({
+      shooting: integer(0, 255),
+      grappling: integer(0, 255),
+      support: integer(0, 255),
+      defense: integer(0, 255),
+    }),
+    { minItems: 99, maxItems: 99 },
+  ),
+});
+
 export const CharacterSchema = strictObject({
   ...base,
   kind: Type.Literal('character'),
+  medalId: id,
+  medalLevel: integer(1, 99),
+  originalSetId: integer(0, 29),
   displayName: Type.String(),
   tagline: Type.String(),
   visual,
@@ -206,6 +280,7 @@ export const GamepadSchema = strictObject({
   kind: Type.Literal('gamepad'),
   displayName: Type.String(),
   axisIndex: integer(0, 15),
+  verticalAxisIndex: integer(0, 15),
   deadzone: boundedNumber(0, 0.9),
   activationThreshold: boundedNumber(0.1, 1),
   bindings: actionBindings(integer(0, 31)),
@@ -229,6 +304,32 @@ export const AISchema = strictObject({
 export const ArenaSchema = strictObject({
   ...base,
   kind: Type.Literal('arena'),
+  original: strictObject({
+    fieldId: integer(0, 18),
+    tiles: Type.Array(Type.Array(integer(0, 255), { minItems: 54, maxItems: 54 }), {
+      minItems: 46,
+      maxItems: 46,
+    }),
+    movingPlatforms: Type.Array(
+      strictObject({
+        id,
+        x: integer(-128, 512),
+        y: integer(0, 368),
+        direction: integer(1, 4),
+        minimum: integer(-128, 512),
+        maximum: integer(-128, 512),
+        width: integer(1, 128),
+        endpointWaitTicks: integer(0, 255),
+      }),
+      { maxItems: 3 },
+    ),
+    waterY: Type.Union([integer(0, 368), Type.Null()]),
+    theme: Type.Union(
+      (['ruins', 'forest', 'industrial', 'ice', 'aquatic', 'volcanic'] as const).map((value) =>
+        Type.Literal(value),
+      ),
+    ),
+  }),
   displayName: Type.String(),
   subtitle: Type.String(),
   width: boundedNumber(10, 100),
@@ -278,6 +379,7 @@ export const schemas = {
   ability: AbilitySchema,
   part: PartSchema,
   character: CharacterSchema,
+  medal: MedalSchema,
   keyboard: KeyboardSchema,
   gamepad: GamepadSchema,
   ai: AISchema,
@@ -309,6 +411,7 @@ export type InputAction = (typeof INPUT_ACTIONS)[number];
 
 export type Definition =
   | RulesDefinition
+  | MedalDefinition
   | AbilityDefinition
   | PartDefinition
   | CharacterDefinition
@@ -319,3 +422,5 @@ export type Definition =
   | MatchDefinition;
 
 export type Region = Static<typeof RegionSchema>;
+
+export type MedalDefinition = Static<typeof MedalSchema>;

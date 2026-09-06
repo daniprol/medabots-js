@@ -11,6 +11,35 @@ import {
 import { KeyboardInput } from '../src/input/keyboard-input';
 import { content } from './helpers';
 describe('input normalization and assignments', () => {
+  it('uses the original B chords, gives Up priority, and preserves short chord edges', () => {
+    const attack = { ...emptyActions(), rightArm: true };
+    expect(normalizeActions(emptyActions(), attack)).toMatchObject({
+      rightArmPressed: true,
+      headPressed: false,
+      leftArmPressed: false,
+    });
+    expect(
+      normalizeActions({ ...emptyActions(), aimUp: true, dropThroughPlatform: true }, attack),
+    ).toMatchObject({ headPressed: true, rightArmPressed: false, leftArmPressed: false });
+    expect(
+      normalizeActions(emptyActions(), { ...attack, dropThroughPlatform: true }),
+    ).toMatchObject({ leftArmPressed: true, rightArmPressed: false });
+    expect(normalizeActions(emptyActions(), { ...attack, aimUp: true })).toMatchObject({
+      headPressed: true,
+      rightArmPressed: false,
+    });
+    const mapped = mapGamepad(
+      {
+        axes: [0, -1],
+        buttons: [
+          { pressed: false, value: 0 },
+          { pressed: true, value: 1 },
+        ],
+      },
+      content.gamepads['standard-gamepad']!,
+    );
+    expect(normalizeActions(mapped, mapped).headPressed).toBe(true);
+  });
   it('ships a solo layout and three mutually non-overlapping shared keyboard profiles', () => {
     expect(Object.keys(content.keyboards)).toHaveLength(4);
     expect(
@@ -51,7 +80,7 @@ describe('input normalization and assignments', () => {
   it('maps standard gamepad stick, d-pad, configurable button indices and thresholds', () => {
     const p = content.gamepads['standard-gamepad']!;
     const buttons = Array.from({ length: 16 }, () => ({ pressed: false, value: 0 }));
-    buttons[2]!.pressed = true;
+    buttons[1]!.pressed = true;
     expect(mapGamepad({ axes: [0.65], buttons }, p)).toMatchObject({
       moveRight: true,
       rightArm: true,
@@ -74,8 +103,8 @@ describe('input normalization and assignments', () => {
       target.dispatchEvent(event);
       return event;
     };
-    expect(key('keydown', 'KeyW').defaultPrevented).toBe(true);
-    key('keyup', 'KeyW');
+    expect(key('keydown', 'KeyG').defaultPrevented).toBe(true);
+    key('keyup', 'KeyG');
     key('keydown', 'KeyD');
     key('keydown', 'ArrowLeft');
     expect(input.read(p1)).toMatchObject({

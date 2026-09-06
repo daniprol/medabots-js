@@ -19,6 +19,13 @@ export function createBattle({
     content,
     state: {
       tick: 0,
+      randomCursor: setup.seed & 255,
+      specialFreezeTicks: 0,
+      supportEffects: [],
+      platforms: content.arenas[setup.arenaId]!.original.movingPlatforms.map((platform) => ({
+        ...platform,
+        waitTicks: 0,
+      })),
       arenaId: setup.arenaId,
       rulesId: setup.rulesId,
       remainingTicks: content.rules[setup.rulesId]!.roundTicks,
@@ -66,7 +73,6 @@ function validateSetup(setup: BattleSetup, content: ContentCatalog) {
 function createCombatants(setup: BattleSetup, content: ContentCatalog): CombatantSnapshot[] {
   const arena = content.arenas[setup.arenaId]!;
   const ids = new Set<string>();
-  let index = 0;
   const combatants: CombatantSnapshot[] = setup.teams.flatMap((team) =>
     team.combatants.map((combatantSetup) => {
       if (ids.has(combatantSetup.instanceId)) {
@@ -94,6 +100,7 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         parts[slot] = {
           definitionId: part.id,
           currentArmor: part.armor,
+          readiness: 0,
           maxArmor: part.armor,
           cooldownTicks: 0,
           destroyed: false,
@@ -101,7 +108,8 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         };
       }
 
-      const spawn = arena.spawns[index++]!;
+      const actorIndex = setup.teams.indexOf(team) + (combatantSetup.role === 'partner' ? 2 : 0);
+      const spawn = arena.spawns[actorIndex]!;
 
       return {
         id: combatantSetup.instanceId,
@@ -133,9 +141,37 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         lastTapLeft: -9999,
         lastTapRight: -9999,
         strategy: 'ATTACK_LEADER',
+        actorIndex,
+        medalId: definition.medalId,
+        medalLevel: definition.medalLevel,
+        movementState: 'idle',
+        movementTicks: 0,
+        residualX: 4,
+        residualY: 4,
+        jumpHoldTicks: 0,
+        jumpFinalized: false,
+        jumpCurve: 'ordinary_full',
+        carryDirection: 0,
+        carryMode: 0,
+        extraJumpUsed: false,
+        lastTapUp: -9999,
+        lastTapDown: -9999,
+        idleTicks: 0,
+        passiveChargeTicks: 0,
+        displayMeter: 0,
+        panelIndex: 0,
+        panelPendingTicks: 0,
+        panel: 1,
+        invulnerabilityTicks: 0,
+        waterToggle: false,
+        transported: false,
+        iceMomentum: 0,
+        supportStatus: 'none',
+        supportMagnitude: 0,
+        supportTicks: 0,
       };
     }),
   );
 
-  return combatants;
+  return combatants.sort((first, second) => first.actorIndex - second.actorIndex);
 }

@@ -6,7 +6,7 @@ import {
   type BattleResult,
   type CommandFrame,
 } from '../battle-core';
-import { TICKS_PER_SECOND, TICK_DURATION_SECONDS } from '../battle-core/timing';
+import { TICK_DURATION_SECONDS } from '../battle-core/timing';
 import type { ContentCatalog } from '../content/catalog';
 import type { Assignments } from '../input/bindings';
 import { InputManager } from '../input/input-manager';
@@ -35,7 +35,7 @@ export class LocalBattleSession {
           combatant.instanceId,
           assignments[combatant.instanceId] ?? {
             type: 'ai',
-            aiProfileId: Object.keys(content.ai)[0]!,
+            aiProfileId: content.ai['ai-balanced'] ? 'ai-balanced' : Object.keys(content.ai)[0]!,
           },
         ]),
     );
@@ -132,7 +132,7 @@ export class LocalBattleSession {
   }
 
   get alpha() {
-    return this.accumulator * TICKS_PER_SECOND;
+    return this.accumulator / TICK_DURATION_SECONDS;
   }
 
   drainEvents() {

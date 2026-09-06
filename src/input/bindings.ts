@@ -12,13 +12,20 @@ export const emptyActions = (): ActionState =>
   Object.fromEntries(INPUT_ACTIONS.map((a) => [a, false])) as ActionState;
 
 export function normalizeActions(held: ActionState, pressed: ActionState): CombatantCommand {
+  const up = held.aimUp || pressed.aimUp;
+  const down = held.dropThroughPlatform || pressed.dropThroughPlatform;
   return {
     moveX: held.moveLeft === held.moveRight ? 0 : held.moveLeft ? -1 : 1,
     jumpPressed: pressed.jump,
-    dropHeld: held.dropThroughPlatform,
-    rightArmPressed: pressed.rightArm,
-    leftArmPressed: pressed.leftArm,
-    headPressed: pressed.head,
+    jumpHeld: held.jump,
+    attackHeld: held.rightArm || held.head || held.leftArm,
+    upHeld: held.aimUp,
+    upPressed: pressed.aimUp,
+    downPressed: pressed.dropThroughPlatform,
+    dropHeld: down,
+    rightArmPressed: pressed.rightArm && !up && !down,
+    leftArmPressed: pressed.leftArm || (pressed.rightArm && down && !up),
+    headPressed: pressed.head || (pressed.rightArm && up),
     guardHeld: held.guard,
     chargeHeld: held.chargeSpecial,
     specialPressed: pressed.activateSpecial,
@@ -91,6 +98,10 @@ export function mapGamepad(pad: GamepadLike, profile: GamepadDefinition): Action
   const axis = Math.abs(raw) < profile.deadzone ? 0 : raw;
   state.moveLeft ||= axis <= -profile.activationThreshold;
   state.moveRight ||= axis >= profile.activationThreshold;
+
+  const vertical = pad.axes[profile.verticalAxisIndex] ?? 0;
+  state.aimUp ||= vertical <= -profile.activationThreshold;
+  state.dropThroughPlatform ||= vertical >= profile.activationThreshold;
 
   return state;
 }

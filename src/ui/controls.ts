@@ -19,9 +19,9 @@ export function controlsStrip(content: ContentCatalog, assignments: Assignments)
       for (const [actions, label] of [
         [['moveLeft', 'moveRight'], 'MOVE'],
         [['jump'], 'JUMP'],
-        [['rightArm', 'leftArm', 'head'], 'ATTACK'],
+        [['rightArm'], 'ATTACK · ↑ HEAD / ↓ LEFT'],
         [['guard'], 'GUARD'],
-        [['chargeSpecial', 'activateSpecial'], 'CHARGE / SPECIAL'],
+        [['activateSpecial'], 'MEDAFORCE'],
       ] as const) {
         const item = element('span', 'control-item');
 
@@ -42,7 +42,6 @@ export function controlsStrip(content: ContentCatalog, assignments: Assignments)
         ['leftArm', 'L-ARM'],
         ['head', 'HEAD'],
         ['guard', 'GUARD'],
-        ['chargeSpecial', 'CHARGE'],
         ['activateSpecial', 'SPECIAL'],
       ] as const) {
         row.append(element('span', '', `B${p.bindings[action].join('/')} ${label}`));

@@ -77,13 +77,20 @@ test('three profiles assign without conflicts; two keyboards move and attack ind
         () => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants.find((c) => c.id === 'B1')!.x,
       ),
     )
-    .toBeLessThan(start.combatants[2]!.x - 1);
+    .toBeLessThan(start.combatants.find((actor) => actor.id === 'B1')!.x - 1);
   await page.keyboard.up('d');
   await page.keyboard.up('ArrowLeft');
-  await page.keyboard.press('w');
+  await page.keyboard.press('g');
   await expect
     .poll(() => page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.y))
     .toBeGreaterThan(0.2);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.parts.rightArm.readiness,
+      ),
+    )
+    .toBe(320);
   // A complete keydown/keyup before the next tick still starts the attack.
   await page.evaluate(() => {
     window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyF', cancelable: true }));
@@ -137,6 +144,21 @@ test('deterministic short match shows results, rematches, and returns to setup',
   await expect(page.getByTestId('timer')).toHaveText('03:00');
 });
 
+test('returning from a match with omitted assignments fills the other slots with AI', async ({
+  page,
+}) => {
+  await page.evaluate(() =>
+    window.__BATTLE_DEBUG__!.restart({
+      assignments: { A1: { type: 'keyboard', profileId: 'keyboard-solo' } },
+    }),
+  );
+  await expect(page.getByTestId('fighter-A2')).toContainText('CPU');
+  await page.evaluate(() => window.__BATTLE_DEBUG__!.returnToSetup());
+  await expect(page.getByTestId('match-setup')).toBeVisible();
+  await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
+  await expect(page.getByLabel('A2 controller')).toHaveValue('ai');
+});
+
 test('character selection and session key editing survive a battle and return to setup', async ({
   page,
 }) => {
@@ -146,14 +168,23 @@ test('character selection and session key editing survive a battle and return to
     page.getByRole('button', { name: 'Select A1 leader: Rokusho', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
-  await page.getByRole('button', { name: 'Rebind Right arm / Primary', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true })
+    .click();
   await page.keyboard.press('z');
   await expect(
-    page.getByRole('button', { name: 'Rebind Right arm / Primary', exact: true }),
+    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
   ).toHaveText('Z');
   await page.getByRole('button', { name: 'APPLY CONTROLS', exact: false }).click();
   await page.getByRole('button', { name: 'START ROBATTLE', exact: false }).click();
   await expect(page.getByTestId('fighter-A1')).toContainText('Rokusho');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.parts.rightArm.readiness,
+      ),
+    )
+    .toBe(320);
   await page.keyboard.press('z');
   await expect
     .poll(() =>
@@ -165,7 +196,7 @@ test('character selection and session key editing survive a battle and return to
   await page.keyboard.down('ArrowRight');
   await expect
     .poll(() => page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.x))
-    .toBeGreaterThan(-8);
+    .toBeGreaterThan(-20);
   await page.keyboard.up('ArrowRight');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'RETURN TO SETUP', exact: true }).click();
@@ -174,15 +205,15 @@ test('character selection and session key editing survive a battle and return to
   ).toBeVisible();
   await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
   await expect(
-    page.getByRole('button', { name: 'Rebind Right arm / Primary', exact: true }),
+    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
   ).toHaveText('Z');
   await page.getByRole('button', { name: 'RESET', exact: true }).click();
   await expect(
-    page.getByRole('button', { name: 'Rebind Right arm / Primary', exact: true }),
+    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
   ).toHaveText('F');
   await page.getByRole('button', { name: 'CANCEL', exact: true }).click();
   await page.getByRole('button', { name: '⚙  CONTROLS', exact: true }).click();
   await expect(
-    page.getByRole('button', { name: 'Rebind Right arm / Primary', exact: true }),
+    page.getByRole('button', { name: 'Rebind B · Attack (Up: head / Down: left)', exact: true }),
   ).toHaveText('Z');
 });

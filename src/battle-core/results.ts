@@ -1,3 +1,4 @@
+import { battleRandom } from './random';
 import type { BattleContext, BattleResult } from './types';
 
 export function finishBattle(
@@ -27,25 +28,30 @@ export function finishBattle(
 
 export function finishAtTimeout(context: BattleContext) {
   const scores = context.setup.teams.map((team) => {
-    const parts = context.state.combatants
-      .filter((combatant) => combatant.teamId === team.id)
-      .flatMap((combatant) => Object.values(combatant.parts));
-
-    return {
-      teamId: team.id,
-      remainingArmor: parts.reduce((total, part) => total + part.currentArmor, 0),
-      startingArmor: parts.reduce((total, part) => total + part.maxArmor, 0),
-    };
+    const actors = context.state.combatants.filter((actor) => actor.teamId === team.id);
+    const leader = actors.find((actor) => actor.role === 'leader')!;
+    const partner = actors.find((actor) => actor.role === 'partner')!;
+    const liveParts = (actor: typeof leader) =>
+      Object.values(actor.parts).filter((part) => part.currentArmor > 0).length;
+    const parts = Object.values(leader.parts);
+    return [
+      actors.filter((actor) => !actor.knockedOut).length,
+      liveParts(leader),
+      liveParts(partner),
+      Math.floor(
+        (100 * parts.reduce((sum, part) => sum + part.currentArmor, 0)) /
+          parts.reduce((sum, part) => sum + part.maxArmor, 0),
+      ),
+      Math.floor((100 * leader.parts.head.currentArmor) / leader.parts.head.maxArmor),
+      -leader.medalLevel,
+    ];
   });
-
-  // Battle setup validation guarantees exactly two teams.
-  const firstTeam = scores[0]!;
-  const secondTeam = scores[1]!;
-
-  // Cross multiplication compares armor percentages without floating-point division.
-  const difference =
-    firstTeam.remainingArmor * secondTeam.startingArmor -
-    secondTeam.remainingArmor * firstTeam.startingArmor;
-  const winner = difference === 0 ? null : difference > 0 ? firstTeam.teamId : secondTeam.teamId;
-  finishBattle(context, winner, winner === null ? 'draw' : 'timeout');
+  for (let index = 0; index < scores[0]!.length; index++) {
+    const difference = scores[0]![index]! - scores[1]![index]!;
+    if (difference !== 0) {
+      finishBattle(context, context.setup.teams[difference > 0 ? 0 : 1]!.id, 'timeout');
+      return;
+    }
+  }
+  finishBattle(context, context.setup.teams[battleRandom(context) & 1 ? 0 : 1]!.id, 'timeout');
 }

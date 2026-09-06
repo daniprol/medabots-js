@@ -1,0 +1,277 @@
+{
+  "source": "Original AK8P ROM, fresh natural-input mGBA observation; see docs/original-battle-reference.md",
+  "romSha256": "20d77b6d1540908b1f1f2b27fede5d539a0f5edd198f93e7ecbe025a0891ca9a",
+  "startFrame": 5470,
+  "samples": [
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 311
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 303
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 295
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 287
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 280
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 273
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 266
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 260
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 254
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 248
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 243
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 238
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 233
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 229
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 225
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 221
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 218
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 215
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 212
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 210
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 208
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 206
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 205
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 204
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 203
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 203
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 203
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 204
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 205
+    },
+    {
+      "jumpHeld": true,
+      "x": 81,
+      "bottomY": 206
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 208
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 210
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 212
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 215
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 218
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 221
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 225
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 229
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 233
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 238
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 243
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 248
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 254
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 260
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 266
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 271
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 276
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 281
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 286
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 291
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 296
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 301
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 306
+    },
+    {
+      "jumpHeld": false,
+      "x": 81,
+      "bottomY": 311
+    }
+  ]
+}

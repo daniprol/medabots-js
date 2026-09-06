@@ -8,28 +8,18 @@ import {
   type AIDefinition,
   type ArenaDefinition,
   type MatchDefinition,
+  type MedalDefinition,
 } from './schemas';
 
-export type RuntimeAbility = AbilityDefinition & {
-  startupTicks: number;
-  activeTicks: number;
-  recoveryTicks: number;
-  staggerTicks: number;
-  projectileLifetimeTicks: number;
-};
+export type RuntimeAbility = AbilityDefinition;
 
-export type RuntimeRules = RulesDefinition & {
-  roundTicks: number;
-  doubleTapTicks: number;
-  dashDurationTicks: number;
-  dashCooldownTicks: number;
-  dropThroughTicks: number;
-};
+export type RuntimeRules = RulesDefinition & { roundTicks: number };
 
 export type RuntimeAI = AIDefinition & { reactionTicks: number };
 
 export type ContentCatalog = {
   rules: Record<string, RuntimeRules>;
+  medals: Record<string, MedalDefinition>;
   abilities: Record<string, RuntimeAbility>;
   parts: Record<string, PartDefinition>;
   characters: Record<string, CharacterDefinition>;

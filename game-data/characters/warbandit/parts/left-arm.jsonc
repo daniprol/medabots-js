@@ -1,9 +1,15 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-left-arm",
   "kind": "part",
   "slot": "leftArm",
-  "armor": 380,
+  "armor": 40,
   "abilityId": "warbandit-left-arm-attack",
+  "originalId": 5,
+  "displayName": "Range Shooter",
+  "defense": 7,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
 }

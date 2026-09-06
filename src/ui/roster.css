@@ -1135,3 +1135,27 @@
     flex-shrink: 0;
   }
 }
+
+.sprite-roster-preview {
+  position: absolute;
+  width: 80%;
+  height: 94%;
+  inset: 1% 10%;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 16px #0008);
+  animation: sprite-breathe 4s ease-in-out infinite;
+}
+@keyframes sprite-breathe {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.match-summary select {
+  margin-top: 4px;
+  background: #193440;
+  color: #f4eed9;
+  border: 1px solid #a6c4b955;
+  border-radius: 4px;
+  padding: 5px 10px;
+  max-width: 210px;
+}

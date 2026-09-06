@@ -28,7 +28,9 @@ export function aiCommand(
       ...emptyCommand(),
       moveX: memory.command.moveX,
       guardHeld: memory.command.guardHeld,
-      chargeHeld: memory.command.chargeHeld,
+      chargeHeld: false,
+      jumpHeld: memory.command.jumpHeld,
+      attackHeld: combatant.attack?.slot === 'head' && combatant.attack.chargeTicks < 90,
       dropHeld: memory.command.dropHeld,
     };
   }
@@ -50,7 +52,8 @@ export function aiCommand(
   const score = (candidate: typeof combatant) =>
     Math.abs(candidate.x - combatant.x) * profile.strategyWeights.proximity +
     Math.abs(candidate.y - combatant.y) * 2 -
-    (combatant.strategy === 'ATTACK_LEADER' && candidate.role === 'leader'
+    ((combatant.panel === 6 || combatant.strategy === 'ATTACK_LEADER') &&
+    candidate.role === 'leader'
       ? profile.strategyWeights.leader * 5
       : 0) +
     (combatant.strategy === 'PROTECT_LEADER' ? Math.abs(candidate.x - ownLeader.x) * 1.5 : 0) -
@@ -59,7 +62,12 @@ export function aiCommand(
       5;
   enemies.sort((a, b) => score(a) - score(b) || a.id.localeCompare(b.id));
 
-  const target = enemies[0];
+  const target =
+    (combatant.panel === 30
+      ? enemies.find((enemy) => enemy.role === 'partner')
+      : combatant.panel === 6
+        ? enemies.find((enemy) => enemy.role === 'leader')
+        : undefined) ?? enemies[0];
 
   if (!target) {
     return emptyCommand();
@@ -92,6 +100,9 @@ export function aiCommand(
 
   command.jumpPressed = combatant.grounded && targetOffsetY > profile.jumpThreshold;
   command.dropHeld = combatant.grounded && targetOffsetY < -1.5;
+  command.jumpPressed ||= command.dropHeld;
+  command.jumpHeld = command.jumpPressed && !command.dropHeld;
+  command.attackHeld = combatant.attack?.slot === 'head' && combatant.attack.chargeTicks < 90;
 
   if (
     combatant.grounded &&
@@ -121,7 +132,7 @@ export function aiCommand(
     const ability = content.abilities[content.parts[part.definitionId]!.abilityId!]!;
 
     return (
-      !part.destroyed &&
+      (slot !== 'head' || !part.destroyed) &&
       part.cooldownTicks === 0 &&
       (ability.maxUses === 0 || part.uses < ability.maxUses)
     );
@@ -142,6 +153,16 @@ export function aiCommand(
     distance < preferred + 1 &&
     combatant.specialMeter < content.rules[snapshot.rulesId]!.specialMaximum &&
     !command.guardHeld;
+  if (combatant.panel === 1 && available.includes('rightArm') && canHit) {
+    command.rightArmPressed = true;
+  }
+  if (combatant.panel === 2 && available.includes('leftArm') && canHit) {
+    command.leftArmPressed = true;
+  }
+  if (combatant.panel === 3 && available.includes('head') && canHit) {
+    command.headPressed = true;
+  }
+  command.jumpHeld ||= command.jumpPressed && !command.dropHeld;
   memory.command = command;
 
   return command;

@@ -1,9 +1,15 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-right-arm",
   "kind": "part",
   "slot": "rightArm",
-  "armor": 400,
+  "armor": 35,
   "abilityId": "metabee-right-arm-attack",
+  "originalId": 0,
+  "displayName": "Revolver",
+  "defense": 4,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
 }

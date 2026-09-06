@@ -35,7 +35,7 @@ Robattle Arena is an independent, unofficial fan prototype inspired by **Medabot
 
 The [MIT license](LICENSE) covers the contributors' original source code and documentation to the extent they hold those rights. It does not grant rights to third-party names, logos, character designs, or other underlying intellectual property. It does not claim that the franchise-inspired models or screenshots are cleared for redistribution or commercial use.
 
-The four character models were constructed procedurally for this project. Their names and recognizable designs refer to existing Medabots characters; creating new geometry does not remove the underlying rights. No ROMs, extracted sprites, original-game recordings, or official model files are bundled.
+The current sprite atlases and environment paintings were generated for this project; the earlier procedural models remain available as a rendering option. Their names and recognizable character designs refer to existing Medabots characters. Creating new artwork or geometry does not remove the underlying rights. See [asset provenance](docs/hd2d-art.md). No ROMs, extracted sprites, original-game recordings, or official model files are bundled.
 
 The locally supplied `graphics_reference.png` is not part of the licensed release files. It is retained locally and ignored by Git. **Earlier commits contain that image.** Before publishing repository history, establish permission for it or prepare a reviewed source export that excludes it. History has not been rewritten.
 

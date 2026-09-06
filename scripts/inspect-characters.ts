@@ -51,7 +51,7 @@ try {
   await page.keyboard.down('ArrowRight');
   await page.waitForFunction(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants[0]!.x > -5);
   await page.keyboard.up('ArrowRight');
-  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('g');
   await page.keyboard.press('f');
   await page.waitForFunction(() => window.__BATTLE_DEBUG__!.getSnapshot()!.tick >= 180);
   await page.evaluate(

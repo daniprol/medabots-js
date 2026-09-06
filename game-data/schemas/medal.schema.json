@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medabots medal definition",
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "originalId",
+    "displayName",
+    "preferredParts",
+    "levels"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "type": "string",
+      "description": "Globally unique, stable kebab-case content identifier."
+    },
+    "kind": {
+      "const": "medal",
+      "type": "string"
+    },
+    "originalId": {
+      "minimum": 0,
+      "maximum": 11,
+      "type": "integer"
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "preferredParts": {
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "const": "head",
+            "type": "string"
+          },
+          {
+            "const": "leftArm",
+            "type": "string"
+          },
+          {
+            "const": "rightArm",
+            "type": "string"
+          },
+          {
+            "const": "legs",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "levels": {
+      "minItems": 99,
+      "maxItems": 99,
+      "type": "array",
+      "items": {
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "shooting",
+          "grappling",
+          "support",
+          "defense"
+        ],
+        "properties": {
+          "shooting": {
+            "minimum": 0,
+            "maximum": 255,
+            "type": "integer"
+          },
+          "grappling": {
+            "minimum": 0,
+            "maximum": 255,
+            "type": "integer"
+          },
+          "support": {
+            "minimum": 0,
+            "maximum": 255,
+            "type": "integer"
+          },
+          "defense": {
+            "minimum": 0,
+            "maximum": 255,
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

@@ -18,7 +18,7 @@ describe('roster and control configuration', () => {
     const p = content.keyboards['keyboard-solo']!;
     expect(p.bindings.moveLeft).toEqual(['ArrowLeft']);
     expect(p.bindings.rightArm).toEqual(['KeyF']);
-    expect(p.bindings.leftArm).toEqual(['KeyG']);
+    expect(p.bindings.jump).toEqual(['KeyG']);
   });
   it('puts two shared-keyboard humans on opposing teams, with a conflict-free three-player option', () => {
     const a = presetAssignments('shared-two');

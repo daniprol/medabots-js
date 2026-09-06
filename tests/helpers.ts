@@ -41,8 +41,7 @@ export function closeArena(partnerTarget = false, fragile = false) {
       def.armor = def.slot === 'head' ? 30 : 15;
     }
     if (fragile && def.kind === 'ability') {
-      def.knockbackX = 0;
-      def.knockbackY = 0;
+      def.damage = Math.max(20, def.damage);
     }
     if (def.kind === 'arena') {
       def.spawns = [

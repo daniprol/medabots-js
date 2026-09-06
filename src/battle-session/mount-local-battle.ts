@@ -3,6 +3,7 @@ import type { ContentCatalog } from '../content/catalog';
 import type { Assignments } from '../input/bindings';
 import { BattleAudio } from '../render/audio';
 import { BattleRenderer } from '../render/renderer';
+import { preloadSprites } from '../render/sprite-assets';
 import { controlsStrip } from '../ui/controls';
 import { element, button } from '../ui/dom';
 import { createHUD } from '../ui/hud';
@@ -19,7 +20,40 @@ export type MountBattleOptions = {
   onRematch?: () => void;
 };
 
+/** Own asset preparation so callers only need content, setup and local assignments. */
 export function mountLocalBattle(options: MountBattleOptions) {
+  const loading = element('div', 'error-panel', 'PREPARING ARENA');
+  options.root.append(loading);
+  let mounted: ReturnType<typeof mountPreparedBattle> | undefined;
+  let disposed = false;
+  const ready = preloadSprites(options.content).then(() => {
+    if (disposed) {
+      return;
+    }
+    loading.remove();
+    mounted = mountPreparedBattle(options);
+  });
+  void ready.catch((error: unknown) => {
+    if (disposed) {
+      return;
+    }
+    loading.textContent = error instanceof Error ? error.message : String(error);
+    console.error('Unable to prepare battle artwork', error);
+  });
+  return {
+    ready,
+    getSnapshot: () => mounted?.getSnapshot() ?? null,
+    pause: () => mounted?.pause(),
+    resume: () => mounted?.resume(),
+    dispose() {
+      disposed = true;
+      loading.remove();
+      mounted?.dispose();
+    },
+  };
+}
+
+function mountPreparedBattle(options: MountBattleOptions) {
   const { root, setup, content } = options;
   const screen = element('section', 'battle-screen');
   root.append(screen);
@@ -40,7 +74,7 @@ export function mountLocalBattle(options: MountBattleOptions) {
   const portraits = Object.fromEntries(
     session.current.combatants.map((c) => [c.characterId, renderer.portrait(c.characterId)]),
   );
-  const hud = createHUD(screen, content, session.current, assignments, portraits, () =>
+  const hud = createHUD(viewport, content, session.current, assignments, portraits, () =>
     session.pause(),
   );
   const controls = controlsStrip(content, assignments);

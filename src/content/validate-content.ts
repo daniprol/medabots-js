@@ -30,22 +30,24 @@ export function validateContent(
   };
 
   for (const definition of definitions) {
-    if (definition.kind === 'part') {
-      if (definition.slot === 'legs' && !definition.movement) {
-        invalidContent(sources[definition.id]!, '/movement', 'leg movement values', undefined);
+    if (definition.kind === 'ability') {
+      for (const [index, stage] of definition.original.comboStages.entries()) {
+        for (const event of ['contactTick', 'shotTick'] as const) {
+          if (stage[event] >= stage.actionTicks) {
+            invalidContent(
+              sources[definition.id]!,
+              `/original/comboStages/${index}/${event}`,
+              'event before the stage ends',
+              stage[event],
+            );
+          }
+        }
       }
+    }
 
+    if (definition.kind === 'part') {
       if (definition.slot !== 'legs' && !definition.abilityId) {
         invalidContent(sources[definition.id]!, '/abilityId', 'ability for head/arm', undefined);
-      }
-
-      if (definition.slot !== 'legs' && definition.movement) {
-        invalidContent(
-          sources[definition.id]!,
-          '/movement',
-          'movement only on leg parts',
-          definition.movement,
-        );
       }
 
       if (definition.slot === 'legs' && definition.abilityId) {
@@ -71,7 +73,42 @@ export function validateContent(
       }
     }
 
+    if (definition.kind === 'rules') {
+      for (const name of [
+        'ordinary_short',
+        'ordinary_medium',
+        'ordinary_full',
+        'type5_short',
+        'type5_medium',
+        'type5_full',
+        'type6_short',
+        'type6_medium',
+        'type6_full',
+        'special',
+      ]) {
+        if (!definition.original.jumpCurves[name]) {
+          invalidContent(
+            sources[definition.id]!,
+            `/original/jumpCurves/${name}`,
+            'required AX movement curve',
+            undefined,
+          );
+        }
+      }
+      for (const [index, weights] of definition.original.partWeights.entries()) {
+        if (weights[0] === 0) {
+          invalidContent(
+            sources[definition.id]!,
+            `/original/partWeights/${index}/0`,
+            'positive head weight',
+            weights[0],
+          );
+        }
+      }
+    }
+
     if (definition.kind === 'character') {
+      ref(definition.id, '/medalId', catalog.medals, definition.medalId);
       checkLoadout(definition.id, definition.defaultLoadout, '/defaultLoadout');
       ref(definition.id, '/specialAbilityId', catalog.abilities, definition.specialAbilityId);
 
@@ -126,6 +163,26 @@ export function validateContent(
 
     if (definition.kind === 'arena') {
       const ids = new Set<string>();
+      for (const [index, platform] of definition.original.movingPlatforms.entries()) {
+        const path = `/original/movingPlatforms/${index}`;
+        if (ids.has(platform.id)) {
+          invalidContent(sources[definition.id]!, `${path}/id`, 'unique platform ID', platform.id);
+        }
+        ids.add(platform.id);
+        const coordinate = platform.direction <= 2 ? platform.x : platform.y;
+        if (
+          platform.minimum >= platform.maximum ||
+          coordinate < platform.minimum ||
+          coordinate > platform.maximum
+        ) {
+          invalidContent(
+            sources[definition.id]!,
+            path,
+            'increasing movement bounds containing initial coordinate',
+            platform,
+          );
+        }
+      }
 
       for (const [i, p] of definition.platforms.entries()) {
         if (ids.has(p.id)) {

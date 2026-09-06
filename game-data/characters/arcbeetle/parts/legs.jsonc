@@ -1,13 +1,14 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-legs",
   "kind": "part",
   "slot": "legs",
-  "armor": 620,
-  "movement": {
-    "speed": 6.4,
-    "jumpSpeed": 16.8,
-    "dashSpeed": 16,
-  },
+  "armor": 55,
+  "originalId": 29,
+  "displayName": "Firework",
+  "defense": 3,
+  "locomotion": 0,
+  "speedIndex": 4,
+  "attackRanks": [4, 0, 0],
+  "defenseRank": 1,
 }

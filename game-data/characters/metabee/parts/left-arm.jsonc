@@ -1,9 +1,15 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "metabee-left-arm",
   "kind": "part",
   "slot": "leftArm",
-  "armor": 380,
+  "armor": 35,
   "abilityId": "metabee-left-arm-attack",
+  "originalId": 0,
+  "displayName": "SubmachineGun",
+  "defense": 6,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
 }

@@ -117,13 +117,27 @@ export function createMatchSetup(
 
   const match = element('div', 'match-summary');
   match.append(
-    element('strong', '', content.arenas[setup.arenaId]!.displayName),
+    element('strong', '', 'BATTLE FIELD'),
     element(
       'span',
       '',
       `${content.rules[setup.rulesId]!.roundTimeMs / 1000}s · 2 vs 2 · Leader elimination`,
     ),
   );
+  const fieldSelect = element('select');
+  fieldSelect.setAttribute('aria-label', 'Battle field');
+  for (const field of Object.values(content.arenas).sort(
+    (a, b) => a.original.fieldId - b.original.fieldId,
+  )) {
+    const option = element('option', '', field.displayName);
+    option.value = field.id;
+    fieldSelect.append(option);
+  }
+  fieldSelect.value = setup.arenaId;
+  fieldSelect.onchange = () => {
+    setup = { ...setup, arenaId: fieldSelect.value };
+  };
+  match.append(fieldSelect);
   footer.append(match);
 
   const start = button(
@@ -249,10 +263,10 @@ export function createMatchSetup(
     const statList = element('div', 'character-stats');
 
     for (const [label, value, max, unit] of [
-      ['TOTAL ARMOR', stats.armor, 2600, 'HP'],
-      ['MOVEMENT', stats.speed, 10, 'SPD'],
-      ['ATTACK POWER', stats.power, 35, 'DMG'],
-      ['JUMP', stats.jump, 20, 'VEL'],
+      ['TOTAL ARMOR', stats.armor, 250, 'HP'],
+      ['MOVEMENT', stats.speed, 3, 'SPD'],
+      ['ATTACK POWER', stats.power, 120, 'PWR'],
+      ['JUMP', stats.jump * 8, 120, 'PX'],
     ] as const) {
       const row = element('div', 'character-stat');
       const names = element('div');
@@ -283,11 +297,11 @@ export function createMatchSetup(
     const rules = element('div', 'roster-rules');
     rules.append(
       element('span', 'rule-icon', '⬡'),
-      element('strong', '', 'BREAK ARMOR. EXPOSE THE HEAD.'),
+      element('strong', '', 'AIM FOR THE LEADER.'),
       element(
         'p',
         '',
-        'Both arms and legs protect the head. Break all three, then disable the enemy leader to win.',
+        'Disable the enemy leader’s head to win. Guard protects vulnerable parts. Stay still to build Medaforce.',
       ),
     );
     details.append(rules);

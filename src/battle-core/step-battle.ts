@@ -1,6 +1,6 @@
-import { separateBodies } from './collisions';
-import { updateAttack } from './combat';
+import { updateAttack, advanceAttack } from './combat';
 import { moveCombatant } from './movement';
+import { updatePlatforms } from './platforms';
 import { updateProjectiles } from './projectiles';
 import { finishAtTimeout } from './results';
 import type { BattleContext, CommandFrame, Strategy } from './types';
@@ -19,11 +19,28 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
   cyclePartnerStrategies(context, frame);
 
   context.state.tick = frame.tick;
+  if (context.state.specialFreezeTicks > 0) {
+    const caster = context.state.combatants.find((actor) => actor.attack?.slot === 'special');
+    if (caster) {
+      advanceAttack(context, caster, frame.commands[caster.id]!);
+    } else {
+      context.state.specialFreezeTicks = 0;
+    }
+    return;
+  }
   context.state.remainingTicks = Math.max(0, context.state.remainingTicks - 1);
 
+  updatePlatforms(context);
+
   for (const combatant of context.state.combatants) {
+    if (combatant.panelPendingTicks > 0 && --combatant.panelPendingTicks === 0) {
+      combatant.panel = [1, 2, 3, 6, 30][combatant.panelIndex]!;
+    }
     updateAttack(context, combatant, frame.commands[combatant.id]!);
 
+    if (context.state.specialFreezeTicks > 0) {
+      return;
+    }
     if (context.state.result) {
       break;
     }
@@ -32,7 +49,19 @@ export function stepBattle(context: BattleContext, frame: CommandFrame) {
   }
 
   if (!context.state.result) {
-    separateBodies(context);
+    context.state.supportEffects = context.state.supportEffects.filter((effect) => {
+      if (--effect.remainingTicks > 0) {
+        return true;
+      }
+      for (const actor of context.state.combatants) {
+        if (actor.teamId === effect.teamId && !actor.knockedOut) {
+          actor.supportStatus = effect.family === 'scouting' ? 'scouting' : 'speed';
+          actor.supportMagnitude = effect.magnitude;
+          actor.supportTicks = effect.family === 'scouting' ? 600 : effect.magnitude * 60;
+        }
+      }
+      return false;
+    });
     updateProjectiles(context);
   }
 
@@ -72,6 +101,8 @@ function cyclePartnerStrategies(context: BattleContext, frame: CommandFrame) {
       const partner = context.state.combatants.find(
         (partner) => partner.teamId === combatant.teamId && partner.role === 'partner',
       )!;
+      partner.panelIndex = (partner.panelIndex + 1) % 5;
+      partner.panelPendingTicks = 11;
       partner.strategy =
         PARTNER_STRATEGIES[
           (PARTNER_STRATEGIES.indexOf(partner.strategy) + 1) % PARTNER_STRATEGIES.length

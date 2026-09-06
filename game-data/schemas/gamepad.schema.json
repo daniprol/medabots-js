@@ -8,6 +8,7 @@
     "kind",
     "displayName",
     "axisIndex",
+    "verticalAxisIndex",
     "deadzone",
     "activationThreshold",
     "bindings"
@@ -34,6 +35,11 @@
       "type": "integer",
       "description": "Zero-based browser Gamepad.axes index for horizontal movement."
     },
+    "verticalAxisIndex": {
+      "minimum": 0,
+      "maximum": 15,
+      "type": "integer"
+    },
     "deadzone": {
       "minimum": 0,
       "maximum": 0.9,
@@ -53,6 +59,7 @@
         "moveLeft",
         "moveRight",
         "jump",
+        "aimUp",
         "dropThroughPlatform",
         "rightArm",
         "leftArm",
@@ -65,7 +72,7 @@
       ],
       "properties": {
         "moveLeft": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -75,7 +82,7 @@
           }
         },
         "moveRight": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -85,7 +92,17 @@
           }
         },
         "jump": {
-          "minItems": 1,
+          "minItems": 0,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 31,
+            "type": "integer"
+          }
+        },
+        "aimUp": {
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -95,7 +112,7 @@
           }
         },
         "dropThroughPlatform": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -105,7 +122,7 @@
           }
         },
         "rightArm": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -115,7 +132,7 @@
           }
         },
         "leftArm": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -125,7 +142,7 @@
           }
         },
         "head": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -135,7 +152,7 @@
           }
         },
         "guard": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -145,7 +162,7 @@
           }
         },
         "chargeSpecial": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -155,7 +172,7 @@
           }
         },
         "activateSpecial": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -165,7 +182,7 @@
           }
         },
         "partnerStrategy": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {
@@ -175,7 +192,7 @@
           }
         },
         "pause": {
-          "minItems": 1,
+          "minItems": 0,
           "uniqueItems": true,
           "type": "array",
           "items": {

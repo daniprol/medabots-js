@@ -6,25 +6,10 @@
   "required": [
     "id",
     "kind",
+    "original",
     "tickRate",
-    "protectHeadUntilPartsDestroyed",
     "roundTimeMs",
-    "gravity",
-    "acceleration",
-    "friction",
-    "doubleTapMs",
-    "dashDurationMs",
-    "dashCooldownMs",
-    "dropThroughMs",
-    "guardDamageMultiplier",
-    "guardKnockbackMultiplier",
-    "brokenLegSpeedMultiplier",
-    "brokenLegJumpMultiplier",
-    "brokenLegDashMultiplier",
-    "specialMaximum",
-    "chargePerSecond",
-    "meterPerDamageDealt",
-    "meterPerDamageReceived"
+    "specialMaximum"
   ],
   "properties": {
     "$schema": {
@@ -39,13 +24,117 @@
       "const": "rules",
       "type": "string"
     },
+    "original": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "speedRows",
+        "jumpCurves",
+        "sine",
+        "battleRandom",
+        "partWeights",
+        "guardPowerDivisor",
+        "readinessMaximum",
+        "idleChargeTicks",
+        "passiveChargeTicks",
+        "chargePulseTicks"
+      ],
+      "properties": {
+        "speedRows": {
+          "minItems": 8,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "minItems": 9,
+            "maxItems": 9,
+            "type": "array",
+            "items": {
+              "minimum": 0,
+              "maximum": 40,
+              "type": "integer"
+            }
+          }
+        },
+        "jumpCurves": {
+          "type": "object",
+          "patternProperties": {
+            "^(.*)$": {
+              "minItems": 1,
+              "maxItems": 128,
+              "type": "array",
+              "items": {
+                "minimum": -16,
+                "maximum": 16,
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "sine": {
+          "minItems": 360,
+          "maxItems": 360,
+          "type": "array",
+          "items": {
+            "minimum": -128,
+            "maximum": 127,
+            "type": "integer"
+          }
+        },
+        "battleRandom": {
+          "minItems": 256,
+          "maxItems": 256,
+          "type": "array",
+          "items": {
+            "minimum": 0,
+            "maximum": 255,
+            "type": "integer"
+          }
+        },
+        "partWeights": {
+          "minItems": 8,
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "minItems": 4,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "minimum": 0,
+              "maximum": 100,
+              "type": "integer"
+            }
+          }
+        },
+        "guardPowerDivisor": {
+          "minimum": 1,
+          "maximum": 16,
+          "type": "integer"
+        },
+        "readinessMaximum": {
+          "minimum": 1,
+          "maximum": 1000,
+          "type": "integer"
+        },
+        "idleChargeTicks": {
+          "minimum": 1,
+          "maximum": 1000,
+          "type": "integer"
+        },
+        "passiveChargeTicks": {
+          "minimum": 1,
+          "maximum": 1000,
+          "type": "integer"
+        },
+        "chargePulseTicks": {
+          "minimum": 1,
+          "maximum": 1000,
+          "type": "integer"
+        }
+      }
+    },
     "tickRate": {
       "const": 60,
       "type": "number"
-    },
-    "protectHeadUntilPartsDestroyed": {
-      "description": "Helmet hits are absorbed by surviving limbs until both arms and legs are destroyed. Excess damage never carries into the head.",
-      "type": "boolean"
     },
     "roundTimeMs": {
       "minimum": 100,
@@ -53,90 +142,8 @@
       "type": "integer",
       "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
     },
-    "gravity": {
-      "minimum": 1,
-      "maximum": 100,
-      "type": "number"
-    },
-    "acceleration": {
-      "minimum": 1,
-      "maximum": 200,
-      "type": "number"
-    },
-    "friction": {
-      "minimum": 1,
-      "maximum": 200,
-      "type": "number"
-    },
-    "doubleTapMs": {
-      "minimum": 1,
-      "maximum": 1000,
-      "type": "integer",
-      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
-    },
-    "dashDurationMs": {
-      "minimum": 1,
-      "maximum": 1000,
-      "type": "integer",
-      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
-    },
-    "dashCooldownMs": {
-      "minimum": 1,
-      "maximum": 5000,
-      "type": "integer",
-      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
-    },
-    "dropThroughMs": {
-      "minimum": 1,
-      "maximum": 2000,
-      "type": "integer",
-      "description": "Duration in milliseconds, rounded up to integer 60Hz simulation ticks."
-    },
-    "guardDamageMultiplier": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number",
-      "description": "Fraction of incoming damage retained while guarding (0–1)."
-    },
-    "guardKnockbackMultiplier": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number",
-      "description": "Fraction of knockback retained while guarding (0–1)."
-    },
-    "brokenLegSpeedMultiplier": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number"
-    },
-    "brokenLegJumpMultiplier": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number"
-    },
-    "brokenLegDashMultiplier": {
-      "minimum": 0,
-      "maximum": 1,
-      "type": "number"
-    },
     "specialMaximum": {
-      "minimum": 1,
-      "maximum": 1000,
-      "type": "number"
-    },
-    "chargePerSecond": {
-      "minimum": 0.1,
-      "maximum": 1000,
-      "type": "number"
-    },
-    "meterPerDamageDealt": {
-      "minimum": 0,
-      "maximum": 10,
-      "type": "number"
-    },
-    "meterPerDamageReceived": {
-      "minimum": 0,
-      "maximum": 10,
+      "const": 51,
       "type": "number"
     }
   }

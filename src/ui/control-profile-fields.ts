@@ -10,13 +10,14 @@ import { element, button } from './dom';
 const ACTION_LABELS: Record<InputAction, string> = {
   moveLeft: 'Move left',
   moveRight: 'Move right',
-  jump: 'Jump',
-  dropThroughPlatform: 'Drop through platform',
-  rightArm: 'Right arm / Primary',
-  leftArm: 'Left arm / Secondary',
-  head: 'Head weapon',
+  jump: 'A · Jump (hold for height)',
+  aimUp: 'D-pad up / Aim head',
+  dropThroughPlatform: 'D-pad down (Down + A to drop)',
+  rightArm: 'B · Attack (Up: head / Down: left)',
+  leftArm: 'Optional shortcut · Left arm',
+  head: 'Optional shortcut · Head weapon',
   guard: 'Guard (hold)',
-  chargeSpecial: 'Charge Medaforce (hold)',
+  chargeSpecial: 'Unused · Medaforce charges while idle',
   activateSpecial: 'Activate special',
   partnerStrategy: 'Partner strategy',
   pause: 'Pause / Resume',
@@ -35,6 +36,7 @@ export function createControlProfileFields(
 
     for (const [key, label, min, max, step] of [
       ['axisIndex', 'Horizontal axis', 0, 15, 1],
+      ['verticalAxisIndex', 'Vertical axis', 0, 15, 1],
       ['deadzone', 'Deadzone', 0, 0.9, 0.01],
       ['activationThreshold', 'Activation', 0.1, 1, 0.01],
     ] as const) {
@@ -60,7 +62,7 @@ export function createControlProfileFields(
 
   const rows = element('div', 'binding-rows');
 
-  for (const action of INPUT_ACTIONS) {
+  for (const action of INPUT_ACTIONS.filter((action) => action !== 'chargeSpecial')) {
     const row = element('div', 'binding-row');
     row.append(element('span', '', ACTION_LABELS[action]));
 
@@ -84,7 +86,8 @@ export function createControlProfileFields(
         const next = structuredClone(profile);
         next.bindings[action] = input.value
           .split(',')
-          .map((v) => (v.trim() === '' ? NaN : Number(v.trim())));
+          .filter((value) => value.trim().length > 0)
+          .map((value) => Number(value.trim()));
         onChange(next);
       };
       row.append(input);

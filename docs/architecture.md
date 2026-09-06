@@ -1,5 +1,7 @@
 # Architecture
 
+For original-game behavior and the evidence behind future fidelity changes, see the [Medabots AX battle reference](original-battle-reference.md). This page describes the current prototype. See [fidelity status](ax-remaster-status.md) for implemented mechanics and known gaps.
+
 ```text
 Keyboard / gamepad ─┐
                    ├─ flat CombatantCommand ─ CommandFrame ─ battle-core
@@ -9,13 +11,13 @@ Seeded AI ─────────┘                                        
                                                         Three.js + HTML HUD
 ```
 
-`src/battle-core/` is ordinary deterministic TypeScript: no DOM, physical inputs, Three.js, Vite, timers, file access, or networking. `createBattle({ setup, content })` returns `step(frame)`, `getSnapshot()`, `drainEvents()`, and `getResult()`. Frames must contain one complete command per combatant and the next consecutive tick. Simulation runs at **60 fixed ticks per second** with stable entity ordering. Cooldowns, dash taps, attacks and statuses use ticks. The session clamps long real frame deltas to 100ms and uses an accumulator; rendering uses `requestAnimationFrame` separately.
+`src/battle-core/` is ordinary deterministic TypeScript: no DOM, physical inputs, Three.js, Vite, timers, file access, or networking. `createBattle({ setup, content })` returns `step(frame)`, `getSnapshot()`, `drainEvents()`, and `getResult()`. Frames must contain one complete command per combatant and the next consecutive tick. The session advances at the original GBA cadence, **16777216 / 280896 updates per second** (about 59.7275 Hz), with stable actor order A1, B1, A2, B2. UI seconds and millisecond content conversion retain the original nominal 60-update convention. Cooldowns, dash taps, attacks and statuses use ticks. The session clamps long real frame deltas to 100ms and uses an accumulator; rendering uses `requestAnimationFrame` separately.
 
 Definitions are frozen shared content. Runtime state owns positions, velocities, armor, uses, cooldowns, attacks, projectiles, strategies, and meters. Snapshots are detached plain objects, including stable combatant/projectile IDs and the current result; JSON stringify/parse preserves render state. Events describe transient hits, attacks, debris and results. Missing an old event cannot permanently hide an intact part or resurrect a destroyed one.
 
-The seeded 32-bit random generator drives deterministic AI choices; core combat itself requires no random rolls. Identical validated content, setup, seed, and command frames reproduce the same outcome. Tests run whole matches without browser globals and report seed, tick, recent frames and snapshot on scenario execution failures.
+Core combat consumes the original 256-byte random table through a snapshot-owned cursor initialized from the setup seed. The utility AI still uses a separate seeded 32-bit generator; this is a documented fidelity gap. Identical validated content, setup, seed, and command frames reproduce the same outcome. Tests run whole matches without browser globals and report seed, tick, recent frames and snapshot on scenario execution failures.
 
-`LocalBattleSession` combines human and AI commands, enforces local strategy eligibility, advances the core, and handles pause/focus/controller lifecycle. Presentation receives snapshots/events, interpolates supplied snapshot pairs using a caller-provided interpolation fraction (not a hardcoded tick gap), and never calculates damage or winners. Camera shake, impact freeze, particles and final-hit slow presentation do not modify the simulation. Static arena meshes are batched by material; outlines use enlarged back faces, and inexpensive contact shadows keep software-rendered browsers usable. Temporary effects are capped at 160 objects.
+`LocalBattleSession` combines human and AI commands, enforces local strategy eligibility, advances the core, and handles pause/focus/controller lifecycle. Presentation receives snapshots/events, interpolates supplied snapshot pairs using a caller-provided interpolation fraction (not a hardcoded tick gap), and never calculates damage or winners. Camera shake, impact freeze, particles and final-hit slow presentation do not modify the simulation. Static arena meshes are batched by material. The initial characters use cel-art texture regions on flat planes; their outlines are in the artwork. Inexpensive contact shadows keep software-rendered browsers usable. Moving platforms and live support/special objects have persistent snapshot state. Original Medaforce startup has its own authoritative simulation pause, separate from presentation-only impact freeze. Temporary effects are capped at 160 objects.
 
 ## Integrating the battle feature later
 
@@ -38,6 +40,7 @@ const mounted = mountLocalBattle({
   },
 });
 
+await mounted.ready; // Assets and presentation are ready; getSnapshot() is null while loading.
 mounted.dispose(); // Removes listeners, animation loop, UI and WebGL resources.
 ```
 

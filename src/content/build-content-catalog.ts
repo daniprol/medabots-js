@@ -8,6 +8,7 @@ import { validateContent } from './validate-content';
 export function buildContentCatalog(documents: RawDocument[]): ContentCatalog {
   const catalog: ContentCatalog = {
     rules: {},
+    medals: {},
     abilities: {},
     parts: {},
     characters: {},
@@ -46,25 +47,17 @@ export function buildContentCatalog(documents: RawDocument[]): ContentCatalog {
 
 function addRuntimeDefinition(catalog: ContentCatalog, definition: Definition) {
   switch (definition.kind) {
+    case 'medal':
+      catalog.medals[definition.id] = definition;
+      break;
     case 'rules':
       catalog.rules[definition.id] = {
         ...definition,
         roundTicks: millisecondsToTicks(definition.roundTimeMs),
-        doubleTapTicks: millisecondsToTicks(definition.doubleTapMs),
-        dashDurationTicks: millisecondsToTicks(definition.dashDurationMs),
-        dashCooldownTicks: millisecondsToTicks(definition.dashCooldownMs),
-        dropThroughTicks: millisecondsToTicks(definition.dropThroughMs),
       };
       break;
     case 'ability':
-      catalog.abilities[definition.id] = {
-        ...definition,
-        startupTicks: millisecondsToTicks(definition.startupMs),
-        activeTicks: millisecondsToTicks(definition.activeMs),
-        recoveryTicks: millisecondsToTicks(definition.recoveryMs),
-        staggerTicks: millisecondsToTicks(definition.staggerMs),
-        projectileLifetimeTicks: millisecondsToTicks(definition.projectileLifetimeMs),
-      };
+      catalog.abilities[definition.id] = definition;
       break;
     case 'ai':
       catalog.ai[definition.id] = {

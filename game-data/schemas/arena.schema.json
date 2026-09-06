@@ -6,6 +6,7 @@
   "required": [
     "id",
     "kind",
+    "original",
     "displayName",
     "subtitle",
     "width",
@@ -25,6 +26,139 @@
     "kind": {
       "const": "arena",
       "type": "string"
+    },
+    "original": {
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "fieldId",
+        "tiles",
+        "movingPlatforms",
+        "waterY",
+        "theme"
+      ],
+      "properties": {
+        "fieldId": {
+          "minimum": 0,
+          "maximum": 18,
+          "type": "integer"
+        },
+        "tiles": {
+          "minItems": 46,
+          "maxItems": 46,
+          "type": "array",
+          "items": {
+            "minItems": 54,
+            "maxItems": 54,
+            "type": "array",
+            "items": {
+              "minimum": 0,
+              "maximum": 255,
+              "type": "integer"
+            }
+          }
+        },
+        "movingPlatforms": {
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "additionalProperties": false,
+            "type": "object",
+            "required": [
+              "id",
+              "x",
+              "y",
+              "direction",
+              "minimum",
+              "maximum",
+              "width",
+              "endpointWaitTicks"
+            ],
+            "properties": {
+              "id": {
+                "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                "type": "string",
+                "description": "Globally unique, stable kebab-case content identifier."
+              },
+              "x": {
+                "minimum": -128,
+                "maximum": 512,
+                "type": "integer"
+              },
+              "y": {
+                "minimum": 0,
+                "maximum": 368,
+                "type": "integer"
+              },
+              "direction": {
+                "minimum": 1,
+                "maximum": 4,
+                "type": "integer"
+              },
+              "minimum": {
+                "minimum": -128,
+                "maximum": 512,
+                "type": "integer"
+              },
+              "maximum": {
+                "minimum": -128,
+                "maximum": 512,
+                "type": "integer"
+              },
+              "width": {
+                "minimum": 1,
+                "maximum": 128,
+                "type": "integer"
+              },
+              "endpointWaitTicks": {
+                "minimum": 0,
+                "maximum": 255,
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "waterY": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "maximum": 368,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "theme": {
+          "anyOf": [
+            {
+              "const": "ruins",
+              "type": "string"
+            },
+            {
+              "const": "forest",
+              "type": "string"
+            },
+            {
+              "const": "industrial",
+              "type": "string"
+            },
+            {
+              "const": "ice",
+              "type": "string"
+            },
+            {
+              "const": "aquatic",
+              "type": "string"
+            },
+            {
+              "const": "volcanic",
+              "type": "string"
+            }
+          ]
+        }
+      }
     },
     "displayName": {
       "type": "string"

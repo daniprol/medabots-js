@@ -1,4 +1,3 @@
-// Armor regions use local centers; X mirrors with facing. Feet are Y = 0.
 {
   "$schema": "../../schemas/character.schema.json",
   "id": "metabee",
@@ -6,14 +5,41 @@
   "displayName": "Metabee",
   "tagline": "PRECISION / RANGED",
   "visual": {
-    "type": "procedural",
-    "model": "metabee",
+    "type": "sprite",
+    "url": "/assets/characters/hd2d/medabots-atlas.png",
     "color": "#f8bc27",
     "accent": "#fff3c7",
+    "frameSize": 320,
+    "frames": [
+      {
+        "x": 45,
+        "y": 9,
+        "width": 236,
+        "height": 303,
+      },
+      {
+        "x": 338,
+        "y": 34,
+        "width": 270,
+        "height": 277,
+      },
+      {
+        "x": 626,
+        "y": 0,
+        "width": 251,
+        "height": 292,
+      },
+      {
+        "x": 951,
+        "y": 28,
+        "width": 280,
+        "height": 285,
+      },
+    ],
   },
   "collider": {
-    "width": 1.5,
-    "height": 2.4,
+    "width": 2,
+    "height": 4,
   },
   "hitRegions": {
     "head": {
@@ -48,4 +74,7 @@
     "legs": "metabee-legs",
   },
   "specialAbilityId": "metabee-medaforce",
+  "medalId": "kabuto-medal",
+  "medalLevel": 1,
+  "originalSetId": 0,
 }

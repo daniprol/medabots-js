@@ -88,13 +88,22 @@ export function selectCharacter(
 export function characterStats(id: string, content: ContentCatalog) {
   const character = content.characters[id]!;
   const parts = Object.values(character.defaultLoadout).map((id) => content.parts[id]!);
-  const movement = content.parts[character.defaultLoadout.legs]!.movement!;
+  const legs = content.parts[character.defaultLoadout.legs]!;
+  const rules = Object.values(content.rules)[0]!.original;
+  const speed = rules.speedRows[legs.speedIndex]!;
+  const family = legs.locomotion === 5 ? 'type5' : legs.locomotion === 6 ? 'type6' : 'ordinary';
+  let altitude = 0;
+  let jump = 0;
+  for (const sample of rules.jumpCurves[`${family}_full`]!) {
+    altitude += sample;
+    jump = Math.max(jump, altitude);
+  }
   const abilities = parts.flatMap((p) => (p.abilityId ? [content.abilities[p.abilityId]!] : []));
 
   return {
     armor: parts.reduce((n, p) => n + p.armor, 0),
-    speed: movement.speed,
-    jump: movement.jumpSpeed,
+    speed: speed[1]! / 4,
+    jump: jump / 8,
     power: Math.max(...abilities.map((a) => a.damage)),
     special: content.abilities[character.specialAbilityId]!,
     style:

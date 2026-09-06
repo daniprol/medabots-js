@@ -1,9 +1,15 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-head",
   "kind": "part",
   "slot": "head",
-  "armor": 600,
+  "armor": 45,
   "abilityId": "warbandit-head-attack",
+  "originalId": 5,
+  "displayName": "Tension Up",
+  "defense": 4,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
 }

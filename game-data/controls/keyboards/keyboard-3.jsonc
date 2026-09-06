@@ -1,4 +1,3 @@
-// Physical KeyboardEvent.code bindings. All menu presets come from these definitions.
 {
   "$schema": "../../schemas/keyboard.schema.json",
   "id": "keyboard-3",
@@ -7,15 +6,16 @@
   "bindings": {
     "moveLeft": ["Numpad4"],
     "moveRight": ["Numpad6"],
-    "jump": ["Numpad8"],
+    "jump": ["Numpad3"],
     "dropThroughPlatform": ["Numpad5"],
     "rightArm": ["Numpad1"],
-    "leftArm": ["Numpad2"],
-    "head": ["Numpad3"],
-    "guard": ["Numpad0"],
-    "chargeSpecial": ["Numpad7"],
-    "activateSpecial": ["Numpad9"],
-    "partnerStrategy": ["NumpadAdd"],
+    "leftArm": [],
+    "head": [],
+    "guard": ["Numpad7"],
+    "chargeSpecial": [],
+    "activateSpecial": ["Numpad0"],
+    "partnerStrategy": ["Numpad9"],
     "pause": ["NumpadEnter"],
+    "aimUp": ["Numpad8"],
   },
 }

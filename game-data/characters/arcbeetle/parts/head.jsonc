@@ -1,9 +1,15 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "arcbeetle-head",
   "kind": "part",
   "slot": "head",
-  "armor": 700,
+  "armor": 45,
   "abilityId": "arcbeetle-head-attack",
+  "originalId": 29,
+  "displayName": "Prominence",
+  "defense": 3,
+  "locomotion": 0,
+  "speedIndex": 0,
+  "attackRanks": [0, 0, 0],
+  "defenseRank": 0,
 }

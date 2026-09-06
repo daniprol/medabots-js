@@ -1,13 +1,14 @@
-// Armor points. Limbs protect the head until both arms and legs are destroyed.
 {
   "$schema": "../../../schemas/part.schema.json",
   "id": "warbandit-legs",
   "kind": "part",
   "slot": "legs",
-  "armor": 520,
-  "movement": {
-    "speed": 8,
-    "jumpSpeed": 17.6,
-    "dashSpeed": 19,
-  },
+  "armor": 50,
+  "originalId": 5,
+  "displayName": "Abductor",
+  "defense": 4,
+  "locomotion": 0,
+  "speedIndex": 3,
+  "attackRanks": [3, 0, 1],
+  "defenseRank": 1,
 }
