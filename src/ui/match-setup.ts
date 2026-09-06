@@ -3,9 +3,14 @@ import type { ContentCatalog } from '../content/catalog';
 import type { Assignments } from '../input/bindings';
 import { connectedGamepads } from '../input/gamepad-input';
 import { spritePortrait } from '../render/sprite-assets';
+import { createArenaPreview } from './arena-preview';
+import { controllerAssignment } from './controller-assignment';
 import { createControllerMenu } from './controller-menu';
 import { element, button } from './dom';
 import {
+  assignmentsForSetup,
+  resizeTeams,
+  type TeamSize,
   characterStats,
   controllerLabel,
   quickAssignments,
@@ -26,7 +31,7 @@ export function createMatchSetup(
 ) {
   let content = initialContent;
   let setup = structuredClone(initialSetup);
-  let assignments = structuredClone(saved);
+  let assignments = assignmentsForSetup(setup, saved);
   let selectedSlot = 'A1';
   let menu: ReturnType<typeof createControllerMenu> | undefined;
   const screen = element('section', 'prepare-screen');
@@ -36,6 +41,25 @@ export function createMatchSetup(
     element('h1', 'game-logo', 'ROBATTLE'),
     element('span', '', 'Choose your Medabots'),
   );
+  const sizeLabel = element('label', 'match-size', 'Match size');
+  const size = element('select');
+  size.setAttribute('aria-label', 'Match size');
+  for (const count of [1, 2, 3]) {
+    const option = element('option', '', `${count} vs ${count}`);
+    option.value = String(count);
+    size.append(option);
+  }
+  size.value = String(setup.teams[0]!.combatants.length);
+  size.onchange = () => {
+    setup = resizeTeams(setup, Number(size.value) as TeamSize, content);
+    assignments = assignmentsForSetup(setup, assignments);
+    if (!assignments[selectedSlot]) {
+      selectedSlot = 'A1';
+    }
+    refresh();
+  };
+  header.append(sizeLabel);
+  sizeLabel.append(size);
   screen.append(header);
 
   const teams = element('div', 'prepare-teams');
@@ -53,6 +77,8 @@ export function createMatchSetup(
   screen.append(selection);
 
   const footer = element('footer', 'prepare-footer');
+  const preview = createArenaPreview();
+  preview.update(content.arenas[setup.arenaId]!);
   const fieldLabel = element('label', 'field-picker', 'Battle field');
   const fields = element('select');
   fields.setAttribute('aria-label', 'Battle field');
@@ -66,6 +92,7 @@ export function createMatchSetup(
   fields.value = setup.arenaId;
   fields.onchange = () => {
     setup.arenaId = fields.value;
+    preview.update(content.arenas[setup.arenaId]!);
   };
   fieldLabel.append(fields);
   const controls = button(
@@ -95,7 +122,9 @@ export function createMatchSetup(
     },
     'menu-button menu-primary',
   );
-  footer.append(fieldLabel, controls, start);
+  const scenario = element('div', 'scenario-picker');
+  scenario.append(preview.element, fieldLabel);
+  footer.append(scenario, controls, start);
   screen.append(footer);
   const status = element('p', 'prepare-status');
   status.setAttribute('aria-live', 'polite');
@@ -117,6 +146,7 @@ export function createMatchSetup(
       .flatMap((team) => team.combatants)
       .find((actor) => actor.instanceId === selectedSlot)!;
     teams.replaceChildren();
+    teams.dataset.size = String(setup.teams[0]!.combatants.length);
     for (const [index, team] of setup.teams.entries()) {
       const group = element(
         'section',
@@ -152,7 +182,15 @@ export function createMatchSetup(
           element('span', 'input-source', controllerLabel(assignments[actor.instanceId]!, content)),
         );
         pick.append(portrait(actor.characterId), text);
-        slots.append(pick);
+        const card = element('div', 'team-slot');
+        card.append(
+          pick,
+          controllerAssignment(actor.instanceId, assignments, content, (next) => {
+            assignments[actor.instanceId] = next;
+            refresh();
+          }),
+        );
+        slots.append(card);
       }
       group.append(slots);
       teams.append(group);
@@ -218,12 +256,13 @@ export function createMatchSetup(
       .join(',');
     if (next !== signature) {
       signature = next;
-      updateStatus();
+      refresh();
     }
   }, 300);
   return {
     dispose() {
       clearInterval(interval);
+      preview.dispose();
       menu?.dispose();
       screen.remove();
     },

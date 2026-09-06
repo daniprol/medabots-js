@@ -249,4 +249,7 @@
     ],
   },
   "variant": 0,
+  "displayName": "Normal",
+  "decisionIntervalTicks": 1,
+  "attackDelayTicks": 0,
 }

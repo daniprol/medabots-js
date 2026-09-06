@@ -334,6 +334,9 @@ export const GamepadSchema = strictObject({
 export const AISchema = strictObject({
   ...base,
   kind: Type.Literal('ai'),
+  displayName: Type.String({ minLength: 1 }),
+  decisionIntervalTicks: integer(1, 60),
+  attackDelayTicks: integer(0, 120),
   variant: integer(0, 5),
   original: strictObject({
     profiles: Type.Array(
@@ -414,12 +417,12 @@ export const MatchSchema = strictObject({
       id,
       combatants: Type.Array(
         strictObject({
-          instanceId: Type.String({ pattern: '^[AB][12]$' }),
+          instanceId: Type.String({ pattern: '^[AB][123]$' }),
           characterId: id,
           role: Type.Union([Type.Literal('leader'), Type.Literal('partner')]),
           loadout: Type.Optional(loadout),
         }),
-        { minItems: 2, maxItems: 2 },
+        { minItems: 1, maxItems: 3 },
       ),
     }),
     { minItems: 2, maxItems: 2 },

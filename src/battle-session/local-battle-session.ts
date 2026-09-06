@@ -126,17 +126,26 @@ export class LocalBattleSession {
               draw,
             )
           : this.input.read(combatant.id)!.command;
-      const partner = this.current.combatants.find(
-        (partner) => partner.teamId === combatant.teamId && partner.role === 'partner',
-      );
-
-      if (combatant.role !== 'leader' || !partner || this.assignments[partner.id]?.type !== 'ai') {
+      if (combatant.role !== 'leader') {
         command.strategyPressed = false;
       }
-
       frame.commands[combatant.id] = command;
     }
 
+    // The session knows controller ownership; the core only sees normalized commands.
+    for (const leader of this.current.combatants.filter((actor) => actor.role === 'leader')) {
+      const command = frame.commands[leader.id]!;
+      if (command.strategyPressed) {
+        for (const partner of this.current.combatants.filter(
+          (actor) => actor.teamId === leader.teamId && actor.role === 'partner',
+        )) {
+          if (this.assignments[partner.id]?.type === 'ai') {
+            frame.commands[partner.id]!.strategyPressed = true;
+          }
+        }
+        command.strategyPressed = false;
+      }
+    }
     return frame;
   }
 

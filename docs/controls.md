@@ -1,8 +1,8 @@
 # Controls and local multiplayer
 
-Choose a character and field, then press **Start Robattle**. Open **Controls** to assign a keyboard profile, connected gamepad, or CPU independently to A1, A2, B1, and B2. Leaders are marked ◆. Any unassigned slot uses AI.
+Choose **1 vs 1**, **2 vs 2**, or **3 vs 3**, pick characters and a field, then press **Start Robattle**. Each robot card has its controller and AI difficulty directly below it. Open **Controls** to assign a keyboard profile, connected gamepad, or CPU independently to every active slot. Leaders are marked ◆. Any unassigned slot uses AI.
 
-In **Controls → Players**, **2 on one keyboard** assigns the opposing leaders to separate shared presets. The dialog also has a three-player preset and automatic gamepad assignment. Choose team slots individually for co-op. Duplicate keyboard profiles and gamepads are blocked, and overlapping active keys are reported. Up to four humans can play on the same computer.
+In **Controls → Players**, **2 on one keyboard** assigns the opposing leaders to separate shared presets. The dialog also has a three-player preset and automatic gamepad assignment. Choose team slots individually for co-op. Duplicate keyboard profiles and gamepads are blocked, and overlapping active keys are reported. Up to six humans can play on the same computer.
 
 ## Original-style input
 
@@ -21,7 +21,7 @@ B uses the right arm. **Up+B** uses the head; **Down+B** uses the left arm. Up t
 
 Each weapon refills independently. Readiness must reach full before starting another normal action, with a separate buffer for right-arm combos. Head weapons have limited uses. Broken arms retain a weak frame strike. Heads can receive unguarded damage before other parts break; the earlier prototype's global head shield was incorrect. Facing an incoming attack while guarding reduces its power and redirects selection toward the strongest surviving limb.
 
-Medaforce fills passively and while standing idle. At full displayed meter, press Select to activate it. There is no charge button in this original-style layout. R cycles five AI-partner panels: right arm, left arm, head, enemy leader, enemy partner. Panel changes take effect after a short delay. A human partner ignores the leader's panel input. AI behavior is still an approximation of AX.
+Medaforce fills passively and while standing idle. At full displayed meter, press Select to activate it. There is no charge button in this original-style layout. R cycles five AI-partner panels: right arm, left arm, head, enemy leader, enemy partner. Panel changes take effect after a short delay. Leader orders reach all AI partners on that team; human teammates ignore them. In a duel the order button does nothing. AI behavior is still an approximation of AX.
 
 ## Gamepads
 
@@ -38,3 +38,7 @@ Edit `game-data/controls/keyboards/*.jsonc` or `gamepads/standard-gamepad.jsonc`
 The **How to play** tab shows a directional pad, large action keys, and the head/left-arm/drop combinations. Select a key to capture a replacement; Escape cancels capture. **Extra keys & shortcuts** holds alternate bindings and advanced gamepad mapping. **Done** validates and applies edits; the close button discards them; **Reset these keys** restores the selected preset. Reloading restores JSONC values.
 
 A shared keyboard can suppress simultaneous combinations due to hardware ghosting. Non-overlapping profiles prevent software conflicts, but cannot remove that hardware limitation. Use different combinations, an anti-ghosting keyboard, or gamepads when needed. Touch and online play are not implemented.
+
+## AI difficulty
+
+Easy reacts every 12 ticks and waits longer between attacks. Normal retains the existing balanced profile. Hard uses the defensive profile, including threat-based guarding. These presets change AI decisions, not armor, weapon power, or human controls. Tune `displayName`, `decisionIntervalTicks`, `attackDelayTicks`, and `variant` in `game-data/ai/*.jsonc`. They are browser difficulty presets, not original AX difficulty labels.

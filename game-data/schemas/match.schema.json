@@ -57,8 +57,8 @@
             "description": "Globally unique, stable kebab-case content identifier."
           },
           "combatants": {
-            "minItems": 2,
-            "maxItems": 2,
+            "minItems": 1,
+            "maxItems": 3,
             "type": "array",
             "items": {
               "additionalProperties": false,
@@ -70,7 +70,7 @@
               ],
               "properties": {
                 "instanceId": {
-                  "pattern": "^[AB][12]$",
+                  "pattern": "^[AB][123]$",
                   "type": "string"
                 },
                 "characterId": {

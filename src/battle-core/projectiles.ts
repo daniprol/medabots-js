@@ -146,7 +146,7 @@ export function spawnProjectile(
   index = 0,
 ) {
   if (
-    context.state.projectiles.length >= 20 ||
+    context.state.projectiles.length >= Math.max(20, context.state.combatants.length * 5) ||
     context.state.projectiles.filter((projectile) => projectile.ownerId === attacker.id).length >= 4
   ) {
     return;

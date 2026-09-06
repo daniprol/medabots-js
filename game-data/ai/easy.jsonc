@@ -1,6 +1,6 @@
 {
   "$schema": "../schemas/ai.schema.json",
-  "id": "ai-aggressive",
+  "id": "ai-easy",
   "kind": "ai",
   "original": {
     "profiles": [
@@ -248,8 +248,8 @@
       ],
     ],
   },
-  "variant": 5,
-  "displayName": "Hard",
-  "decisionIntervalTicks": 1,
-  "attackDelayTicks": 0,
+  "variant": 0,
+  "displayName": "Easy",
+  "decisionIntervalTicks": 12,
+  "attackDelayTicks": 24,
 }

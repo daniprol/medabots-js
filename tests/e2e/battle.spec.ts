@@ -21,13 +21,13 @@ test('setup discovers controls and the default roster enters the arena without c
     }
   });
   await page.getByRole('button', { name: 'Controls', exact: true }).click();
-  await expect(page.getByLabel('A1 controller')).toHaveValue('keyboard-solo');
+  await expect(page.getByRole('dialog').getByLabel('A1 controller')).toHaveValue('keyboard-solo');
   await expect(
-    page.getByLabel('A2 controller').locator('option[value="keyboard-solo"]'),
+    page.getByRole('dialog').getByLabel('A2 controller').locator('option[value="keyboard-solo"]'),
   ).toHaveJSProperty('disabled', true);
-  await expect(page.getByLabel('A2 controller').locator('option[value="keyboard-3"]')).toHaveCount(
-    1,
-  );
+  await expect(
+    page.getByRole('dialog').getByLabel('A2 controller').locator('option[value="keyboard-3"]'),
+  ).toHaveCount(1);
   await page.getByRole('button', { name: 'Done', exact: false }).click();
   await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('battle-hud')).toBeVisible();
@@ -58,7 +58,7 @@ test('three profiles assign without conflicts; two keyboards move and attack ind
   await page.getByRole('button', { name: 'Controls', exact: true }).click();
   await page.getByRole('button', { name: 'Players', exact: true }).click();
   await page.getByLabel('Player setup', { exact: true }).selectOption('shared-three');
-  await expect(page.getByLabel('A2 controller')).toHaveValue('keyboard-3');
+  await expect(page.getByRole('dialog').getByLabel('A2 controller')).toHaveValue('keyboard-3');
   await page.getByRole('button', { name: 'Done', exact: false }).click();
   await page.getByRole('button', { name: 'Start Robattle', exact: false }).click();
   await expect(page.getByTestId('battle-hud')).toBeVisible();
@@ -157,7 +157,7 @@ test('returning from a match with omitted assignments fills the other slots with
   await page.evaluate(() => window.__BATTLE_DEBUG__!.returnToSetup());
   await expect(page.getByTestId('match-setup')).toBeVisible();
   await page.getByRole('button', { name: 'Controls', exact: true }).click();
-  await expect(page.getByLabel('A2 controller')).toHaveValue('ai');
+  await expect(page.getByRole('dialog').getByLabel('A2 controller')).toHaveValue('ai');
 });
 
 test('character selection and session key editing survive a battle and return to setup', async ({
@@ -231,7 +231,57 @@ test('the complete roster and large control guide fit a mobile screen', async ({
   expect(await dialog.evaluate((node) => node.scrollWidth)).toBeLessThanOrEqual(390);
   await page.getByRole('button', { name: 'Players', exact: true }).click();
   await page.getByLabel('Player setup', { exact: true }).selectOption('shared-two');
-  await expect(page.getByLabel('B1 controller')).toHaveValue('keyboard-2');
+  await expect(page.getByRole('dialog').getByLabel('B1 controller')).toHaveValue('keyboard-2');
   await page.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(dialog).toHaveCount(0);
+});
+
+test('team sizes, field preview and per-robot difficulty survive battle navigation', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  const menu = page.getByTestId('match-setup');
+  await menu.getByLabel('Match size', { exact: true }).selectOption('3');
+  await expect(menu.getByRole('button', { name: /^Select / })).toHaveCount(6);
+  await menu.getByLabel('A3 AI difficulty').selectOption('ai-easy');
+  await menu.getByLabel('B3 AI difficulty').selectOption('ai-aggressive');
+  await menu.getByLabel('B1 controller', { exact: true }).selectOption('keyboard-3');
+  await menu.getByLabel('Battle field', { exact: true }).selectOption({ label: 'Factory 1' });
+  await expect(page.getByTestId('arena-preview')).toHaveAttribute(
+    'aria-label',
+    'Factory 1 battlefield preview',
+  );
+  await page.getByRole('button', { name: 'Start Robattle', exact: true }).click();
+  await expect(page.getByTestId('battle-hud')).toContainText('3 VS 3');
+  await expect(page.getByTestId('fighter-A3')).toContainText('CPU · Easy');
+  await expect(page.getByTestId('fighter-B3')).toContainText('CPU · Hard');
+  await expect(page.getByTestId('fighter-B1')).toContainText('KEY 3');
+  await expect
+    .poll(() => page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.combatants.length))
+    .toBe(6);
+  const bar = page.getByRole('meter', { name: 'A3 HEAD armor', exact: true });
+  await expect(bar).toHaveAttribute('aria-valuenow', /\d+/);
+  const headBounds = await bar.boundingBox();
+  const legBounds = await page
+    .getByRole('meter', { name: 'A3 LEGS armor', exact: true })
+    .boundingBox();
+  expect(headBounds!.width).toBeGreaterThan(50);
+  expect(legBounds!.y - headBounds!.y).toBeGreaterThan(40);
+
+  const labelSize = await page
+    .getByTestId('fighter-A3')
+    .evaluate((node) => parseFloat(getComputedStyle(node.querySelector('.armor-row')!).fontSize));
+  expect(labelSize).toBeGreaterThanOrEqual(14);
+  await page.evaluate(() => window.__BATTLE_DEBUG__!.returnToSetup());
+  await expect(menu.getByLabel('A3 AI difficulty')).toHaveValue('ai-easy');
+  await menu.getByLabel('Match size', { exact: true }).selectOption('1');
+  await expect(menu.getByRole('button', { name: /^Select / })).toHaveCount(2);
+  await page.getByRole('button', { name: 'Start Robattle', exact: true }).click();
+  await expect(page.getByTestId('battle-hud')).toContainText('1 VS 1');
+  await page.keyboard.press('s');
+  await expect
+    .poll(() => page.evaluate(() => window.__BATTLE_DEBUG__!.getSnapshot()!.tick))
+    .toBeGreaterThan(20);
+  await page.evaluate(() => window.__BATTLE_DEBUG__!.restart({ roundTimeMs: 1000 }));
+  await expect(page.getByTestId('battle-results')).toBeVisible();
 });

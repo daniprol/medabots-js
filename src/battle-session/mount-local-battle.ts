@@ -74,7 +74,7 @@ function mountPreparedBattle(options: MountBattleOptions) {
   const portraits = Object.fromEntries(
     session.current.combatants.map((c) => [c.characterId, renderer.portrait(c.characterId)]),
   );
-  const hud = createHUD(viewport, content, session.current, assignments, portraits, () =>
+  const hud = createHUD(screen, content, session.current, assignments, portraits, () =>
     session.pause(),
   );
   const controls = controlsStrip(content, assignments);

@@ -224,12 +224,17 @@
   background: #fff0b1;
 }
 .prepare-footer {
+  position: sticky;
+  bottom: -24px;
+  z-index: 2;
+  background: #d4e8dc;
+  padding: 12px 0;
+  box-shadow: 0 -8px 16px #c5e2d9;
   display: grid;
   grid-template-columns: minmax(200px, 1fr) auto auto;
   align-items: end;
   gap: 18px;
   margin-top: 24px;
-  padding-bottom: 10px;
 }
 .field-picker,
 .guide-picker {
@@ -774,5 +779,172 @@
   .controls-menu * {
     scroll-behavior: auto;
     transition: none;
+  }
+}
+
+/* Match options stay beside the robot they affect, including on narrow screens. */
+.match-size {
+  display: grid;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 17px;
+}
+.match-size select,
+.controller-assignment select {
+  min-height: 44px;
+  width: 100%;
+  font: inherit;
+  color: #18354b;
+  border: 2px solid #779fac;
+  border-radius: 5px;
+  background: #fffdf0;
+  padding: 7px;
+}
+.prepare-header > span {
+  margin-left: auto;
+}
+.team-slot {
+  min-width: 0;
+  border: 2px solid #648fa5;
+  border-radius: 9px;
+  background: #eaf2e6;
+  overflow: hidden;
+}
+.team-slot .team-pick {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: 90px;
+}
+.controller-assignment {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  font-size: 16px;
+}
+.controller-assignment label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  font-weight: 600;
+}
+.human-badge {
+  color: #14577e;
+  font-weight: 800;
+  letter-spacing: 1px;
+  min-height: 26px;
+}
+.prepare-teams[data-size='1'] .team-picks {
+  grid-template-columns: 1fr;
+}
+.prepare-teams[data-size='3'] .team-picks {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.prepare-teams[data-size='3'] .team-pick {
+  padding: 7px;
+  gap: 3px;
+}
+.prepare-teams[data-size='3'] .team-pick img {
+  width: 42px;
+  height: 68px;
+}
+.prepare-teams[data-size='3'] .team-pick-copy strong {
+  font-size: 18px;
+}
+.scenario-picker {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.scenario-picker .field-picker {
+  flex: 1;
+  min-width: 0;
+}
+.arena-preview {
+  width: 200px;
+  height: 100px;
+  object-fit: cover;
+  border: 3px solid #184b82;
+  border-radius: 6px;
+}
+.player-input-row .controller-assignment {
+  padding: 0;
+}
+@media (max-width: 1000px) {
+  .prepare-teams[data-size='3'] .team-picks {
+    grid-template-columns: 1fr;
+  }
+  .prepare-teams[data-size='3'] .team-pick img {
+    width: 50px;
+  }
+  .prepare-teams[data-size='3'] .controller-assignment {
+    grid-template-columns: 1fr 1fr;
+  }
+  .arena-preview {
+    width: 150px;
+    height: 90px;
+  }
+}
+@media (max-width: 650px) {
+  .prepare-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .prepare-header > span {
+    display: none;
+  }
+  .match-size {
+    font-size: 16px;
+  }
+  .team-picks,
+  .prepare-teams[data-size='3'] .team-picks {
+    grid-template-columns: 1fr;
+  }
+  .prepare-teams[data-size='3'] .controller-assignment {
+    grid-template-columns: 1fr;
+  }
+  .team-pick .input-source {
+    display: none;
+  }
+  .controller-assignment {
+    font-size: 16px;
+    padding: 7px;
+  }
+  .scenario-picker {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .arena-preview {
+    width: 110px;
+    height: 76px;
+  }
+}
+
+@media (min-width: 1001px) {
+  .selected-robot {
+    height: 160px;
+  }
+  .robot-grid {
+    max-height: 320px;
+  }
+  .robot-collection {
+    padding: 14px;
+  }
+  .robot-profile {
+    padding: 14px;
+  }
+  .team-pick .input-source {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  .prepare-footer {
+    bottom: -14px;
+  }
+  .prepare-team .team-picks {
+    grid-auto-rows: minmax(235px, auto);
   }
 }

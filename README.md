@@ -2,9 +2,9 @@
 
 Pick a robot. Bring a friend. Break their armor.
 
-An unofficial browser-game fan prototype inspired by **Medabots AX for Game Boy Advance**. Fight real-time 2-vs-2 platform battles with crisp cel-style robots and layered HD-2D scenery, destructible parts, and keyboard or gamepad controls. Play alone with AI partners or share one computer with up to four players.
+An unofficial browser-game fan prototype inspired by **Medabots AX for Game Boy Advance**. Fight real-time 1-vs-1, 2-vs-2, or 3-vs-3 platform battles with crisp cel-style robots and layered HD-2D scenery, destructible parts, and keyboard or gamepad controls. Play alone with AI partners or share one computer with up to six combatants.
 
-![HD-2D robot battle with a four-corner armor HUD](docs/images/gameplay.png)
+![HD-2D team battle with segmented armor and readable player panels](docs/images/gameplay.png)
 
 ## Try it
 
@@ -19,7 +19,7 @@ You need [Node.js](https://nodejs.org/en/download) and pnpm 10. Use a current No
    pnpm dev
    ```
 
-Open **http://localhost:5173** (or the address printed in your terminal). Pick your character and press **Start Robattle**. Stop the development server with Ctrl+C.
+Open **http://localhost:5173** (or the address printed in your terminal). Choose a match size, pick your robots and battlefield, and press **Start Robattle**. Stop the development server with Ctrl+C.
 
 ## Play
 
@@ -36,7 +36,7 @@ Destroy the enemy leader’s head to win; knocking out a partner does not end th
 | S / A            | Partner panel / Medaforce    |
 | Escape or Enter  | Pause                        |
 
-Open **Controls → Players** and choose **2 on one keyboard** for two players. The same panel offers three-player and gamepad presets. **How to play** shows large key icons and attack combinations; select a key to change it. Connect a controller and press one of its buttons to make it appear. Unassigned slots use AI. All players share the same computer; online play is not implemented.
+Each robot card lets you choose a player controller or AI with **Easy**, **Normal**, or **Hard** difficulty. The battlefield thumbnail previews its scenery and platforms. Open **Controls → Players** and choose **2 on one keyboard** for two players. The same panel offers three-player and gamepad presets. **How to play** shows large key icons and attack combinations; select a key to change it. Connect a controller and press one of its buttons to make it appear. Unassigned slots use AI. All players share the same computer; online play is not implemented.
 
 **Choose from all 30 AX Medabots and 19 battlefields**, with 120 source-derived parts, 12 medals, support weapons, traps, status effects and Medaforce attacks. This remaster remains in progress: AI navigation and some weapon/special details still approximate the original. See the [fidelity status](docs/ax-remaster-status.md) for verified behavior and remaining work.
 

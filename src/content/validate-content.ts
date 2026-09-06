@@ -209,6 +209,9 @@ export function validateContent(
 
       const ids = new Set<string>();
       const teamIds = new Set<string>();
+      if (definition.teams[0]!.combatants.length !== definition.teams[1]!.combatants.length) {
+        invalidContent(sources[definition.id]!, '/teams', 'equally sized teams', definition.teams);
+      }
 
       for (const [ti, team] of definition.teams.entries()) {
         if (teamIds.has(team.id)) {
@@ -221,7 +224,7 @@ export function validateContent(
           invalidContent(
             sources[definition.id]!,
             `/teams/${ti}/combatants`,
-            'exactly one leader and one partner',
+            'exactly one leader',
             team.combatants,
           );
         }

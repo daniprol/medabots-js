@@ -2,6 +2,7 @@ import { type BattleSetup, type BattleSnapshot } from './battle-core';
 
 import './ui/styles.css';
 import './ui/roster.css';
+import './ui/battle-hud.css';
 import { millisecondsToTicks } from './battle-core/timing';
 import { mountLocalBattle } from './battle-session/mount-local-battle';
 import type { ContentCatalog } from './content/catalog';

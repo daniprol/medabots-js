@@ -4,15 +4,9 @@ import { type Assignments, keyLabel } from '../input/bindings';
 import { connectedGamepads } from '../input/gamepad-input';
 import { ACTION_LABELS, createControlProfileFields } from './control-profile-fields';
 import { replaceControlProfile } from './control-settings';
+import { controllerAssignment } from './controller-assignment';
 import { element, button } from './dom';
 import { presetAssignments, setupErrors, type SetupPreset } from './setup-state';
-
-const controllerValue = (assignment: Assignments[string]) =>
-  assignment.type === 'ai'
-    ? 'ai'
-    : assignment.type === 'keyboard'
-      ? assignment.profileId
-      : `pad:${assignment.gamepadIndex}`;
 
 export function createControllerMenu(
   root: HTMLElement,
@@ -122,6 +116,7 @@ export function createControllerMenu(
     assignments = presetAssignments(
       preset.value as SetupPreset,
       pads.map((pad) => pad.index),
+      Object.keys(assigned),
     );
     profileId =
       preset.value === 'solo'
@@ -166,55 +161,22 @@ export function createControllerMenu(
 
   function renderAssignments() {
     rows.replaceChildren();
-    for (const [id, assignment] of Object.entries(assignments)) {
-      const row = element('label', 'player-input-row');
+    for (const id of Object.keys(assignments)) {
+      const row = element('div', 'player-input-row');
       const text = element('span');
       text.append(
         element('strong', '', id),
         element('span', '', id.endsWith('1') ? 'Leader' : 'Partner'),
       );
-      const select = element('select');
-      select.setAttribute('aria-label', `${id} controller`);
-      const choices: [string, string][] = [
-        ['ai', 'Computer'],
-        ...Object.values(draftContent.keyboards).map(
-          (profile) => [profile.id, profile.displayName] as [string, string],
-        ),
-        ...connectedGamepads().map(
-          (pad) => [`pad:${pad.index}`, `Gamepad ${pad.index + 1}`] as [string, string],
-        ),
-      ];
-      const value = controllerValue(assignment);
-      if (!choices.some(([choice]) => choice === value)) {
-        choices.push([value, 'Disconnected gamepad']);
-      }
-      for (const [value, name] of choices) {
-        const option = element('option', '', name);
-        option.value = value;
-        option.disabled =
-          value !== 'ai' &&
-          Object.entries(assignments).some(
-            ([other, input]) => other !== id && controllerValue(input) === value,
-          );
-        select.append(option);
-      }
-      select.value = value;
-      select.onchange = () => {
-        assignments[id] =
-          select.value === 'ai'
-            ? { type: 'ai', aiProfileId: 'ai-balanced' }
-            : select.value.startsWith('pad:')
-              ? {
-                  type: 'gamepad',
-                  gamepadIndex: Number(select.value.slice(4)),
-                  profileId: 'standard-gamepad',
-                }
-              : { type: 'keyboard', profileId: select.value };
-        preset.value = 'custom';
-        error = '';
-        renderAssignments();
-      };
-      row.append(text, select);
+      row.append(
+        text,
+        controllerAssignment(id, assignments, draftContent, (next) => {
+          assignments[id] = next;
+          preset.value = 'custom';
+          error = '';
+          renderAssignments();
+        }),
+      );
       rows.append(row);
     }
     updateStatus();

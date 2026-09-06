@@ -4,6 +4,7 @@ import { TICK_DURATION_SECONDS } from '../src/battle-core/timing';
 import { LocalBattleSession } from '../src/battle-session/local-battle-session';
 import type { Assignments } from '../src/input/bindings';
 import { GamepadInput } from '../src/input/gamepad-input';
+import { resizeTeams } from '../src/ui/setup-state';
 import { content, setup } from './helpers';
 const pad = (axis = 0) => ({
   connected: true,
@@ -107,6 +108,27 @@ describe('local session controller lifecycle', () => {
     window.dispatchEvent(event);
     session.advance(TICK_DURATION_SECONDS);
     expect(session.current.combatants.find((actor) => actor.id === 'A2')!.panelIndex).toBe(3);
+    session.dispose();
+  });
+  it('leader orders reach every AI partner and skip human teammates in a 3 vs 3 match', () => {
+    const session = new LocalBattleSession(
+      resizeTeams(setup, 3, content),
+      {
+        A1: { type: 'keyboard', profileId: 'keyboard-1' },
+        A2: { type: 'keyboard', profileId: 'keyboard-2' },
+      },
+      content,
+    );
+    const press = (code: string) => {
+      const event = new Event('keydown');
+      Object.defineProperty(event, 'code', { value: code });
+      window.dispatchEvent(event);
+    };
+    press('KeyO'); // Human partner's order key is ignored.
+    press('KeyT'); // Leader orders the AI partner only.
+    session.advance(TICK_DURATION_SECONDS);
+    expect(session.current.combatants.find((actor) => actor.id === 'A2')!.panelIndex).toBe(3);
+    expect(session.current.combatants.find((actor) => actor.id === 'A3')!.panelIndex).toBe(4);
     session.dispose();
   });
 });

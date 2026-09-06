@@ -186,7 +186,7 @@ export function advanceAttack(
   }
   const ability = context.content.abilities[attack.abilityId]!;
   if (!attack.initialized) {
-    if ((context.state.tick & 3) !== actor.actorIndex) {
+    if ((context.state.tick & 3) !== (actor.actorIndex & 3)) {
       return;
     }
     attack.initialized = true;

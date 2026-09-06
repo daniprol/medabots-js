@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import type { BattleSnapshot } from '../battle-core';
 import type { ArenaDefinition } from '../content/schemas';
+import { arenaBackdrop } from './arena-art';
 import { batchStatic } from './batch-static';
 import { slopedPlatform } from './platform-view';
 
@@ -39,20 +40,10 @@ export function createArena(definition: ArenaDefinition) {
     return mesh;
   };
 
-  const fieldGroup = Math.floor(definition.original.fieldId / 3);
-  const backdrop = new THREE.TextureLoader().load(
-    fieldGroup === 0
-      ? '/assets/arenas/hd2d/ruins-distance.png'
-      : '/assets/arenas/hd2d/environment-atlas.png',
-  );
-  if (fieldGroup > 0) {
-    const index = fieldGroup - 1;
-    const row = Math.floor(index / 2);
-    const top = [1, 355, 676][row]!;
-    const bottom = [352, 673, 1023][row]!;
-    backdrop.repeat.set(0.499, (bottom - top) / 1024);
-    backdrop.offset.set((index % 2) / 2 + 0.0005, 1 - bottom / 1024);
-  }
+  const art = arenaBackdrop(definition);
+  const backdrop = new THREE.TextureLoader().load(art.url);
+  backdrop.repeat.set(art.width, art.height);
+  backdrop.offset.set(art.x, 1 - art.y - art.height);
   const platformAtlas = new THREE.TextureLoader().load('/assets/arenas/hd2d/platform-atlas.png');
   platformAtlas.colorSpace = THREE.SRGBColorSpace;
   platformAtlas.wrapS = THREE.RepeatWrapping;

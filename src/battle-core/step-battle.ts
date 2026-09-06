@@ -107,20 +107,21 @@ function validateFrame(context: BattleContext, frame: CommandFrame) {
 
 function cyclePartnerStrategies(context: BattleContext, frame: CommandFrame) {
   for (const combatant of context.state.combatants) {
-    if (
-      combatant.role === 'leader' &&
-      !combatant.knockedOut &&
-      frame.commands[combatant.id]!.strategyPressed
-    ) {
-      const partner = context.state.combatants.find(
-        (partner) => partner.teamId === combatant.teamId && partner.role === 'partner',
-      )!;
-      partner.panelIndex = (partner.panelIndex + 1) % 5;
-      partner.panelPendingTicks = 11;
-      partner.strategy =
-        PARTNER_STRATEGIES[
-          (PARTNER_STRATEGIES.indexOf(partner.strategy) + 1) % PARTNER_STRATEGIES.length
-        ]!;
+    if (!combatant.knockedOut && frame.commands[combatant.id]!.strategyPressed) {
+      const partners =
+        combatant.role === 'partner'
+          ? [combatant]
+          : context.state.combatants.filter(
+              (partner) => partner.teamId === combatant.teamId && partner.role === 'partner',
+            );
+      for (const partner of partners) {
+        partner.panelIndex = (partner.panelIndex + 1) % 5;
+        partner.panelPendingTicks = 11;
+        partner.strategy =
+          PARTNER_STRATEGIES[
+            (PARTNER_STRATEGIES.indexOf(partner.strategy) + 1) % PARTNER_STRATEGIES.length
+          ]!;
+      }
     }
   }
 }

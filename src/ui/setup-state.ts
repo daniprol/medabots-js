@@ -5,9 +5,13 @@ import { assignmentErrors, keyboardConflicts } from '../input/bindings';
 
 export type SetupPreset = 'solo' | 'shared-two' | 'shared-three' | 'gamepads';
 
-export function presetAssignments(preset: SetupPreset, pads: number[] = []): Assignments {
+export function presetAssignments(
+  preset: SetupPreset,
+  pads: number[] = [],
+  slots = ['A1', 'A2', 'B1', 'B2'],
+): Assignments {
   const assignments: Assignments = Object.fromEntries(
-    ['A1', 'A2', 'B1', 'B2'].map((id) => [id, { type: 'ai', aiProfileId: 'ai-balanced' }]),
+    slots.map((id) => [id, { type: 'ai', aiProfileId: 'ai-balanced' }]),
   );
 
   if (preset === 'solo') {
@@ -18,14 +22,17 @@ export function presetAssignments(preset: SetupPreset, pads: number[] = []): Ass
     assignments.A1 = { type: 'keyboard', profileId: 'keyboard-1' };
     assignments.B1 = { type: 'keyboard', profileId: 'keyboard-2' };
 
-    if (preset === 'shared-three') {
+    if (preset === 'shared-three' && slots.includes('A2')) {
       assignments.A2 = { type: 'keyboard', profileId: 'keyboard-3' };
     }
   }
 
   if (preset === 'gamepads') {
-    for (const [i, index] of pads.slice(0, 4).entries()) {
-      assignments[['A1', 'B1', 'A2', 'B2'][i]!] = {
+    const playerSlots = [...slots].sort(
+      (a, b) => Number(a.slice(1)) - Number(b.slice(1)) || a.localeCompare(b),
+    );
+    for (const [i, index] of pads.slice(0, slots.length).entries()) {
+      assignments[playerSlots[i]!] = {
         type: 'gamepad',
         gamepadIndex: index,
         profileId: 'standard-gamepad',
@@ -40,7 +47,7 @@ export const quickAssignments = () => presetAssignments('solo');
 
 export function controllerLabel(a: Assignments[string], content: ContentCatalog) {
   return a.type === 'ai'
-    ? 'CPU · AI'
+    ? `AI · ${content.ai[a.aiProfileId]?.displayName ?? 'Normal'}`
     : a.type === 'gamepad'
       ? `Gamepad ${a.gamepadIndex + 1}`
       : (content.keyboards[a.profileId]?.displayName ?? 'Unknown keyboard');
@@ -91,22 +98,51 @@ export function characterStats(id: string, content: ContentCatalog) {
   const legs = content.parts[character.defaultLoadout.legs]!;
   const rules = Object.values(content.rules)[0]!.original;
   const speed = rules.speedRows[legs.speedIndex]!;
-  const family = legs.locomotion === 5 ? 'type5' : legs.locomotion === 6 ? 'type6' : 'ordinary';
-  let altitude = 0;
-  let jump = 0;
-  for (const sample of rules.jumpCurves[`${family}_full`]!) {
-    altitude += sample;
-    jump = Math.max(jump, altitude);
-  }
   const abilities = parts.flatMap((p) => (p.abilityId ? [content.abilities[p.abilityId]!] : []));
 
   return {
     armor: parts.reduce((n, p) => n + p.armor, 0),
     speed: speed[1]! / 4,
-    jump: jump / 8,
     power: Math.max(...abilities.map((a) => a.damage)),
     special: content.abilities[character.specialAbilityId]!,
-    style:
-      content.abilities[content.parts[character.defaultLoadout.rightArm]!.abilityId!]!.delivery,
   };
+}
+
+export type TeamSize = 1 | 2 | 3;
+
+/** Resize each team without changing existing robots or their loadouts. */
+export function resizeTeams(
+  setup: BattleSetup,
+  size: TeamSize,
+  content: ContentCatalog,
+): BattleSetup {
+  const defaults = Object.values(content.characters).sort(
+    (a, b) => a.originalSetId - b.originalSetId,
+  );
+  return {
+    ...setup,
+    teams: setup.teams.map((team, teamIndex) => ({
+      ...team,
+      combatants: Array.from({ length: size }, (_, memberIndex) =>
+        structuredClone(
+          team.combatants[memberIndex] ?? {
+            instanceId: `${teamIndex === 0 ? 'A' : 'B'}${memberIndex + 1}`,
+            characterId: defaults[(teamIndex + memberIndex * 2) % defaults.length]!.id,
+            role: memberIndex === 0 ? 'leader' : 'partner',
+          },
+        ),
+      ),
+    })),
+  };
+}
+
+export function assignmentsForSetup(setup: BattleSetup, saved: Assignments): Assignments {
+  return Object.fromEntries(
+    setup.teams
+      .flatMap((team) => team.combatants)
+      .map((actor) => [
+        actor.instanceId,
+        structuredClone(saved[actor.instanceId] ?? { type: 'ai', aiProfileId: 'ai-balanced' }),
+      ]),
+  );
 }

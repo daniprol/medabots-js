@@ -1,0 +1,271 @@
+/* The dashboard owns its space; armor information never covers the arena. */
+.battle-screen {
+  background: #102c3c;
+  --dashboard-height: 260px;
+}
+.battle-screen .viewport {
+  inset: 64px auto calc(var(--dashboard-height) + 58px) 50%;
+  width: min(100%, calc((100dvh - var(--dashboard-height) - 122px) * 1.5));
+  transform: translateX(-50%);
+}
+.battle-hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #fff8de;
+  font-size: 16px;
+}
+.battle-scoreboard {
+  height: 64px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  background: #163e53;
+  border-bottom: 3px solid #86b4bd;
+  font-weight: 700;
+}
+.battle-timer {
+  font:
+    800 38px/1 'Barlow Condensed',
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.battle-timer.urgent {
+  color: #ffab83;
+}
+.hud-pause {
+  pointer-events: auto;
+  border: 2px solid #86b4bd;
+  background: #fff6d5;
+  color: #163e53;
+  border-radius: 5px;
+  padding: 8px 14px;
+  min-height: 44px;
+  font:
+    700 17px 'Barlow',
+    sans-serif;
+}
+.hud-teams {
+  position: absolute;
+  bottom: 58px;
+  height: var(--dashboard-height);
+  inset-inline: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 6px 12px;
+  background: #102c3c;
+}
+.hud-team {
+  min-width: 0;
+  border-top: 4px solid #63d5eb;
+  padding-top: 5px;
+}
+.hud-team-1 {
+  border-color: #ff9b78;
+}
+.hud-fighters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  height: 100%;
+  pointer-events: auto;
+  scrollbar-color: #79bdc8 #163e53;
+}
+.fighter-card {
+  flex: 1;
+  min-width: 195px;
+  padding: 8px 10px;
+  background: #1d4557;
+  border: 1px solid #80adb4;
+  border-radius: 6px;
+}
+.fighter-card header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+  min-height: 62px;
+}
+.fighter-card header img {
+  width: 44px;
+  height: 59px;
+  object-fit: contain;
+}
+.fighter-card header div {
+  display: grid;
+  min-width: 0;
+}
+.fighter-card header strong {
+  font:
+    800 20px/1.1 'Barlow Condensed',
+    sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fighter-card header span {
+  font-size: 14px;
+  line-height: 1.35;
+}
+.fighter-source {
+  color: #bde8ed;
+}
+.armor-row,
+.force-row {
+  display: grid;
+  grid-template-columns: 53px minmax(20px, 1fr) 32px;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  margin-block: 3px;
+  font-variant-numeric: tabular-nums;
+}
+.armor-row b,
+.force-row b {
+  text-align: right;
+}
+.armor-track,
+.force-track {
+  display: block;
+  height: 11px;
+  background: #0b2330;
+  position: relative;
+  border: 1px solid #668b96;
+}
+.armor-track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 calc(8.333% - 1px),
+    #183744bb calc(8.333% - 1px) 8.333%
+  );
+}
+.armor-track i,
+.force-track i {
+  display: block;
+  height: 100%;
+  background: #c3ee72;
+  transition: width 80ms linear;
+}
+.armor-row[data-broken='true'] {
+  color: #ffad96;
+}
+.armor-row[data-broken='true'] .armor-track {
+  background: repeating-linear-gradient(135deg, #733f3c 0 4px, #3a2730 4px 8px);
+}
+.force-row {
+  margin-top: 7px;
+}
+.force-track i {
+  background: #7be8eb;
+}
+.weapon-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  font:
+    700 13px 'Barlow Condensed',
+    sans-serif;
+  margin-top: 7px;
+}
+.weapon-status [data-ready='true'] {
+  color: #d2f78c;
+}
+.fighter-condition {
+  font-size: 13px;
+  color: #f8dfa3;
+  margin-top: 4px;
+  font-weight: 600;
+}
+.fighter-card.knocked-out {
+  opacity: 0.6;
+}
+.battle-order-toast {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 9px 16px;
+  border: 2px solid #91ced3;
+  border-radius: 5px;
+  background: #163e53;
+  font-size: 18px;
+  font-weight: 700;
+}
+.robot-label {
+  font-size: 13px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #143846;
+  border: 1px solid #80bdc6;
+}
+.battle-screen .sound-button {
+  bottom: auto;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .battle-scoreboard {
+    justify-content: flex-start;
+    gap: 16px;
+  }
+  .battle-field-name {
+    display: none;
+  }
+  .hud-teams {
+    padding-inline: 6px;
+    gap: 6px;
+  }
+  .fighter-card {
+    min-width: 180px;
+    padding: 8px;
+  }
+  .battle-screen .sound-button {
+    top: 16px;
+  }
+}
+@media (max-height: 650px) and (min-width: 800px) {
+  .battle-screen {
+    --dashboard-height: 228px;
+  }
+  .fighter-card header {
+    min-height: 42px;
+  }
+  .fighter-card header img {
+    height: 42px;
+    width: 32px;
+  }
+  .fighter-card header strong {
+    font-size: 18px;
+  }
+  .fighter-card header span {
+    line-height: 1.1;
+  }
+}
+
+.battle-screen .controls-strip {
+  height: 58px;
+  min-height: 58px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding: 6px 14px;
+}
+.battle-screen .control-profile {
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.battle-screen .control-profile kbd {
+  font-size: 12px;
+  height: 26px;
+}
+.battle-screen .control-item > span {
+  font-size: 10px;
+}

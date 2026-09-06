@@ -62,11 +62,15 @@ function validateSetup(setup: BattleSetup, content: ContentCatalog) {
     new Set(setup.teams.map((team) => team.id)).size !== 2 ||
     setup.teams.some(
       (team) =>
-        team.combatants.length !== 2 ||
+        team.combatants.length < 1 ||
+        team.combatants.length > 3 ||
+        team.combatants.length !== setup.teams[0]!.combatants.length ||
         team.combatants.filter((combatantSetup) => combatantSetup.role === 'leader').length !== 1,
     )
   ) {
-    throw new Error('BattleSetup requires two distinct teams, each with a leader and partner');
+    throw new Error(
+      'BattleSetup requires two distinct teams, each with one leader and the same one-to-three combatants',
+    );
   }
 }
 
@@ -74,7 +78,7 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
   const arena = content.arenas[setup.arenaId]!;
   const ids = new Set<string>();
   const combatants: CombatantSnapshot[] = setup.teams.flatMap((team) =>
-    team.combatants.map((combatantSetup) => {
+    team.combatants.map((combatantSetup, memberIndex) => {
       if (ids.has(combatantSetup.instanceId)) {
         throw new Error(`Duplicate combatant ${combatantSetup.instanceId}`);
       }
@@ -110,8 +114,15 @@ function createCombatants(setup: BattleSetup, content: ContentCatalog): Combatan
         };
       }
 
-      const actorIndex = setup.teams.indexOf(team) + (combatantSetup.role === 'partner' ? 2 : 0);
-      const spawn = arena.spawns[actorIndex]!;
+      const teamIndex = setup.teams.indexOf(team);
+      const actorIndex = teamIndex + memberIndex * 2;
+      const leaderSpawn = arena.spawns[teamIndex]!;
+      const partnerSpawn = arena.spawns[teamIndex + 2]!;
+      // Keep the original four spawns. Extra partners start between teammates and settle onto terrain.
+      const spawn = arena.spawns[actorIndex] ?? {
+        x: (leaderSpawn.x + partnerSpawn.x) / 2,
+        y: Math.max(leaderSpawn.y, partnerSpawn.y),
+      };
 
       return {
         id: combatantSetup.instanceId,

@@ -53,6 +53,9 @@ export function aiCommand(
       memory.rng = (memory.rng + 1) & 255;
       return value;
     });
+  const canReact =
+    snapshot.tick % profile.decisionIntervalTicks ===
+    actor.actorIndex % profile.decisionIntervalTicks;
   const medal = content.medals[actor.medalId]!.levels[actor.medalLevel - 1]!;
   const ranks = [medal.shooting, medal.grappling, medal.support];
   const dominant = ranks.indexOf(Math.max(...ranks));
@@ -93,7 +96,7 @@ export function aiCommand(
     : 10;
   const distance = Math.abs(target.x - actor.x);
   const dy = target.y - actor.y;
-  if (memory.moveTicks-- <= 0) {
+  if (memory.moveTicks-- <= 0 && canReact) {
     memory.moveTicks = (random() + 10) & 15;
     const direction = Math.sign(target.x - actor.x) as -1 | 1;
     memory.moveX =
@@ -127,13 +130,13 @@ export function aiCommand(
   memory.obstacleTicks =
     command.moveX !== 0 && Math.abs(actor.x - memory.lastX) < 0.04 ? memory.obstacleTicks + 1 : 0;
   memory.lastX = actor.x;
-  if (actor.grounded && !actor.attack && (dy > 1.5 || memory.obstacleTicks > 12)) {
+  if (canReact && actor.grounded && !actor.attack && (dy > 1.5 || memory.obstacleTicks > 12)) {
     command.jumpPressed = !memory.previous.jumpHeld;
     if (command.jumpPressed) {
       memory.jumpTicks = 12;
     }
   }
-  if (actor.grounded && dy < -2) {
+  if (canReact && actor.grounded && dy < -2) {
     command.dropHeld = true;
     command.jumpPressed = !memory.previous.jumpHeld;
   }
@@ -173,7 +176,7 @@ export function aiCommand(
       const ability = abilityFor(selected);
       if (memory.cooldowns[selected] > 0) {
         memory.cooldowns[selected]--;
-      } else if (actor.parts[selected].readiness >= 320) {
+      } else if (canReact && actor.parts[selected].readiness >= 320) {
         const directional =
           ability.original.category <= 1 ||
           [22, 23, 24, 25, 26].includes(ability.original.actionType);
@@ -188,6 +191,7 @@ export function aiCommand(
             [1, 2, 3][['rightArm', 'leftArm', 'head'].indexOf(selected)] === actor.panel
               ? 10
               : delays[category]!;
+          memory.cooldowns[selected] += profile.attackDelayTicks;
           if ([3, 4].includes(ability.original.actionType) && random() & 1) {
             memory.heldAttackTicks = 200;
           }

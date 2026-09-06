@@ -6,6 +6,9 @@
   "required": [
     "id",
     "kind",
+    "displayName",
+    "decisionIntervalTicks",
+    "attackDelayTicks",
     "variant",
     "original"
   ],
@@ -21,6 +24,20 @@
     "kind": {
       "const": "ai",
       "type": "string"
+    },
+    "displayName": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "decisionIntervalTicks": {
+      "minimum": 1,
+      "maximum": 60,
+      "type": "integer"
+    },
+    "attackDelayTicks": {
+      "minimum": 0,
+      "maximum": 120,
+      "type": "integer"
     },
     "variant": {
       "minimum": 0,

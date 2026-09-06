@@ -30,14 +30,14 @@ export function finishAtTimeout(context: BattleContext) {
   const scores = context.setup.teams.map((team) => {
     const actors = context.state.combatants.filter((actor) => actor.teamId === team.id);
     const leader = actors.find((actor) => actor.role === 'leader')!;
-    const partner = actors.find((actor) => actor.role === 'partner')!;
+    const partners = actors.filter((actor) => actor.role === 'partner');
     const liveParts = (actor: typeof leader) =>
       Object.values(actor.parts).filter((part) => part.currentArmor > 0).length;
     const parts = Object.values(leader.parts);
     return [
       actors.filter((actor) => !actor.knockedOut).length,
       liveParts(leader),
-      liveParts(partner),
+      partners.reduce((sum, partner) => sum + liveParts(partner), 0),
       Math.floor(
         (100 * parts.reduce((sum, part) => sum + part.currentArmor, 0)) /
           parts.reduce((sum, part) => sum + part.maxArmor, 0),
