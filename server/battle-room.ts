@@ -142,7 +142,6 @@ export function battleRoomType(content: ContentCatalog, config: OnlineConfig, ha
       this.clearInput(client.sessionId);
       if (this.state.phase === 'waiting') {
         this.state.players.delete(client.sessionId);
-        this.cancelCountdown();
       } else if (['preparing', 'countdown', 'fighting'].includes(this.state.phase)) {
         const player = this.state.players.get(client.sessionId);
         if (player) {
@@ -171,9 +170,6 @@ export function battleRoomType(content: ContentCatalog, config: OnlineConfig, ha
         this.state.countdown = 0;
         this.countdownMs = 0;
         this.publishPhase();
-        if (this.state.players.size < this.maxClients) {
-          void this.unlock();
-        }
       }
     }
 

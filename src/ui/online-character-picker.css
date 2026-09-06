@@ -1,0 +1,123 @@
+.online-character-choice {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 12px 20px;
+  text-align: left;
+  border: 1px solid #60869a;
+  border-radius: 8px;
+  background: #142f40;
+  color: #edf8ff;
+  cursor: pointer;
+  font: inherit;
+}
+.online-character-choice:hover,
+.online-character-option:hover {
+  background: #254c5d;
+  border-color: var(--cyan);
+}
+.online-character-choice:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.online-character-choice > img {
+  width: 90px;
+  height: 106px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.online-character-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.online-character-identity strong {
+  font-size: 26px;
+}
+.online-change {
+  color: var(--cyan);
+  font-weight: 700;
+}
+.online-character-dialog {
+  width: min(820px, calc(100% - 24px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: 20px;
+  color: #edf8ff;
+  background: #102736;
+  border: 1px solid #60869a;
+  border-radius: 10px;
+}
+.online-character-dialog::backdrop {
+  background: #030c16d9;
+}
+.online-character-dialog .online-section-heading {
+  position: sticky;
+  top: -20px;
+  background: #102736;
+  z-index: 1;
+  padding: 12px 0;
+}
+.online-character-dialog h2 {
+  margin: 0;
+}
+.online-character-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.online-character-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 4px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  border: 2px solid #446577;
+  border-radius: 6px;
+  color: #edf8ff;
+  background: #193545;
+  cursor: pointer;
+}
+.online-character-option img {
+  width: 64px;
+  height: 76px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.online-character-option[aria-pressed='true'] {
+  border-color: var(--cyan);
+  background: #215466;
+}
+.online-character-option[aria-pressed='true']::after {
+  content: '✓';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cyan);
+  color: #092431;
+}
+@media (max-width: 650px) {
+  .online-character-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .online-character-dialog {
+    padding: 12px;
+  }
+  .online-character-dialog .online-section-heading {
+    top: -12px;
+  }
+  .online-character-dialog h2 {
+    font-size: 18px;
+  }
+}

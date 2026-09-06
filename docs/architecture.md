@@ -46,11 +46,15 @@ mounted.dispose(); // Removes listeners, animation loop, UI and WebGL resources.
 
 `main.ts` is a small example owner of setup, rematch and return. Completion is reported once per mount. The battle feature knows nothing about missions, save games, rewards, accounts, or inventory.
 
-The online entry menu mounts `src/online/mount-online-mode.ts`. Its browser, waiting room and battle mount use the existing renderer/HUD with a separate connection and input lifecycle. `server/battle-room.ts` owns the same core in a Colyseus 0.18 room, maps connection sessions to combatants, validates joins, consumes one normalized input per player per fixed step, and authoritatively decides combat and results. Online code is loaded only when selected.
+## Online play
+
+The online entry menu mounts `src/online/mount-online-mode.ts`. Its browser, waiting room and battle mount use the existing renderer/HUD with a separate connection and input lifecycle. `lobby-connection.ts` owns live listings and guards against stale updates after server changes; `battle-connection.ts` owns battle reconnection and events. UI modules own their DOM: `character-picker.ts` handles portrait selection, while `waiting-roster.ts` updates player cards independently of room status. `server/battle-room.ts` owns the same core in a Colyseus 0.18 room, maps connection sessions to combatants, validates joins, consumes one normalized input per player per fixed step, and authoritatively decides combat and results. Online code is loaded only when selected.
 
 `src/online/state.ts` defines nested Colyseus schemas; `state-adapter.ts` maintains their identities across updates and converts decoded state into detached renderer snapshots. Room messages carry transient events. TypeBox still validates authored content and network options; Colyseus schema handles continuous synchronization. `src/online/snapshot-buffer.ts` supplies presentation interpolation from actual tick gaps. Prediction and rollback are not implemented.
 
 Client and server remain separate entry points in one package, sharing the core and validated file content. `pnpm dev`, `pnpm dev:server`, and `pnpm dev:all` run the app, server or both. Configuration is in `config/online.json` and `config/server.json`. See [Online multiplayer](online-multiplayer.md) for the state machine, protocol, commands and deployment, and [research](research/online-multiplayer.md) for the supporting Colyseus recommendations.
+
+## Development hooks
 
 In development/tests only, `window.__BATTLE_DEBUG__` exposes `getSnapshot`, `restart`, `returnToSetup`, `pause`, and `resume`. `restart` optionally accepts assignments, a setup, or a short `roundTimeMs` for deterministic lifecycle smoke tests. It creates a fresh session and does not expose mutable core internals.
 
@@ -60,4 +64,4 @@ In development/tests only, `window.__BATTLE_DEBUG__` exposes `getSnapshot`, `res
 
 Teams have equal sizes of 1–3, each with exactly one leader. The original four spawn positions remain unchanged; third partners spawn between their teammates. Timeout scoring sums surviving partner parts when multiple partners exist and uses zero when there are none. Attack initialization uses four phase slots, wrapping extra actor indices. These size extensions are browser rules, not a claim that AX offered 3-vs-3.
 
-The session routes leader order presses into AI partners' commands and clears presses from human partners. Core commands contain no controller ownership. `ui/hud.ts` manages the clock, teams and order notices; `ui/fighter-card.ts` renders a robot's armor, weapon readiness, ammunition and statuses. `ui/battle-hud.css` reserves space outside the canvas. Narrow screens scroll team panels instead of shrinking their text. Shared shell styles live in `ui/styles.css`; setup/control styles live in `ui/roster.css`.
+The session routes leader order presses into AI partners' commands and clears presses from human partners. Core commands contain no controller ownership. `ui/hud.ts` manages the clock, teams and order notices; `ui/fighter-card.ts` renders a robot's armor, weapon readiness, ammunition and statuses. `ui/battle-hud.css` reserves space outside the canvas. Narrow screens scroll team panels instead of shrinking their text. Shared shell styles live in `ui/styles.css`; setup/control styles live in `ui/roster.css`. Online shell/browser styles live in `ui/online.css`, with portrait-picker and waiting-room styles in `ui/online-character-picker.css` and `ui/online-lobby.css`.

@@ -22,14 +22,12 @@
   line-height: 1;
   margin: 18px 0;
 }
-.mode-panel p,
-.online-intro {
+.mode-panel p {
   color: #c6dce6;
   font-size: 20px;
   line-height: 1.5;
 }
-.mode-choices,
-.online-teams {
+.mode-choices {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
@@ -60,17 +58,46 @@
   line-height: 1.6;
   color: #c6dce6;
 }
+.online-screen {
+  padding: 24px;
+  font-size: 16px;
+}
+.online-screen [hidden] {
+  display: none !important;
+}
+.online-panel h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  margin: 12px 0;
+}
+.online-screen h2,
+.online-character-dialog h2 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+.online-screen .button,
+.online-character-dialog .button {
+  min-height: 48px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+}
+.online-screen :focus-visible,
+.online-character-dialog :focus-visible {
+  outline: 3px solid white;
+  outline-offset: 3px;
+}
 .online-field {
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  margin: 16px 0;
+  gap: 8px;
+  margin: 0;
   font-weight: 700;
+  min-width: 0;
 }
 .online-field input,
 .online-field select {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   font: inherit;
   padding: 10px 12px;
   border: 1px solid #52758a;
@@ -78,27 +105,48 @@
   background: #112c3c;
   color: #edf8ff;
 }
-.online-field input:focus-visible {
-  outline: 3px solid white;
-  outline-offset: 3px;
-}
-.online-fields {
+.online-fields,
+.online-create-fields {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.online-server-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+.online-server-bar > .online-field {
+  flex: 1;
+  min-width: 180px;
 }
 .online-add-server {
-  margin: 22px 0;
-  padding: 16px;
   border: 1px solid var(--line);
+  border-radius: 3px;
 }
-.online-add-server summary {
+.online-add-server summary,
+.online-player-settings summary,
+.online-room-details summary {
   cursor: pointer;
   font-weight: 700;
+  padding: 14px;
+  min-height: 48px;
+}
+.online-add-server[open] {
+  width: 100%;
+  padding: 0 16px 16px;
+}
+.online-add-server .online-field {
+  margin-bottom: 16px;
+}
+.online-add-server .button {
+  margin-right: 12px;
 }
 .online-error {
   color: #ffac9f;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .online-error:empty {
   display: none;
@@ -106,53 +154,73 @@
 .online-status {
   color: var(--cyan);
   min-height: 24px;
+  margin: 12px 0;
+}
+.online-player-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 1fr;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+.online-player-settings .online-fields {
+  padding: 0 14px 14px;
+}
+.online-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.online-battle-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 20px 0;
+}
+.online-open-battles,
+.online-create {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #102735;
 }
 .online-battle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 18px;
+  gap: 16px;
+  padding: 16px;
   margin: 12px 0;
-  background: #142f40;
+  background: #193747;
   border: 1px solid var(--line);
+  border-radius: 6px;
 }
-.online-battle-row > div,
-.online-player {
+.online-battle-row > div {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 .online-battle-row span,
-.online-player small,
 .online-empty {
-  color: #b0c9d7;
+  color: #bcd2df;
+  line-height: 1.5;
 }
-.online-create {
-  border-top: 1px solid var(--line);
-  margin: 30px 0;
-  padding: 20px 0;
+.online-battle-row .button {
+  flex-shrink: 0;
 }
 .online-panel .arena-preview {
   display: block;
-  width: min(480px, 100%);
-  height: auto;
-  margin: 20px 0;
+  width: 100%;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin: 16px 0;
 }
-.online-team {
-  background: #112c3c;
-  padding: 20px;
-  border-top: 3px solid var(--cyan);
-}
-.online-team:last-child {
-  border-color: var(--coral);
-}
-.online-team h2 {
-  margin-top: 0;
-}
-.online-player {
-  padding: 16px 0;
-  border-top: 1px solid var(--line);
+.online-create > .button {
+  width: 100%;
 }
 .online-actions {
   display: flex;
@@ -169,26 +237,64 @@
   pointer-events: none;
   z-index: 5;
 }
-.online-battle-status:empty {
-  display: none;
-}
 .mode-back {
   position: fixed;
   right: 20px;
   bottom: 16px;
   z-index: 5;
 }
+@media (max-width: 900px) {
+  .online-battle-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .online-player-settings .online-fields {
+    grid-template-columns: 1fr;
+  }
+}
 @media (max-width: 650px) {
   .mode-choices,
-  .online-teams,
-  .online-fields {
+  .online-battle-options,
+  .online-player-panel {
     grid-template-columns: 1fr;
   }
   .mode-card {
     padding: 22px;
   }
-  .online-battle-row {
-    align-items: stretch;
-    flex-direction: column;
+  .online-screen {
+    padding: 16px;
   }
+  .online-player-panel {
+    gap: 4px;
+  }
+  .online-open-battles,
+  .online-create {
+    padding: 16px;
+  }
+}
+.online-battle-status[hidden] {
+  display: none;
+}
+.online-battle-status[data-phase='countdown'],
+.online-battle-status[data-phase='preparing'] {
+  top: 40%;
+  transform: translate(-50%, -50%);
+  min-width: 240px;
+  max-width: calc(100% - 32px);
+  padding: 24px;
+  text-align: center;
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.online-countdown-number {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 96px;
+  line-height: 1.1;
+  color: var(--cyan);
+}
+.online-countdown-number:empty {
+  display: none;
 }

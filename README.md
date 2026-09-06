@@ -8,7 +8,7 @@ An unofficial browser-game fan prototype inspired by **Medabots AX for Game Boy 
 
 ## Try it
 
-You need [Node.js](https://nodejs.org/en/download) and pnpm 10. Use a current Node.js LTS release; the project requires Node 22.12+; Node 24 LTS is recommended. No ROM, emulator, account, or gamepad is required.
+You need [Node.js](https://nodejs.org/en/download) and pnpm 10. Use Node 24 from `.nvmrc` (Node 22.12+ is required). No ROM, emulator, account, or gamepad is required.
 
 1. Download or clone this repository and open a terminal in its folder.
 2. Install pnpm if you do not already have it: `npm install --global pnpm@10`.
@@ -51,18 +51,23 @@ pnpm dev         # Browser app
 pnpm dev:server  # Colyseus server
 ```
 
-Choose **Online multiplayer → Localhost**. Pick your name and character, create a 1v1, 2v2 or 3v3 battle, and wait for friends to join and ready up. Each online player controls one robot. Custom server addresses are saved in your browser; built-in addresses and online timing live in `config/online.json`.
+Choose **Online multiplayer**, then select **Localhost** or add a server address. Pick your Medabot from the portrait chooser; **Player name & controls** contains your name and controller settings.
 
-See [Online multiplayer](docs/online-multiplayer.md) for LAN/public servers, configuration, architecture, disconnect behavior and deployment. The [research report](docs/research/online-multiplayer.md) explains the Colyseus capabilities and design choices. This first version uses server-authoritative play with interpolation; prediction and lag compensation are future work.
+Create a battle with a battlefield and size, or join an open room. Team cards show selected Medabots, open slots and ready checkmarks. Press **Ready to battle**; play starts after every player joins, readies up and loads the arena. Each person controls one robot, so 1v1/2v2/3v3 need 2/4/6 people.
+
+Custom servers are saved in your browser when storage is available. Built-in servers and online timing live in `config/online.json`. Use the host computer's LAN address when connecting from another device.
+
+See [Online multiplayer](docs/online-multiplayer.md) for configuration, disconnects and hosting. Online play uses server authority and interpolation; prediction and lag compensation are not implemented.
 
 ## Build or contribute
 
 ```sh
-pnpm check       # Formatting, linting, types, tests, and production build
+pnpm check       # Formatting, linting, types, tests, and both production builds
+pnpm test:e2e    # Browser tests; install Chromium first (see Contributing)
 pnpm preview     # Play the built version locally
 ```
 
-The browser build is in `dist/` and can be served by a static web host. `pnpm build:server` produces the separate online server; run it with `pnpm start:server`. `pnpm build:all` builds both. Local play needs no backend.
+The browser build is in `dist/` and can be served by a static web host. `pnpm build:server` produces the separate online server; run it with `pnpm start:server`. `pnpm build:all` builds both. Local play needs no backend. GitHub Actions runs checks and browser tests on pushes to `main`/`dev` and on pull requests.
 
 Want to tune damage, add a robot, or improve game feel? Start with [Contributing](CONTRIBUTING.md), [Editing content](docs/content.md), or [Architecture](docs/architecture.md). Gameplay and input presets live in readable JSONC files.
 

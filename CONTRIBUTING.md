@@ -14,7 +14,7 @@ pnpm exec playwright install chromium
 pnpm test:e2e                # Browser smoke tests; separate from the fast check
 ```
 
-Lefthook installs automatically in Git checkouts during `pnpm install`. Pre-commit checks formatting, typed linting, and TypeScript; pre-push runs the unit/integration suite. Hooks check the working tree and never rewrite or stage files. Run `pnpm hooks:install` to reinstall them. CI repeats the checks and runs Chromium; source ZIP installs skip hooks.
+Lefthook installs automatically in Git checkouts during `pnpm install`. Pre-commit checks formatting, typed linting, and TypeScript; pre-push runs the unit/integration suite. Hooks check the working tree and never rewrite or stage files. Run `pnpm hooks:install` to reinstall them. Source ZIP installs skip hooks. GitHub Actions runs `pnpm check`, verifies generated files, and runs Chromium tests on pushes to `main`/`dev` and all pull requests. Failed browser traces are kept for seven days; the workflow can also be run manually.
 
 Use an editor's Oxc extension for formatting and lint feedback. `.editorconfig`, `.oxfmtrc.json`, and `.oxlintrc.json` define the shared rules. Do not introduce a second formatter.
 

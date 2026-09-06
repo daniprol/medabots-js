@@ -31,10 +31,15 @@ export function normalizeServerUrl(value: string, pageProtocol = 'http:'): strin
   return url.href.replace(/\/$/, '');
 }
 
-export function readServers(storage: Pick<Storage, 'getItem'>): SavedServer[] {
-  const builtIn = ONLINE_CONFIG.servers.map((server) => ({ ...server }));
+export function readServers(storage?: Pick<Storage, 'getItem'>): SavedServer[] {
+  const builtIn = ONLINE_CONFIG.servers.map((server) => ({
+    ...server,
+    url: normalizeServerUrl(server.url),
+  }));
   try {
-    const saved: unknown = JSON.parse(storage.getItem(SERVER_STORAGE_KEY) ?? '[]');
+    const saved: unknown = JSON.parse(
+      (storage ?? localStorage).getItem(SERVER_STORAGE_KEY) ?? '[]',
+    );
     if (!Array.isArray(saved)) {
       return builtIn;
     }

@@ -4,6 +4,8 @@ import './ui/styles.css';
 import './ui/roster.css';
 import './ui/battle-hud.css';
 import './ui/online.css';
+import './ui/online-character-picker.css';
+import './ui/online-lobby.css';
 import { millisecondsToTicks } from './battle-core/timing';
 import { mountLocalBattle } from './battle-session/mount-local-battle';
 import type { ContentCatalog } from './content/catalog';

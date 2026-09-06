@@ -61,26 +61,17 @@ export function mountOnlineMode(root: HTMLElement, content: ContentCatalog, back
     }
     assignment = selection.assignment;
     connection = new BattleConnection(room);
-    // First state follows the join handshake; don't read a not-yet-decoded room.
-    const showWaiting = () => {
-      if (!connection || !room.state.players?.has(room.sessionId)) {
-        return;
-      }
-      unsubscribe?.();
-      current?.dispose();
-      current = createWaitingRoom(screen, connection, content, browse);
-      unsubscribe = connection.subscribe(update);
-      update();
-    };
-    unsubscribe = connection.subscribe(showWaiting);
-    showWaiting();
+    current?.dispose();
+    current = createWaitingRoom(screen, connection, content, browse);
+    unsubscribe = connection.subscribe(update);
+    update();
   }
   void contentHash(content)
     .then((value) => {
       if (!controller.signal.aborted) {
         hash = value;
-        loading.remove();
         browse();
+        loading.remove();
       }
     })
     .catch((error: unknown) => {

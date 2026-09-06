@@ -1,19 +1,19 @@
-import { Client, type Room, type RoomAvailable } from '@colyseus/sdk';
+import { Client } from '@colyseus/sdk';
 
 import type { ContentCatalog } from '../content/catalog';
 import type { Assignments } from '../input/bindings';
 import { createArenaPreview } from '../ui/arena-preview';
 import { button, element } from '../ui/dom';
-import { boundedConnection } from './battle-connection';
+import { createCharacterPicker } from './character-picker';
 import { ONLINE_CONFIG } from './config';
+import { LobbyConnection } from './lobby-connection';
+import { type CreateBattleOptions, type JoinBattleOptions } from './protocol';
 import {
-  BATTLE_ROOM,
-  LOBBY_ROOM,
-  type BattleListing,
-  type CreateBattleOptions,
-  type JoinBattleOptions,
-} from './protocol';
-import { normalizeServerUrl, readServers, SERVER_STORAGE_KEY } from './server-addresses';
+  normalizeServerUrl,
+  readServers,
+  SERVER_STORAGE_KEY,
+  type SavedServer,
+} from './server-addresses';
 
 function selectField(label: string, values: { value: string; label: string }[]) {
   const container = element('label', 'online-field');
@@ -38,6 +38,7 @@ function textField(label: string, placeholder: string, maxLength: number) {
 }
 
 export type BrowserPreferences = {
+  servers?: SavedServer[];
   serverUrl?: string;
   name?: string;
   characterId?: string;
@@ -63,19 +64,11 @@ export function createServerBrowser(
   const screen = element('section', 'online-screen');
   screen.dataset.testid = 'online-browser';
   const panel = element('div', 'online-panel online-browser');
-  panel.append(
-    element('span', 'eyebrow', 'ROBATTLE / ONLINE'),
-    element('h1', '', 'FIND YOUR NEXT BATTLE'),
-    element(
-      'p',
-      'online-intro',
-      'Choose a server, pick your Medabot, then join a battle or create one for your friends.',
-    ),
-  );
-  let servers = readServers(localStorage);
+  panel.append(element('span', 'eyebrow', 'ROBATTLE'), element('h1', '', 'ONLINE BATTLES'));
+  let servers = preferences.servers ?? readServers();
   const server = selectField(
     'Server',
-    servers.map((s) => ({ value: s.url, label: `${s.name} · ${s.url}` })),
+    servers.map((s) => ({ value: s.url, label: s.name })),
   );
   server.input.value = preferences.serverUrl ?? servers[0]?.url ?? '';
   const url = textField('New server URL', 'http://localhost:2567', 2048);
@@ -95,18 +88,20 @@ export function createServerBrowser(
           url: address,
         };
         servers.push(entry);
-        const option = element('option', '', `${entry.name} · ${entry.url}`);
+        const option = element('option', '', entry.name);
         option.value = address;
         server.input.append(option);
       }
+      let storageNotice = '';
       try {
         localStorage.setItem(SERVER_STORAGE_KEY, JSON.stringify(servers));
       } catch {
-        errors.textContent = 'Server added for this visit. Browser storage is unavailable.';
+        storageNotice = 'Server added for this visit. Browser storage is unavailable.';
       }
       server.input.value = address;
       addDetails.open = false;
-      void connectLobby();
+      connectLobby();
+      errors.textContent = storageNotice;
     } catch (error) {
       showError(error);
     }
@@ -127,27 +122,21 @@ export function createServerBrowser(
         /* Session still works without storage. */
       }
       server.input.selectedOptions[0]?.remove();
-      void connectLobby();
+      connectLobby();
     },
     'button ghost',
   );
   const serverActions = element('div', 'online-actions');
-  serverActions.append(
-    button('Refresh battles', () => {
-      void connectLobby();
-    }),
-    forget,
-  );
+  const refresh = button('Refresh battles', connectLobby);
+  serverActions.append(refresh, forget);
   const fields = element('div', 'online-fields');
   const name = textField('Player name', 'Medafighter', 24);
   name.input.value = preferences.name ?? 'Medafighter';
-  const character = selectField(
-    'Your character',
-    Object.values(content.characters).map((c) => ({ value: c.id, label: c.displayName })),
-  );
-  character.input.value =
+  const character = createCharacterPicker(
+    content,
     preferences.characterId ??
-    content.matches['local-default']!.teams[0]!.combatants[0]!.characterId;
+      content.matches['local-default']!.teams[0]!.combatants[0]!.characterId,
+  );
   const controllers = selectField('Your controller', [
     ...Object.values(content.keyboards).map((k) => ({ value: k.id, label: k.displayName })),
     ...Array.from({ length: 4 }, (_, index) => ({
@@ -156,7 +145,11 @@ export function createServerBrowser(
     })),
   ]);
   controllers.input.value = preferences.controller ?? 'keyboard-solo';
-  fields.append(name.element, character.element, controllers.element);
+  fields.append(name.element, controllers.element);
+  const playerSettings = element('details', 'online-player-settings');
+  playerSettings.append(element('summary', '', 'Player name & controls'), fields);
+  const playerPanel = element('section', 'online-player-panel');
+  playerPanel.append(character.element, playerSettings);
   const battles = element('div', 'online-battles');
   const createSection = element('section', 'online-create');
   const arena = selectField(
@@ -180,66 +173,74 @@ export function createServerBrowser(
     },
     'button primary',
   );
-  createSection.append(
-    element('h2', '', 'CREATE A BATTLE'),
-    arena.element,
-    size.element,
-    preview.element,
-    create,
-  );
+  const createFields = element('div', 'online-create-fields');
+  createFields.append(arena.element, size.element);
+  createSection.append(element('h2', '', 'CREATE A BATTLE'), createFields, preview.element, create);
+  const serverBar = element('div', 'online-server-bar');
+  serverBar.append(server.element, serverActions, addDetails);
+  const openSection = element('section', 'online-open-battles');
+  openSection.append(element('h2', '', 'JOIN A BATTLE'), battles);
+  const battleOptions = element('div', 'online-battle-options');
+  battleOptions.append(openSection, createSection);
   panel.append(
-    server.element,
-    serverActions,
-    addDetails,
-    fields,
+    serverBar,
     errors,
     connectionStatus,
-    element('h2', '', 'OPEN BATTLES'),
-    battles,
-    createSection,
+    playerPanel,
+    battleOptions,
     button('Back to main menu', back, 'button ghost'),
   );
   screen.append(panel);
   root.append(screen);
   let client: Client;
-  let lobby: Room | undefined;
-  let attempt: AbortController | undefined;
   let disposed = false;
   let busy = false;
-  let connected = false;
-  const listings = new Map<string, RoomAvailable<BattleListing>>();
+  const lobby = new LobbyConnection(() => {
+    if (!busy) {
+      connectionStatus.textContent =
+        lobby.status === 'connected'
+          ? `Connected to ${new URL(server.input.value).host}`
+          : lobby.status === 'connecting'
+            ? 'Connecting to server…'
+            : 'Server disconnected. Use Refresh battles to reconnect.';
+    }
+    if (lobby.error) {
+      errors.textContent = lobby.error;
+    }
+    renderListings();
+  });
 
   function showError(error: unknown) {
     errors.textContent = error instanceof Error ? error.message : String(error);
   }
   function remember() {
     Object.assign(preferences, {
+      servers,
       serverUrl: server.input.value,
       name: name.input.value.trim(),
-      characterId: character.input.value,
+      characterId: character.value,
       arenaId: arena.input.value,
       teamSize: size.input.value,
       controller: controllers.input.value,
     });
   }
   function renderListings() {
+    const connected = lobby.status === 'connected';
     battles.replaceChildren();
-    const visible = Array.from(listings.values()).filter(
-      (room) => room.metadata?.phase === 'waiting' && room.clients < room.maxClients,
+    const visible = Array.from(lobby.rooms.values()).filter(
+      (room) => room.metadata.phase === 'waiting' && room.clients < room.maxClients,
     );
     if (!visible.length) {
       battles.append(
         element(
           'p',
           'online-empty',
-          connected
-            ? 'No open battles. Create one and invite another player to this server.'
-            : 'Connect to a server to see its battles.',
+          connected ? 'No open battles yet' : 'Connect to see open battles',
         ),
       );
     }
     for (const room of visible) {
-      const metadata = room.metadata!;
+      const metadata = room.metadata;
       const compatible =
         metadata.protocolVersion === ONLINE_CONFIG.protocolVersion && metadata.contentHash === hash;
       const row = element('article', 'online-battle-row');
@@ -264,9 +265,27 @@ export function createServerBrowser(
       battles.append(row);
     }
     create.disabled = busy || !connected;
+    character.disabled = busy;
+    for (const control of [
+      server.input,
+      add,
+      forget,
+      refresh,
+      serverName.input,
+      url.input,
+      name.input,
+      controllers.input,
+      arena.input,
+      size.input,
+    ]) {
+      control.disabled = busy;
+    }
+    forget.hidden = ONLINE_CONFIG.servers.some(
+      (s) => normalizeServerUrl(s.url) === server.input.value,
+    );
   }
   async function enter(roomId?: string) {
-    if (busy || !connected) {
+    if (busy || lobby.status !== 'connected') {
       return;
     }
     try {
@@ -289,7 +308,7 @@ export function createServerBrowser(
       }
       const common: JoinBattleOptions = {
         name: playerName,
-        characterId: character.input.value,
+        characterId: character.value,
         protocolVersion: ONLINE_CONFIG.protocolVersion,
         contentHash: hash,
       };
@@ -299,7 +318,6 @@ export function createServerBrowser(
       }
       busy = true;
       renderListings();
-      server.input.disabled = true;
       connectionStatus.textContent = 'Joining battle…';
       await join({
         client,
@@ -316,92 +334,34 @@ export function createServerBrowser(
       busy = false;
       if (!disposed) {
         renderListings();
-        server.input.disabled = false;
       }
     }
   }
-  async function connectLobby() {
+  function connectLobby() {
     if (busy) {
       return;
     }
-    attempt?.abort();
-    if (lobby) {
-      lobby.reconnection.enabled = false;
-      void lobby.leave().catch(() => {});
-      lobby = undefined;
-    }
-    const current = new AbortController();
-    attempt = current;
-    connected = false;
-    listings.clear();
     errors.textContent = '';
-    renderListings();
     try {
       const endpoint = normalizeServerUrl(server.input.value, location.protocol);
       remember();
       client = new Client(endpoint);
-      connectionStatus.textContent = 'Connecting to server…';
-      const room = await boundedConnection(
-        client.joinOrCreate(LOBBY_ROOM, { filter: { name: BATTLE_ROOM } }),
-        current.signal,
-      );
-      if (disposed || current.signal.aborted) {
-        void room.leave();
-        return;
-      }
-      lobby = room;
-      connected = true;
-      connectionStatus.textContent = `Connected to ${new URL(endpoint).host}`;
-      room.onMessage<RoomAvailable<BattleListing>[]>('rooms', (rooms) => {
-        listings.clear();
-        for (const entry of rooms) {
-          listings.set(entry.roomId, entry);
-        }
-        renderListings();
-      });
-      room.onMessage<[string, RoomAvailable<BattleListing>]>('+', ([id, entry]) => {
-        listings.set(id, entry);
-        renderListings();
-      });
-      room.onMessage<string>('-', (id) => {
-        listings.delete(id);
-        renderListings();
-      });
-      room.onLeave(() => {
-        if (!disposed && lobby === room) {
-          connected = false;
-          connectionStatus.textContent = 'Server disconnected. Use Refresh battles to reconnect.';
-          renderListings();
-        }
-      });
-      room.onError((_code, message) => {
-        if (!disposed && lobby === room) {
-          showError(new Error(message ?? 'Server error'));
-        }
-      });
-      renderListings();
+      void lobby.connect(client);
     } catch (error) {
-      if (disposed || current.signal.aborted) {
-        return;
-      }
-      connectionStatus.textContent = 'Server unavailable';
+      lobby.disconnect();
       showError(error);
-      renderListings();
     }
   }
   server.input.addEventListener('change', () => {
-    void connectLobby();
+    connectLobby();
   });
-  void connectLobby();
+  connectLobby();
   return {
     dispose() {
       disposed = true;
       remember();
-      attempt?.abort();
-      if (lobby) {
-        lobby.reconnection.enabled = false;
-        void lobby.leave().catch(() => {});
-      }
+      lobby.dispose();
+      character.dispose();
       screen.remove();
     },
   };

@@ -79,6 +79,10 @@ export function mountOnlineBattle(
   screen.append(controlsStrip(content, assignments));
   const status = element('div', 'online-battle-status');
   status.setAttribute('role', 'status');
+  const statusLabel = element('span');
+  const countdown = element('strong', 'online-countdown-number');
+  status.append(statusLabel, countdown);
+  status.hidden = true;
   screen.append(status);
   const audio = new BattleAudio();
   const sound = button(
@@ -144,20 +148,33 @@ export function mountOnlineBattle(
       wire.send();
     }
     input.endTick();
-    status.textContent =
+    const message =
       connection.status === 'reconnecting'
         ? 'Connection lost · Reconnecting…'
         : connection.status === 'closed'
           ? 'Disconnected · Use Menu to return to the server browser'
           : room.state.phase === 'preparing'
-            ? 'Preparing arena · Waiting for all players…'
+            ? 'Loading arena…'
             : room.state.phase === 'countdown'
-              ? `Battle starts in ${room.state.countdown}`
+              ? 'BATTLE STARTS IN'
               : missing.length
                 ? 'Controller disconnected · Reconnect it to continue'
                 : Array.from(room.state.players.values()).some((p) => !p.connected)
                   ? 'A player is reconnecting…'
                   : '';
+    const countdownText =
+      connection.status === 'connected' && room.state.phase === 'countdown'
+        ? String(room.state.countdown)
+        : '';
+    // Avoid repeatedly announcing the same message at the input sampling rate.
+    if (statusLabel.textContent !== message) {
+      statusLabel.textContent = message;
+    }
+    if (countdown.textContent !== countdownText) {
+      countdown.textContent = countdownText;
+    }
+    status.dataset.phase = connection.status === 'connected' ? room.state.phase : connection.status;
+    status.hidden = !message;
   }, 1000 / room.state.inputHz);
 
   let raf = 0;
